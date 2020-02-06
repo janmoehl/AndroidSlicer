@@ -4,10 +4,29 @@ This application was generated using JHipster 6.4.0, you can find documentation 
 
 ## Development
 
+### Requirements (tested on Linux)
+
+| Requirement | Tested Version | Comment                                                                                           |
+| ----------- | -------------- | ------------------------------------------------------------------------------------------------- |
+| Java        | OpenJDK 8      | (Version 8 or earlier required by WALA, see [Issue 442](https://github.com/wala/WALA/issues/442)) |
+| MongoDB     | 4.2.3          |                                                                                                   |
+| WALA        | 1.5.4          |                                                                                                   |
+
+### Installation
+
 Before you can build this project, you must install and configure the following dependencies on your machine:
 
-1. [Node.js][]: We use Node to run a development web server and build the project.
+1. Node.js: We use Node to run a development web server and build the project.
    Depending on your system, you can install Node either from source or as a pre-packaged bundle.
+2. MongoDB: Use a system-wide installation, or the Gradle embedded
+
+#### 1. Node.js
+
+| Operating System | Installation Instructions |
+| ---------------- | ------------------------- |
+| Windows          |                           |
+| Linux (Debian)   |                           |
+| Linux (Arch)     | from AUR: `yay -S nodejs` |
 
 After installing Node, you should be able to run the following command to install development tools.
 You will only need to run this command when dependencies change in [package.json](package.json).
@@ -16,43 +35,48 @@ You will only need to run this command when dependencies change in [package.json
 
 We use npm scripts and [Webpack][] as our build system.
 
-Run the following commands in two separate terminals to create a blissful development experience where your browser
-auto-refreshes when files change on your hard drive.
+#### 2. MongoDB
 
-    gradlew
-    npm start
-
-Npm is also used to manage CSS and JavaScript dependencies used in this application. You can upgrade dependencies by
-specifying a newer version in [package.json](package.json). You can also run `npm update` and `npm install` to manage dependencies.
-Add the `help` flag on any command to see how you can use it. For example, `npm help update`.
-
-The `npm run` command will list all of the scripts available to run for this project.
-
-2.  [MongoDB][]
-
-Download MongoDB server (community edition) from
-
-https://www.mongodb.com/download-center/community
-
-and follow the installation instructions under
-
-https://docs.mongodb.com/manual/administration/install-community/
-
-There is no need to install MongoDB-Compass (GUI for MongoDB). After the binaries are installed, create a folder under C:\data\db run with
-
-    mongod
-
-or install the service with
-
-    mongod --install
-
-If you want the databases in a different folder use the --dbpath parameter, e.g.
-
-    mongod --dbpath=C:\folder\to\databases\data\db
+| Operating System | Installation Instructions                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Windows          | [Download MongoDB](https://www.mongodb.com/download-center/community) server (community edition) from and follow the [installation instructions](https://docs.mongodb.com/manual/administration/install-community/). There is no need to install MongoDB-Compass (GUI for MongoDB). After the binaries are installed, create a folder under C:\data\db run with `mongod` or install the service with `mongod --install`. If you want the databases in a different folder use the `--dbpath` parameter, e.g. `mongod --dbpath=C:\folder\to\databases\data\db` |
+| Linux (Debian)   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Linux (Arch)     | `yay -S mongodb-bin`<br />`sudo mkdir -p /data/db`<br />`sudo chown /data/db`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 
 Or run embedded mongo db with (use `gradle clean` before)
 
     gradlew -Pembedded-mongo
+
+### Use local WALA
+
+**Note, that WALA 1.5.4 requires Java 8, as Version 9 has some breaking changes**.
+
+It could be necessary, to compile a local version of WALA to provide it with the correct paths.
+
+```
+git clone https://github.com/wala/WALA
+git checkout v1.5.4
+```
+
+Edit the file `WALA/com.ibm.wala.core/dat/wala.properties.sample` to match your environment. Unter linux the `java_runtime_dir` might look like `/usr/lib/jvm/default/jre/lib/`. Save it as `WALA/com.ibm.wala.core/dat/wala.properties`.
+
+After that, you can compile it with
+
+```
+cd WALA
+./gradlew install
+```
+
+### Start the Program
+
+Run the following commands in two separate terminals to create a blissful development experience where your browser auto-refreshes when files change on your hard drive.
+
+    gradlew
+    npm start
+
+Npm is also used to manage CSS and JavaScript dependencies used in this application. You can upgrade dependencies by specifying a newer version in [package.json](package.json). You can also run `npm update` and `npm install` to manage dependencies. Add the `help` flag on any command to see how you can use it. For example, `npm help update`.
+
+The `npm run` command will list all of the scripts available to run for this project.
 
 ### PWA Support
 
