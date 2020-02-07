@@ -35,6 +35,8 @@ You will only need to run this command when dependencies change in [package.json
 
 We use npm scripts and [Webpack][] as our build system.
 
+If `jhipster` isn't an executable in your path, try to fix it with `sudo npm install -g generator-jhipster`.
+
 #### 2. MongoDB
 
 | Operating System | Installation Instructions                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
@@ -125,7 +127,7 @@ For further instructions on how to develop with JHipster, have a look at [Using 
 
 ### Using Angular CLI
 
-You can also use [Angular CLI][] to generate some custom client code.
+You can also use [Angular CLI][] to generate some custom client code. (Installed with `npm install -g @angular/cli`)
 
 For example, the following command:
 
