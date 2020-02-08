@@ -39,6 +39,12 @@ public class InitialSetupMigration {
         androidPlatformPath.setDescription("This is the file path to the android binary code (android.jar). The android.jar should be inside a subfolder named android-xx, where xx represents the API-Level. Can be relative to the execution directory of the Android-Slicer or an absolute Path.");
         mongoTemplate.save(androidPlatformPath);
 
+        SlicerSetting defaultSlicingMode = new SlicerSetting();
+        defaultSlicingMode.setKey(Constants.DEFAULT_SLICING_MODE);
+        defaultSlicingMode.setValue("java");
+        defaultSlicingMode.setDescription("This changes the default mode for new slices. If it equals 'java', the new slice is considered to run on an java program. If it equals 'android', the new slice is considered to inspect an android system service.");
+        mongoTemplate.save(defaultSlicingMode);
+
         SlicerSetting serviceRegex = new SlicerSetting();
         serviceRegex.setKey(Constants.SERVICE_REGEX_KEY);
         serviceRegex.setValue(".*ManagerService.java");
