@@ -90,6 +90,14 @@
             "fieldValidateRules": [
                 "required"
             ]
+        },
+        {
+            "fieldName": "sliceMode",
+            "fieldType": "SliceMode",
+            "fieldValues": "ANDROID,JAVA",
+            "fieldValidateRules": [
+                "required"
+            ]
         }
     ],
     "relationships": [],
@@ -103,5 +111,8 @@
     "clientRootFolder": "",
     "applications": [
         "AndroidSlicer"
-    ]
+    ],
+    "searchEngine": false,
+    "databaseType": "mongodb",
+    "readOnly": false
 }

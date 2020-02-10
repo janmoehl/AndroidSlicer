@@ -85,6 +85,7 @@ class SliceGatlingTest extends Simulation {
                 , "reflectionOptions":"FULL"
                 , "dataDependenceOptions":"FULL"
                 , "controlDependenceOptions":"FULL"
+                , "sliceMode":"ANDROID"
                 }""")).asJson
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_slice_url"))).exitHereIfFailed

@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.unibremen.mcyl.androidslicer.domain.enumeration.CFAType;
 
 import io.swagger.annotations.ApiModelProperty;
+import org.unibremen.mcyl.androidslicer.domain.enumeration.SliceMode;
 
 /**
  * A Slice.
@@ -94,6 +95,10 @@ public class Slice implements Serializable {
     @ApiModelProperty(value = "com.ibm.wala.ipa.slicer.Slicer.ControlDependenceOptions", required = true)
     @Field("control_dependence_options")
     private ControlDependenceOptions controlDependenceOptions;
+
+    @NotNull
+    @Field("slice_mode")
+    private SliceMode sliceMode;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public String getId() {
@@ -267,6 +272,10 @@ public class Slice implements Serializable {
     public void setControlDependenceOptions(ControlDependenceOptions controlDependenceOptions) {
         this.controlDependenceOptions = controlDependenceOptions;
     }
+
+    public SliceMode getSliceMode() {
+        return sliceMode;
+    }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -302,6 +311,7 @@ public class Slice implements Serializable {
             ", reflectionOptions='" + getReflectionOptions() + "'" +
             ", dataDependenceOptions='" + getDataDependenceOptions() + "'" +
             ", controlDependenceOptions='" + getControlDependenceOptions() + "'" +
+            ", sliceMode='" + getSliceMode() + "'" +
             "}";
     }
 }
