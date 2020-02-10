@@ -15,7 +15,7 @@ import { ISlice, Slice } from 'app/shared/model/slice.model';
 import { ISlicerOption } from 'app/shared/model/slicer-option.model';
 import { AndroidOptionsService } from 'app/shared/services/android-options.service';
 import { JhiAlertService, JhiDataUtils } from 'ng-jhipster';
-import { SelectItem } from 'primeng/components/common/selectitem';
+import { SelectItem } from 'primeng/api';
 import { Observable } from 'rxjs';
 import { SlicerOptionService } from '../slicer-option/slicer-option.service';
 import { SliceService } from './slice.service';
@@ -28,6 +28,8 @@ export class SliceMakeComponent implements OnInit {
   slice: ISlice;
   isSaving: boolean;
 
+  sliceMode = 'java';
+  sliceModes: SelectItem[];
   versionOptions: IAndroidVersion[];
 
   classOptions: IAndroidClass[];
@@ -48,6 +50,7 @@ export class SliceMakeComponent implements OnInit {
   sourceFile: String;
 
   createForm = this.fb.group({
+    sliceMode: [null, [Validators.required]],
     androidVersion: [null, [Validators.required]],
     androidClassName: [null, [Validators.required]],
     entryMethods: [null, [Validators.required]],
@@ -71,6 +74,7 @@ export class SliceMakeComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.sliceModes = [{ label: 'Android', value: 'android' }, { label: 'Java', value: 'java' }];
     this.isSaving = false;
     this.slice = new Slice();
 
@@ -139,6 +143,10 @@ export class SliceMakeComponent implements OnInit {
       },
       (res: HttpErrorResponse) => this.onError(res.message)
     );
+  }
+
+  onSliceModeChange(event: any) {
+    this.sliceMode = event.value;
   }
 
   previousState() {

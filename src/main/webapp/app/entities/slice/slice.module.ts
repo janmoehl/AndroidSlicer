@@ -13,6 +13,7 @@ const ENTITY_STATES = [...sliceRoute, ...slicePopupRoute];
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { DropdownModule } from 'primeng/dropdown';
 import { CheckboxModule } from 'primeng/checkbox';
+import { SelectButtonModule } from 'primeng/selectbutton';
 import { SpinnerModule } from 'primeng/spinner';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { TabMenuModule } from 'primeng/tabmenu';
@@ -24,6 +25,7 @@ import { MonacoEditorModule } from 'ngx-monaco-editor';
     RouterModule.forChild(ENTITY_STATES),
     InputSwitchModule,
     DropdownModule,
+    SelectButtonModule,
     CheckboxModule,
     AutoCompleteModule,
     SpinnerModule,
