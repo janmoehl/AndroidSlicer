@@ -107,4 +107,17 @@ public class SlicerSettingResource {
         Optional<SlicerSetting> slicerSetting = slicerSettingRepository.findById(id);
         return ResponseUtil.wrapOrNotFound(slicerSetting);
     }
+
+    /**
+     * {@code GET  /slicer-settings/by-key/:key} : get the "key" slicerSetting.
+     *
+     * @param key the key of the slicerSetting to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the slicerSetting, or with status {@code 404 (Not Found)}.
+     */
+    @GetMapping("/slicer-settings/by-key/{key}")
+    public ResponseEntity<SlicerSetting> getSlicerSettingByKey(@PathVariable String key) {
+        log.debug("REST request to get SlicerSetting by key: {}", key);
+        Optional<SlicerSetting> slicerSetting = slicerSettingRepository.findOneByKey(key);
+        return ResponseUtil.wrapOrNotFound(slicerSetting);
+    }
 }

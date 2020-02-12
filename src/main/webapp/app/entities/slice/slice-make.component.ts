@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { CFAOptionService } from 'app/entities/cfa-option';
+import { SlicerSettingService } from 'app/entities/slicer-setting/slicer-setting.service';
 import { IAndroidClass } from 'app/shared/model/android-class.model';
 import { IAndroidVersion } from 'app/shared/model/android-version.model';
 import { ICFAOption } from 'app/shared/model/cfa-option.model';
@@ -13,6 +14,7 @@ import { ReflectionOptions } from 'app/shared/model/enumerations/reflection-opti
 import { SlicerOptionType } from 'app/shared/model/enumerations/slicer-option-type.model';
 import { ISlice, Slice } from 'app/shared/model/slice.model';
 import { ISlicerOption } from 'app/shared/model/slicer-option.model';
+import { ISlicerSetting } from 'app/shared/model/slicer-setting.model';
 import { AndroidOptionsService } from 'app/shared/services/android-options.service';
 import { JhiAlertService, JhiDataUtils } from 'ng-jhipster';
 import { SelectItem } from 'primeng/api';
@@ -28,7 +30,7 @@ export class SliceMakeComponent implements OnInit {
   slice: ISlice;
   isSaving: boolean;
 
-  sliceMode = 'java';
+  sliceMode: String;
   sliceModes: SelectItem[];
   versionOptions: IAndroidVersion[];
 
@@ -67,6 +69,7 @@ export class SliceMakeComponent implements OnInit {
     protected jhiAlertService: JhiAlertService,
     protected sliceService: SliceService,
     protected slicerOptionService: SlicerOptionService,
+    protected slicerSettingService: SlicerSettingService,
     protected activatedRoute: ActivatedRoute,
     protected androidOptionsService: AndroidOptionsService,
     protected cfaOptionService: CFAOptionService,
@@ -77,6 +80,13 @@ export class SliceMakeComponent implements OnInit {
     this.sliceModes = [{ label: 'Android', value: 'android' }, { label: 'Java', value: 'java' }];
     this.isSaving = false;
     this.slice = new Slice();
+
+    this.slicerSettingService.findByKey('Default_Slicing_Mode').subscribe(
+      (res: HttpResponse<ISlicerSetting>) => {
+        this.sliceMode = res.body.value;
+      },
+      (res: HttpErrorResponse) => this.onError(res.message)
+    );
 
     this.androidOptionsService.getAndroidVersions().subscribe(
       (res: HttpResponse<IAndroidVersion[]>) => {

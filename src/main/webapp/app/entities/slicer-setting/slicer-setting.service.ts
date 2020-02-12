@@ -23,6 +23,10 @@ export class SlicerSettingService {
     return this.http.get<ISlicerSetting>(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
+  findByKey(key: string): Observable<EntityResponseType> {
+    return this.http.get<ISlicerSetting>(`${this.resourceUrl}/by-key/${key}`, { observe: 'response' });
+  }
+
   query(req?: any): Observable<EntityArrayResponseType> {
     const options = createRequestOption(req);
     return this.http.get<ISlicerSetting[]>(this.resourceUrl, { params: options, observe: 'response' });
