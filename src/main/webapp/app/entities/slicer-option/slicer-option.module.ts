@@ -5,20 +5,12 @@ import { AndroidSlicerSharedModule } from 'app/shared/shared.module';
 import { SlicerOptionComponent } from './slicer-option.component';
 import { SlicerOptionDetailComponent } from './slicer-option-detail.component';
 import { SlicerOptionUpdateComponent } from './slicer-option-update.component';
-import { SlicerOptionDeletePopupComponent, SlicerOptionDeleteDialogComponent } from './slicer-option-delete-dialog.component';
-import { slicerOptionRoute, slicerOptionPopupRoute } from './slicer-option.route';
-
-const ENTITY_STATES = [...slicerOptionRoute, ...slicerOptionPopupRoute];
+import { SlicerOptionDeleteDialogComponent } from './slicer-option-delete-dialog.component';
+import { slicerOptionRoute } from './slicer-option.route';
 
 @NgModule({
-  imports: [AndroidSlicerSharedModule, RouterModule.forChild(ENTITY_STATES)],
-  declarations: [
-    SlicerOptionComponent,
-    SlicerOptionDetailComponent,
-    SlicerOptionUpdateComponent,
-    SlicerOptionDeleteDialogComponent,
-    SlicerOptionDeletePopupComponent
-  ],
+  imports: [AndroidSlicerSharedModule, RouterModule.forChild(slicerOptionRoute)],
+  declarations: [SlicerOptionComponent, SlicerOptionDetailComponent, SlicerOptionUpdateComponent, SlicerOptionDeleteDialogComponent],
   entryComponents: [SlicerOptionDeleteDialogComponent]
 })
 export class AndroidSlicerSlicerOptionModule {}

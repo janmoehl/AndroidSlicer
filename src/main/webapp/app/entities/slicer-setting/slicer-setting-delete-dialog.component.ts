@@ -1,14 +1,12 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component } from '@angular/core';
 
-import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 
 import { ISlicerSetting } from 'app/shared/model/slicer-setting.model';
 import { SlicerSettingService } from './slicer-setting.service';
 
 @Component({
-  selector: 'jhi-slicer-setting-delete-dialog',
   templateUrl: './slicer-setting-delete-dialog.component.html'
 })
 export class SlicerSettingDeleteDialogComponent {
@@ -32,38 +30,5 @@ export class SlicerSettingDeleteDialogComponent {
       });
       this.activeModal.dismiss(true);
     });
-  }
-}
-
-@Component({
-  selector: 'jhi-slicer-setting-delete-popup',
-  template: ''
-})
-export class SlicerSettingDeletePopupComponent implements OnInit, OnDestroy {
-  protected ngbModalRef: NgbModalRef;
-
-  constructor(protected activatedRoute: ActivatedRoute, protected router: Router, protected modalService: NgbModal) {}
-
-  ngOnInit() {
-    this.activatedRoute.data.subscribe(({ slicerSetting }) => {
-      setTimeout(() => {
-        this.ngbModalRef = this.modalService.open(SlicerSettingDeleteDialogComponent as Component, { size: 'lg', backdrop: 'static' });
-        this.ngbModalRef.componentInstance.slicerSetting = slicerSetting;
-        this.ngbModalRef.result.then(
-          () => {
-            this.router.navigate(['/slicer-setting', { outlets: { popup: null } }]);
-            this.ngbModalRef = null;
-          },
-          () => {
-            this.router.navigate(['/slicer-setting', { outlets: { popup: null } }]);
-            this.ngbModalRef = null;
-          }
-        );
-      }, 0);
-    });
-  }
-
-  ngOnDestroy() {
-    this.ngbModalRef = null;
   }
 }

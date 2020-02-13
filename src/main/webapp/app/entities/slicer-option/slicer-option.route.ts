@@ -10,7 +10,6 @@ import { SlicerOptionService } from './slicer-option.service';
 import { SlicerOptionComponent } from './slicer-option.component';
 import { SlicerOptionDetailComponent } from './slicer-option-detail.component';
 import { SlicerOptionUpdateComponent } from './slicer-option-update.component';
-import { SlicerOptionDeletePopupComponent } from './slicer-option-delete-dialog.component';
 import { ISlicerOption } from 'app/shared/model/slicer-option.model';
 
 @Injectable({ providedIn: 'root' })
@@ -75,21 +74,5 @@ export const slicerOptionRoute: Routes = [
       pageTitle: 'SlicerOptions'
     },
     canActivate: [UserRouteAccessService]
-  }
-];
-
-export const slicerOptionPopupRoute: Routes = [
-  {
-    path: ':id/delete',
-    component: SlicerOptionDeletePopupComponent,
-    resolve: {
-      slicerOption: SlicerOptionResolve
-    },
-    data: {
-      authorities: ['ROLE_USER'],
-      pageTitle: 'SlicerOptions'
-    },
-    canActivate: [UserRouteAccessService],
-    outlet: 'popup'
   }
 ];

@@ -5,14 +5,12 @@ import { AndroidSlicerSharedModule } from 'app/shared/shared.module';
 import { SliceComponent } from './slice.component';
 import { SliceDetailComponent } from './slice-detail.component';
 import { SliceUpdateComponent } from './slice-update.component';
-import { SliceDeletePopupComponent, SliceDeleteDialogComponent } from './slice-delete-dialog.component';
-import { sliceRoute, slicePopupRoute } from './slice.route';
-
-const ENTITY_STATES = [...sliceRoute, ...slicePopupRoute];
+import { SliceDeleteDialogComponent } from './slice-delete-dialog.component';
+import { sliceRoute } from './slice.route';
 
 @NgModule({
-  imports: [AndroidSlicerSharedModule, RouterModule.forChild(ENTITY_STATES)],
-  declarations: [SliceComponent, SliceDetailComponent, SliceUpdateComponent, SliceDeleteDialogComponent, SliceDeletePopupComponent],
+  imports: [AndroidSlicerSharedModule, RouterModule.forChild(sliceRoute)],
+  declarations: [SliceComponent, SliceDetailComponent, SliceUpdateComponent, SliceDeleteDialogComponent],
   entryComponents: [SliceDeleteDialogComponent]
 })
 export class AndroidSlicerSliceModule {}
