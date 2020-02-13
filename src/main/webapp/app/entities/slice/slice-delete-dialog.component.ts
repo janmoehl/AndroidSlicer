@@ -21,7 +21,7 @@ export class SliceDeleteDialogComponent {
   }
 
   confirmDelete(id: string) {
-    this.sliceService.delete(id).subscribe(response => {
+    this.sliceService.delete(id).subscribe(() => {
       this.eventManager.broadcast({
         name: 'sliceListModification',
         content: 'Deleted an slice'
@@ -46,11 +46,11 @@ export class SliceDeletePopupComponent implements OnInit, OnDestroy {
         this.ngbModalRef = this.modalService.open(SliceDeleteDialogComponent as Component, { size: 'lg', backdrop: 'static' });
         this.ngbModalRef.componentInstance.slice = slice;
         this.ngbModalRef.result.then(
-          result => {
+          () => {
             this.router.navigate(['/slice', { outlets: { popup: null } }]);
             this.ngbModalRef = null;
           },
-          reason => {
+          () => {
             this.router.navigate(['/slice', { outlets: { popup: null } }]);
             this.ngbModalRef = null;
           }

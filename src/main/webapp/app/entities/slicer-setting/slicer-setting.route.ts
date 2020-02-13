@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@angular/router';
+import { Resolve, ActivatedRouteSnapshot, Routes } from '@angular/router';
 import { JhiResolvePagingParams } from 'ng-jhipster';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access-service';
 import { Observable, of } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { SlicerSetting } from 'app/shared/model/slicer-setting.model';
 import { SlicerSettingService } from './slicer-setting.service';
 import { SlicerSettingComponent } from './slicer-setting.component';
@@ -17,13 +17,10 @@ import { ISlicerSetting } from 'app/shared/model/slicer-setting.model';
 export class SlicerSettingResolve implements Resolve<ISlicerSetting> {
   constructor(private service: SlicerSettingService) {}
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<ISlicerSetting> {
+  resolve(route: ActivatedRouteSnapshot): Observable<ISlicerSetting> {
     const id = route.params['id'];
     if (id) {
-      return this.service.find(id).pipe(
-        filter((response: HttpResponse<SlicerSetting>) => response.ok),
-        map((slicerSetting: HttpResponse<SlicerSetting>) => slicerSetting.body)
-      );
+      return this.service.find(id).pipe(map((slicerSetting: HttpResponse<SlicerSetting>) => slicerSetting.body));
     }
     return of(new SlicerSetting());
   }

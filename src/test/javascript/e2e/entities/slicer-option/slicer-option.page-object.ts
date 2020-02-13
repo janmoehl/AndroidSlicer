@@ -5,11 +5,11 @@ export class SlicerOptionComponentsPage {
   deleteButtons = element.all(by.css('jhi-slicer-option div table .btn-danger'));
   title = element.all(by.css('jhi-slicer-option div h2#page-heading span')).first();
 
-  async clickOnCreateButton(timeout?: number) {
+  async clickOnCreateButton() {
     await this.createButton.click();
   }
 
-  async clickOnLastDeleteButton(timeout?: number) {
+  async clickOnLastDeleteButton() {
     await this.deleteButtons.last().click();
   }
 
@@ -43,7 +43,7 @@ export class SlicerOptionUpdatePage {
     return await this.typeSelect.element(by.css('option:checked')).getText();
   }
 
-  async typeSelectLastOption(timeout?: number) {
+  async typeSelectLastOption() {
     await this.typeSelect
       .all(by.tagName('option'))
       .last()
@@ -66,14 +66,14 @@ export class SlicerOptionUpdatePage {
     return await this.descriptionInput.getAttribute('value');
   }
 
-  getIsDefaultInput(timeout?: number) {
+  getIsDefaultInput() {
     return this.isDefaultInput;
   }
-  async save(timeout?: number) {
+  async save() {
     await this.saveButton.click();
   }
 
-  async cancel(timeout?: number) {
+  async cancel() {
     await this.cancelButton.click();
   }
 
@@ -90,7 +90,7 @@ export class SlicerOptionDeleteDialog {
     return this.dialogTitle.getText();
   }
 
-  async clickOnConfirmButton(timeout?: number) {
+  async clickOnConfirmButton() {
     await this.confirmButton.click();
   }
 }

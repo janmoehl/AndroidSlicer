@@ -2,12 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { filter, map } from 'rxjs/operators';
 import { JhiEventManager, JhiParseLinks, JhiDataUtils } from 'ng-jhipster';
 
 import { ISlice } from 'app/shared/model/slice.model';
-import { AccountService } from 'app/core/auth/account.service';
 
 import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { SliceService } from './slice.service';
@@ -17,7 +14,6 @@ import { SliceService } from './slice.service';
   templateUrl: './slice.component.html'
 })
 export class SliceComponent implements OnInit, OnDestroy {
-  currentAccount: any;
   slice: ISlice[];
   error: any;
   success: any;
@@ -34,7 +30,6 @@ export class SliceComponent implements OnInit, OnDestroy {
   constructor(
     protected sliceService: SliceService,
     protected parseLinks: JhiParseLinks,
-    protected accountService: AccountService,
     protected activatedRoute: ActivatedRoute,
     protected dataUtils: JhiDataUtils,
     protected router: Router,
@@ -91,9 +86,6 @@ export class SliceComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadAll();
-    this.accountService.identity().subscribe(account => {
-      this.currentAccount = account;
-    });
     this.registerChangeInSlice();
   }
 
@@ -114,7 +106,7 @@ export class SliceComponent implements OnInit, OnDestroy {
   }
 
   registerChangeInSlice() {
-    this.eventSubscriber = this.eventManager.subscribe('sliceListModification', response => this.loadAll());
+    this.eventSubscriber = this.eventManager.subscribe('sliceListModification', () => this.loadAll());
   }
 
   sort() {

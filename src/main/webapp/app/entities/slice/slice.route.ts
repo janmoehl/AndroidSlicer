@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Routes } from '@angular/router';
+import { Resolve, ActivatedRouteSnapshot, Routes } from '@angular/router';
 import { JhiResolvePagingParams } from 'ng-jhipster';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access-service';
 import { Observable, of } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Slice } from 'app/shared/model/slice.model';
 import { SliceService } from './slice.service';
 import { SliceComponent } from './slice.component';
@@ -17,13 +17,10 @@ import { ISlice } from 'app/shared/model/slice.model';
 export class SliceResolve implements Resolve<ISlice> {
   constructor(private service: SliceService) {}
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<ISlice> {
+  resolve(route: ActivatedRouteSnapshot): Observable<ISlice> {
     const id = route.params['id'];
     if (id) {
-      return this.service.find(id).pipe(
-        filter((response: HttpResponse<Slice>) => response.ok),
-        map((slice: HttpResponse<Slice>) => slice.body)
-      );
+      return this.service.find(id).pipe(map((slice: HttpResponse<Slice>) => slice.body));
     }
     return of(new Slice());
   }

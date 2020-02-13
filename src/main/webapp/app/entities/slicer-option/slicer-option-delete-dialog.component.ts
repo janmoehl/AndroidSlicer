@@ -25,7 +25,7 @@ export class SlicerOptionDeleteDialogComponent {
   }
 
   confirmDelete(id: string) {
-    this.slicerOptionService.delete(id).subscribe(response => {
+    this.slicerOptionService.delete(id).subscribe(() => {
       this.eventManager.broadcast({
         name: 'slicerOptionListModification',
         content: 'Deleted an slicerOption'
@@ -50,11 +50,11 @@ export class SlicerOptionDeletePopupComponent implements OnInit, OnDestroy {
         this.ngbModalRef = this.modalService.open(SlicerOptionDeleteDialogComponent as Component, { size: 'lg', backdrop: 'static' });
         this.ngbModalRef.componentInstance.slicerOption = slicerOption;
         this.ngbModalRef.result.then(
-          result => {
+          () => {
             this.router.navigate(['/slicer-option', { outlets: { popup: null } }]);
             this.ngbModalRef = null;
           },
-          reason => {
+          () => {
             this.router.navigate(['/slicer-option', { outlets: { popup: null } }]);
             this.ngbModalRef = null;
           }
