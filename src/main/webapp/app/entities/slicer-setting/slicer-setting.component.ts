@@ -3,11 +3,13 @@ import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiParseLinks } from 'ng-jhipster';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ISlicerSetting } from 'app/shared/model/slicer-setting.model';
 
 import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { SlicerSettingService } from './slicer-setting.service';
+import { SlicerSettingDeleteDialogComponent } from './slicer-setting-delete-dialog.component';
 
 @Component({
   selector: 'jhi-slicer-setting',
@@ -32,7 +34,8 @@ export class SlicerSettingComponent implements OnInit, OnDestroy {
     protected parseLinks: JhiParseLinks,
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
-    protected eventManager: JhiEventManager
+    protected eventManager: JhiEventManager,
+    protected modalService: NgbModal
   ) {
     this.itemsPerPage = ITEMS_PER_PAGE;
     this.routeData = this.activatedRoute.data.subscribe(data => {
@@ -98,6 +101,11 @@ export class SlicerSettingComponent implements OnInit, OnDestroy {
 
   registerChangeInSlicerSettings() {
     this.eventSubscriber = this.eventManager.subscribe('slicerSettingListModification', () => this.loadAll());
+  }
+
+  delete(slicerSetting: ISlicerSetting) {
+    const modalRef = this.modalService.open(SlicerSettingDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+    modalRef.componentInstance.slicerSetting = slicerSetting;
   }
 
   sort() {
