@@ -114,7 +114,7 @@ export class CFAOptionComponent implements OnInit, OnDestroy {
   }
 
   registerChangeInCFAOptions() {
-    this.eventSubscriber = this.eventManager.subscribe('cFAOptionListModification', response => this.loadAll());
+    this.eventSubscriber = this.eventManager.subscribe('cFAOptionListModification', () => this.loadAll());
   }
 
   sort() {

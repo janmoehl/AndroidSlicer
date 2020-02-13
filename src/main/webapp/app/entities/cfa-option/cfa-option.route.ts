@@ -15,6 +15,7 @@ import { CFAOptionService } from './cfa-option.service';
 export class CFAOptionResolve implements Resolve<ICFAOption> {
   constructor(private service: CFAOptionService) {}
 
+  // eslint-disable-next-line
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<ICFAOption> {
     const id = route.params['id'];
     if (id) {

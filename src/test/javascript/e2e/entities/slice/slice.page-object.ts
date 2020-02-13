@@ -95,10 +95,6 @@ export class SliceMakePage {
     return await this.cfaLevelInput.getAttribute('value');
   }
 
-  getRunningInput() {
-    return this.runningInput;
-  }
-
   async setReflectionOptionsSelect(reflectionOptions) {
     await this.reflectionOptionsSelect.sendKeys(reflectionOptions);
   }

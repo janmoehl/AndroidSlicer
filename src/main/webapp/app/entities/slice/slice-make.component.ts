@@ -186,7 +186,10 @@ export class SliceMakeComponent implements OnInit {
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<ISlice>>) {
-    result.subscribe((res: HttpResponse<ISlice>) => this.onSaveSuccess(), (res: HttpErrorResponse) => this.onSaveError());
+    result.subscribe(
+      (res: HttpResponse<ISlice>) => this.onSaveSuccess(), // eslint-disable-line
+      (res: HttpErrorResponse) => this.onSaveError() // eslint-disable-line
+    );
   }
 
   protected onSaveSuccess() {
