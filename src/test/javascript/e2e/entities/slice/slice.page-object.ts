@@ -5,11 +5,11 @@ export class SliceComponentsPage {
   deleteButtons = element.all(by.css('jhi-slice div table .btn-danger'));
   title = element.all(by.css('jhi-slice div h2#page-heading span')).first();
 
-  async clickOnCreateButton(timeout?: number) {
+  async clickOnCreateButton() {
     await this.createButton.click();
   }
 
-  async clickOnLastDeleteButton(timeout?: number) {
+  async clickOnLastDeleteButton() {
     await this.deleteButtons.last().click();
   }
 
@@ -95,6 +95,10 @@ export class SliceMakePage {
     return await this.cfaLevelInput.getAttribute('value');
   }
 
+  getRunningInput() {
+    return this.runningInput;
+  }
+
   async setReflectionOptionsSelect(reflectionOptions) {
     await this.reflectionOptionsSelect.sendKeys(reflectionOptions);
   }
@@ -103,7 +107,7 @@ export class SliceMakePage {
     return await this.reflectionOptionsSelect.element(by.css('option:checked')).getText();
   }
 
-  async reflectionOptionsSelectLastOption(timeout?: number) {
+  async reflectionOptionsSelectLastOption() {
     await this.reflectionOptionsSelect
       .all(by.tagName('option'))
       .last()
@@ -118,7 +122,7 @@ export class SliceMakePage {
     return await this.dataDependenceOptionsSelect.element(by.css('option:checked')).getText();
   }
 
-  async dataDependenceOptionsSelectLastOption(timeout?: number) {
+  async dataDependenceOptionsSelectLastOption() {
     await this.dataDependenceOptionsSelect
       .all(by.tagName('option'))
       .last()
@@ -133,18 +137,18 @@ export class SliceMakePage {
     return await this.controlDependenceOptionsSelect.element(by.css('option:checked')).getText();
   }
 
-  async controlDependenceOptionsSelectLastOption(timeout?: number) {
+  async controlDependenceOptionsSelectLastOption() {
     await this.controlDependenceOptionsSelect
       .all(by.tagName('option'))
       .last()
       .click();
   }
 
-  async save(timeout?: number) {
+  async save() {
     await this.saveButton.click();
   }
 
-  async cancel(timeout?: number) {
+  async cancel() {
     await this.cancelButton.click();
   }
 
@@ -161,7 +165,7 @@ export class SliceDeleteDialog {
     return this.dialogTitle.getText();
   }
 
-  async clickOnConfirmButton(timeout?: number) {
+  async clickOnConfirmButton() {
     await this.confirmButton.click();
   }
 }

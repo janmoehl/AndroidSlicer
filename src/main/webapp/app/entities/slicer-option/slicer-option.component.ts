@@ -2,12 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { filter, map } from 'rxjs/operators';
 import { JhiEventManager, JhiParseLinks, JhiDataUtils } from 'ng-jhipster';
 
 import { ISlicerOption } from 'app/shared/model/slicer-option.model';
-import { AccountService } from 'app/core/auth/account.service';
 
 import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { SlicerOptionService } from './slicer-option.service';
@@ -17,7 +14,6 @@ import { SlicerOptionService } from './slicer-option.service';
   templateUrl: './slicer-option.component.html'
 })
 export class SlicerOptionComponent implements OnInit, OnDestroy {
-  currentAccount: any;
   slicerOptions: ISlicerOption[];
   error: any;
   success: any;
@@ -34,7 +30,6 @@ export class SlicerOptionComponent implements OnInit, OnDestroy {
   constructor(
     protected slicerOptionService: SlicerOptionService,
     protected parseLinks: JhiParseLinks,
-    protected accountService: AccountService,
     protected activatedRoute: ActivatedRoute,
     protected dataUtils: JhiDataUtils,
     protected router: Router,
@@ -91,9 +86,6 @@ export class SlicerOptionComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadAll();
-    this.accountService.identity().subscribe(account => {
-      this.currentAccount = account;
-    });
     this.registerChangeInSlicerOptions();
   }
 
@@ -114,7 +106,7 @@ export class SlicerOptionComponent implements OnInit, OnDestroy {
   }
 
   registerChangeInSlicerOptions() {
-    this.eventSubscriber = this.eventManager.subscribe('slicerOptionListModification', response => this.loadAll());
+    this.eventSubscriber = this.eventManager.subscribe('slicerOptionListModification', () => this.loadAll());
   }
 
   sort() {

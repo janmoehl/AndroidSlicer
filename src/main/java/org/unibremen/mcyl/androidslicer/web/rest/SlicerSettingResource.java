@@ -1,6 +1,7 @@
 package org.unibremen.mcyl.androidslicer.web.rest;
 
 import java.net.URISyntaxException;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,13 +14,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.transaction.annotation.Transactional; 
+
 import org.unibremen.mcyl.androidslicer.domain.SlicerSetting;
 import org.unibremen.mcyl.androidslicer.repository.SlicerSettingRepository;
 import org.unibremen.mcyl.androidslicer.web.rest.errors.BadRequestAlertException;

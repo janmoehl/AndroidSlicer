@@ -13,17 +13,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional; 
+
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.unibremen.mcyl.androidslicer.domain.SlicerOption;
 import org.unibremen.mcyl.androidslicer.domain.enumeration.SlicerOptionType;
 import org.unibremen.mcyl.androidslicer.repository.SlicerOptionRepository;
 import org.unibremen.mcyl.androidslicer.web.rest.errors.BadRequestAlertException;
+
+import javax.validation.Valid;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.PaginationUtil;
