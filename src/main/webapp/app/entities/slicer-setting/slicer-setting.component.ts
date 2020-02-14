@@ -9,7 +9,6 @@ import { ISlicerSetting } from 'app/shared/model/slicer-setting.model';
 
 import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { SlicerSettingService } from './slicer-setting.service';
-import { SlicerSettingDeleteDialogComponent } from './slicer-setting-delete-dialog.component';
 
 @Component({
   selector: 'jhi-slicer-setting',
@@ -101,11 +100,6 @@ export class SlicerSettingComponent implements OnInit, OnDestroy {
 
   registerChangeInSlicerSettings() {
     this.eventSubscriber = this.eventManager.subscribe('slicerSettingListModification', () => this.loadAll());
-  }
-
-  delete(slicerSetting: ISlicerSetting) {
-    const modalRef = this.modalService.open(SlicerSettingDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.slicerSetting = slicerSetting;
   }
 
   sort() {

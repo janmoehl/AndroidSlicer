@@ -9,7 +9,6 @@ import { ISlicerOption } from 'app/shared/model/slicer-option.model';
 
 import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { SlicerOptionService } from './slicer-option.service';
-import { SlicerOptionDeleteDialogComponent } from './slicer-option-delete-dialog.component';
 
 @Component({
   selector: 'jhi-slicer-option',
@@ -110,11 +109,6 @@ export class SlicerOptionComponent implements OnInit, OnDestroy {
 
   registerChangeInSlicerOptions() {
     this.eventSubscriber = this.eventManager.subscribe('slicerOptionListModification', () => this.loadAll());
-  }
-
-  delete(slicerOption: ISlicerOption) {
-    const modalRef = this.modalService.open(SlicerOptionDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.slicerOption = slicerOption;
   }
 
   sort() {

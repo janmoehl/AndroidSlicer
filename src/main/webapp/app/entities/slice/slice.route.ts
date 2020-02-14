@@ -10,7 +10,7 @@ import { SliceService } from './slice.service';
 import { SliceComponent } from './slice.component';
 import { SliceDetailComponent } from './slice-detail.component';
 import { SliceMakeComponent } from './slice-make.component';
-import { SliceDeletePopupComponent } from './slice-delete-dialog.component';
+import { SliceDeleteDialogComponent } from './slice-delete-dialog.component';
 import { ISlice } from 'app/shared/model/slice.model';
 
 @Injectable({ providedIn: 'root' })
@@ -66,10 +66,10 @@ export const sliceRoute: Routes = [
   }
 ];
 
-export const slicePopupRoute: Routes = [
+export const sliceDialogRoute: Routes = [
   {
     path: ':id/delete',
-    component: SliceDeletePopupComponent,
+    component: SliceDeleteDialogComponent,
     resolve: {
       slice: SliceResolve
     },
