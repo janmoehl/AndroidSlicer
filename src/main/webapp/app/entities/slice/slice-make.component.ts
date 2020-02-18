@@ -31,7 +31,7 @@ export class SliceMakeComponent implements OnInit {
   isSaving: boolean;
 
   sliceMode: String;
-  sliceModes: SelectItem[];
+  sliceModes: SelectItem[] = [{ label: 'Android', value: 'android' }, { label: 'Java', value: 'java' }];
   versionOptions: IAndroidVersion[];
 
   classOptions: IAndroidClass[];
@@ -52,9 +52,12 @@ export class SliceMakeComponent implements OnInit {
   sourceFile: String;
 
   createForm = this.fb.group({
-    sliceMode: [null, [Validators.required]],
+    sliceMode: [null],
+    javaSourcePath: [null, [Validators.required]],
+    javaJarPath: [null, [Validators.required]],
     androidVersion: [null, [Validators.required]],
     androidClassName: [null, [Validators.required]],
+    editor: [null],
     entryMethods: [null, [Validators.required]],
     seedStatements: [null, [Validators.required]],
     cfaOptions: [null, [Validators.required]],
@@ -77,13 +80,14 @@ export class SliceMakeComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.sliceModes = [{ label: 'Android', value: 'android' }, { label: 'Java', value: 'java' }];
     this.isSaving = false;
     this.slice = new Slice();
 
     this.slicerSettingService.findByKey('Default_Slicing_Mode').subscribe(
       (res: HttpResponse<ISlicerSetting>) => {
         this.sliceMode = res.body.value;
+        this.updateSliceModeForm();
+        this.createForm.get('sliceMode').setValue(this.sliceMode);
       },
       (res: HttpErrorResponse) => this.onError(res.message)
     );
@@ -94,7 +98,7 @@ export class SliceMakeComponent implements OnInit {
 
         // preselect if only one
         if (this.versionOptions && this.versionOptions.length === 1) {
-          this.createForm.get(['androidVersion']).patchValue(this.versionOptions[0]);
+          this.createForm.get('androidVersion').patchValue(this.versionOptions[0]);
           this.onVersionSelection();
         }
       },
@@ -157,6 +161,22 @@ export class SliceMakeComponent implements OnInit {
 
   onSliceModeChange(event: any) {
     this.sliceMode = event.value;
+    this.updateSliceModeForm();
+  }
+
+  updateSliceModeForm() {
+    if (this.sliceMode === 'java') {
+      this.createForm.get('javaSourcePath').enable();
+      this.createForm.get('javaJarPath').enable();
+      this.createForm.get('androidVersion').disable();
+      this.createForm.get('androidClassName').disable();
+    } else {
+      // this.sliceMode == 'android'
+      this.createForm.get('javaSourcePath').disable();
+      this.createForm.get('javaJarPath').disable();
+      this.createForm.get('androidVersion').enable();
+      this.createForm.get('androidClassName').enable();
+    }
   }
 
   previousState() {
@@ -172,8 +192,8 @@ export class SliceMakeComponent implements OnInit {
   private createFromForm(): ISlice {
     const entity = {
       ...new Slice(),
-      androidVersion: (this.createForm.get(['androidVersion']).value as IAndroidVersion).version,
-      androidClassName: (this.createForm.get(['androidClassName']).value as IAndroidClass).name,
+      androidVersion: (this.createForm.get('androidVersion').value as IAndroidVersion).version,
+      androidClassName: (this.createForm.get('androidClassName').value as IAndroidClass).name,
       entryMethods: this.createForm.get(['entryMethods']).value,
       seedStatements: this.createForm.get(['seedStatements']).value,
       cfaType: (this.createForm.get(['cfaOptions']).value as ICFAOption).type,
@@ -206,10 +226,10 @@ export class SliceMakeComponent implements OnInit {
   }
 
   onVersionSelection() {
-    this.createForm.get(['androidClassName']).disable();
+    this.createForm.get('androidClassName').disable();
 
     this.androidOptionsService
-      .getAndroidClasses((this.createForm.get(['androidVersion']).value as IAndroidVersion).path)
+      .getAndroidClasses((this.createForm.get('androidVersion').value as IAndroidVersion).path)
       .subscribe(
         // ok
         (res: HttpResponse<IAndroidClass[]>) => {
@@ -220,20 +240,21 @@ export class SliceMakeComponent implements OnInit {
       )
       .add(() => {
         // finally
-        this.createForm.get(['androidClassName']).enable();
+        this.createForm.get('androidClassName').enable();
       });
   }
 
   onClassSelection() {
-    const androidVersion: number = (this.createForm.get(['androidVersion']).value as IAndroidVersion).version;
-    const serviceClassName: string = (this.createForm.get(['androidClassName']).value as IAndroidClass).name;
-    const sourceFilePath: string = (this.createForm.get(['androidClassName']).value as IAndroidClass).path;
+    const androidVersion: number = (this.createForm.get('androidVersion').value as IAndroidVersion).version;
+    const serviceClassName: string = (this.createForm.get('androidClassName').value as IAndroidClass).name;
+    const sourceFilePath: string = (this.createForm.get('androidClassName').value as IAndroidClass).path;
 
     this.createForm.get(['entryMethods']).disable();
 
     this.androidOptionsService.getServiceSource(androidVersion, serviceClassName).subscribe(
       (res: any) => {
         this.sourceFile = res.body;
+        this.createForm.get('editor').setValue(this.sourceFile);
       },
       (res: HttpErrorResponse) => this.onError(res.message)
     );

@@ -4,19 +4,29 @@
             <h2 id="jhi-slice-heading">Make a new Slice</h2>
             <div>
                 <jhi-alert-error></jhi-alert-error>
+
                 <div class="form-group">
                     <label class="form-control-label" for="field_sliceMode">Slicing mode</label><br >
-                    <p-selectButton id="field_sliceMode" [options]="sliceModes" name="sliceMode"
-                        formControlName="sliceMode" [(ngModel)]="sliceMode"
+                    <p-selectButton id="field_sliceMode"
+                        [options]="sliceModes"
+                        formControlName="sliceMode" 
                         (onChange)="onSliceModeChange($event)" ></p-selectButton>
                 </div>
-                <p>Slice-Mode: {{sliceMode}}</p>
+
                 <div *ngIf="sliceMode == 'android'"><!-- android-specific part -->
                     <div class="form-group">
                         <label class="form-control-label" for="field_androidVersion">Android Version</label>
-                        <p-dropdown name="androidVersion" id="field_androidVersion" [options]="versionOptions" optionLabel="version"
-                            formControlName="androidVersion" placeholder="Select Android Version..." required="true" filter="true"
-                            lazy="true" [style]="{'display':'block','width':'100%'}" (onChange)="onVersionSelection()"></p-dropdown>
+                        <p-dropdown name="androidVersion"
+                                id="field_androidVersion"
+                                [options]="versionOptions"
+                                optionLabel="version"
+                                formControlName="androidVersion"
+                                required="true"
+                                placeholder="Select Android Version..."
+                                filter="true"
+                                lazy="true"
+                                [style]="{'display':'block','width':'100%'}"
+                                (onChange)="onVersionSelection()"></p-dropdown>
                         <div *ngIf="createForm.get('androidVersion').invalid && (createForm.get('androidVersion').dirty || createForm.get('androidVersion').touched)">
                             <small class="form-text text-danger"
                                 *ngIf="createForm.get('androidVersion').errors.required">
@@ -30,9 +40,17 @@
                     </div>
                     <div class="form-group">
                         <label class="form-control-label" for="field_androidClassName">Android Class Name</label>
-                        <p-dropdown name="androidClassName" id="field_androidClassName" [options]="classOptions"
-                            optionLabel="name" formControlName="androidClassName" placeholder="Select Main Class..." required="true"
-                            filter="true" lazy="true" [style]="{'display':'block','width':'100%'}" (onChange)="onClassSelection()"></p-dropdown>
+                        <p-dropdown name="androidClassName"
+                                id="field_androidClassName"
+                                [options]="classOptions"
+                                optionLabel="name"
+                                formControlName="androidClassName"
+                                placeholder="Select Main Class..."
+                                required="true"
+                                filter="true"
+                                lazy="true"
+                                [style]="{'display':'block','width':'100%'}"
+                                (onChange)="onClassSelection()"></p-dropdown>
                         <div *ngIf="createForm.get('androidClassName').invalid && (createForm.get('androidClassName').dirty || createForm.get('androidClassName').touched)">
                             <small class="form-text text-danger"
                                 *ngIf="createForm.get('androidClassName').errors.required">
@@ -41,8 +59,34 @@
                         </div>
                     </div>
                 </div> <!-- end of android specific part -->
+
+                <!-- java-specific part -->
+                <div *ngIf="sliceMode == 'java'">
+                    <div class="form-group">
+                        <label class="form-control-label" for="field_jarPath">Systempath to jar</label>
+                        <p-autoComplete [suggestions]="jarPaths"
+                                id="field_jarPath"
+                                formControlName="javaJarPath"
+                                [style]="{'width':'100%'}"
+                                [inputStyle]="{'width':'100%'}"
+                                placeholder=".../executable.jar"
+                                (completeMethod)="onJarPathChange($event)"
+                                [minLength]="1"></p-autoComplete>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-control-label" for="field_sourcePath">Systempath to source files</label>
+                        <p-autoComplete formControlName="javaSourcePath"
+                                id="field_sourcePath"
+                                [suggestions]="sourcePaths"
+                                (completeMethod)="onSourcePathChange($event)"
+                                placeholder=".../source-root/"
+                                [minLength]="1"></p-autoComplete>
+                    </div>
+                </div> <!-- end of java-specific part -->
+
                 <div class="form-group" *ngIf="sourceFile" class="border rounded">
-                    <ngx-monaco-editor [options]="editorOptions" [(ngModel)]="sourceFile" class="code-editor border rounded" [ngModelOptions]="{standalone: true}"></ngx-monaco-editor>
+                    <ngx-monaco-editor [options]="editorOptions" formControlName="editor"
+                        class="code-editor border rounded"></ngx-monaco-editor>
                 </div>
                 <div class="form-group">
                     <label class="form-control-label" for="field_entryMethods" ngbTooltip="JSON-List with entry method names">Entry Methods</label>
