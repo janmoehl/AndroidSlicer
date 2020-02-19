@@ -3,17 +3,11 @@
     "fields": [
         {
             "fieldName": "androidVersion",
-            "fieldType": "Integer",
-            "fieldValidateRules": [
-                "required"
-            ]
+            "fieldType": "Integer"
         },
         {
             "fieldName": "androidClassName",
-            "fieldType": "String",
-            "fieldValidateRules": [
-                "required"
-            ]
+            "fieldType": "String"
         },
         {
             "fieldName": "entryMethods",
@@ -98,6 +92,14 @@
             "fieldValidateRules": [
                 "required"
             ]
+        },
+        {
+            "fieldName": "javaSourcePath",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "javaJarPath",
+            "fieldType": "String"
         }
     ],
     "relationships": [],

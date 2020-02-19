@@ -2,6 +2,7 @@ import { ReflectionOptions } from 'app/shared/model/enumerations/reflection-opti
 import { DataDependenceOptions } from 'app/shared/model/enumerations/data-dependence-options.model';
 import { ControlDependenceOptions } from 'app/shared/model/enumerations/control-dependence-options.model';
 import { CFAType } from './enumerations/cfa-type.model';
+import { SliceMode } from 'app/shared/model/enumerations/slice-mode.model';
 
 export interface ISlicedClass {
   className?: string;
@@ -28,6 +29,9 @@ export interface ISlice {
   reflectionOptions?: ReflectionOptions;
   dataDependenceOptions?: DataDependenceOptions;
   controlDependenceOptions?: ControlDependenceOptions;
+  sliceMode?: SliceMode;
+  javaSourcePath?: string;
+  javaJarPath?: string;
 }
 
 export class Slice implements ISlice {
@@ -45,7 +49,10 @@ export class Slice implements ISlice {
     public cfaLevel?: number,
     public reflectionOptions?: ReflectionOptions,
     public dataDependenceOptions?: DataDependenceOptions,
-    public controlDependenceOptions?: ControlDependenceOptions
+    public controlDependenceOptions?: ControlDependenceOptions,
+    public sliceMode?: SliceMode,
+    public javaSourcePath?: string,
+    public javaJarPath?: string
   ) {
     this.running = this.running || false;
   }

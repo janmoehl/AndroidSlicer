@@ -29,18 +29,16 @@ public class Slice implements Serializable {
     @Id
     private String id;
 
-    @NotNull
     @Field("android_version")
     private Integer androidVersion;
 
-    @NotNull
     @Field("android_class_name")
     private String androidClassName;
 
     /**
      * JSON-List with entry method names
      */
-
+    
     @ApiModelProperty(value = "JSON-List with entry method names", required = true)
     @Field("entry_methods")
     private Set<String> entryMethods = new HashSet<String>();
@@ -48,11 +46,15 @@ public class Slice implements Serializable {
     /**
      * JSON-List with seed statement names
      */
-
+    
     @ApiModelProperty(value = "JSON-List with seed statement names", required = true)
     @Field("seed_statements")
     private Set<String> seedStatements = new HashSet<String>();
 
+    /**
+     * Set of sliced classes with class name and code
+     */
+    @ApiModelProperty(value = "Set of sliced classes with class name and code")
     @Field("sliced_classes")
     private Set<SlicedClass> slicedClasses = new HashSet<SlicedClass>();
 
@@ -99,6 +101,12 @@ public class Slice implements Serializable {
     @NotNull
     @Field("slice_mode")
     private SliceMode sliceMode;
+
+    @Field("java_source_path")
+    private String javaSourcePath;
+
+    @Field("java_jar_path")
+    private String javaJarPath;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public String getId() {
@@ -276,6 +284,15 @@ public class Slice implements Serializable {
     public SliceMode getSliceMode() {
         return sliceMode;
     }
+
+    public String getJavaSourcePath() {
+        return javaSourcePath;
+    }
+
+    public String getJavaJarPath() {
+        return javaJarPath;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -312,6 +329,8 @@ public class Slice implements Serializable {
             ", dataDependenceOptions='" + getDataDependenceOptions() + "'" +
             ", controlDependenceOptions='" + getControlDependenceOptions() + "'" +
             ", sliceMode='" + getSliceMode() + "'" +
+            ", javaSourcePath='" + getJavaSourcePath() + "'" +
+            ", javaJarPath='" + getJavaJarPath() + "'" +
             "}";
     }
 }

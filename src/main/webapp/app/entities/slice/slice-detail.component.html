@@ -1,18 +1,30 @@
 <div class="row justify-content-center">
     <div class="col-10">
         <div *ngIf="slice">
-            <h2><span>Slice</span> {{slice.id}}</h2>
+            <h2><span>Slice</span> {{slice.id}} ({{slice.sliceMode}})</h2>
             <hr>
             <jhi-alert-error></jhi-alert-error>
             <dl class="row-md jh-entity-details">
-                <dt><span>Android Version</span></dt>
-                <dd>
-                    <span>{{slice.androidVersion}}</span>
-                </dd>
-                <dt><span>Android Class Name</span></dt>
-                <dd>
-                    <span>{{slice.androidClassName}}</span>
-                </dd>
+                <ng-template [ngIf]="slice.sliceMode == 'ANDROID'">
+                    <dt><span>Android Version</span></dt>
+                    <dd>
+                        <span>{{slice.androidVersion}}</span>
+                    </dd>
+                    <dt><span>Android Class Name</span></dt>
+                    <dd>
+                        <span>{{slice.androidClassName}}</span>
+                    </dd>
+                </ng-template>
+                <ng-template [ngIf]="slice.sliceMode == 'JAVA'">
+                    <dt><span>Java Source Path</span></dt>
+                    <dd>
+                        <span>{{slice.javaSourcePath}}</span>
+                    </dd>
+                    <dt><span>Java Jar Path</span></dt>
+                    <dd>
+                        <span>{{slice.javaJarPath}}</span>
+                    </dd>
+                </ng-template>
                 <dt><span>Entry Methods</span></dt>
                 <dd>
                     <ul class="list-inline">

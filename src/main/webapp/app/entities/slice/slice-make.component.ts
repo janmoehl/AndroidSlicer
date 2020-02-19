@@ -192,8 +192,11 @@ export class SliceMakeComponent implements OnInit {
   private createFromForm(): ISlice {
     const entity = {
       ...new Slice(),
+      sliceMode: this.createForm.get('sliceMode').value.toUpperCase(),
       androidVersion: (this.createForm.get('androidVersion').value as IAndroidVersion).version,
       androidClassName: (this.createForm.get('androidClassName').value as IAndroidClass).name,
+      javaSourcePath: this.createForm.get('javaSourcePath').value,
+      javaJarPath: this.createForm.get('javaJarPath').value,
       entryMethods: this.createForm.get(['entryMethods']).value,
       seedStatements: this.createForm.get(['seedStatements']).value,
       cfaType: (this.createForm.get(['cfaOptions']).value as ICFAOption).type,
