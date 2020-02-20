@@ -3,7 +3,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { CFAOptionService } from 'app/entities/cfa-option';
-import { SlicerSettingService } from 'app/entities/slicer-setting/slicer-setting.service';
 import { IAndroidClass } from 'app/shared/model/android-class.model';
 import { IAndroidVersion } from 'app/shared/model/android-version.model';
 import { ICFAOption } from 'app/shared/model/cfa-option.model';
@@ -14,7 +13,6 @@ import { ReflectionOptions } from 'app/shared/model/enumerations/reflection-opti
 import { SlicerOptionType } from 'app/shared/model/enumerations/slicer-option-type.model';
 import { ISlice, Slice } from 'app/shared/model/slice.model';
 import { ISlicerOption } from 'app/shared/model/slicer-option.model';
-import { ISlicerSetting } from 'app/shared/model/slicer-setting.model';
 import { AndroidOptionsService } from 'app/shared/services/android-options.service';
 import { JhiAlertService, JhiDataUtils } from 'ng-jhipster';
 import { SelectItem } from 'primeng/api';
@@ -31,10 +29,6 @@ export class SliceMakeComponent implements OnInit {
   isSaving: boolean;
 
   sliceMode: String;
-  sliceModes: SelectItem[] = [
-    { label: 'Android', value: 'android', icon: 'pi pi-android' },
-    { label: 'Java', value: 'java', icon: 'pi pi-desktop' }
-  ];
   versionOptions: IAndroidVersion[];
 
   classOptions: IAndroidClass[];
@@ -55,7 +49,6 @@ export class SliceMakeComponent implements OnInit {
   sourceFile: String;
 
   createForm = this.fb.group({
-    sliceMode: [null],
     javaSourcePath: [null, [Validators.required]],
     javaJarPath: [null, [Validators.required]],
     androidVersion: [null, [Validators.required]],
@@ -75,7 +68,6 @@ export class SliceMakeComponent implements OnInit {
     protected jhiAlertService: JhiAlertService,
     protected sliceService: SliceService,
     protected slicerOptionService: SlicerOptionService,
-    protected slicerSettingService: SlicerSettingService,
     protected activatedRoute: ActivatedRoute,
     protected androidOptionsService: AndroidOptionsService,
     protected cfaOptionService: CFAOptionService,
@@ -85,15 +77,6 @@ export class SliceMakeComponent implements OnInit {
   ngOnInit() {
     this.isSaving = false;
     this.slice = new Slice();
-
-    this.slicerSettingService.findByKey('Default_Slicing_Mode').subscribe(
-      (res: HttpResponse<ISlicerSetting>) => {
-        this.sliceMode = res.body.value;
-        this.updateSliceModeForm();
-        this.createForm.get('sliceMode').setValue(this.sliceMode);
-      },
-      (res: HttpErrorResponse) => this.onError(res.message)
-    );
 
     this.androidOptionsService.getAndroidVersions().subscribe(
       (res: HttpResponse<IAndroidVersion[]>) => {
@@ -163,7 +146,7 @@ export class SliceMakeComponent implements OnInit {
   }
 
   onSliceModeChange(event: any) {
-    this.sliceMode = event.value;
+    this.sliceMode = event;
     this.updateSliceModeForm();
   }
 
@@ -195,7 +178,7 @@ export class SliceMakeComponent implements OnInit {
   private createFromForm(): ISlice {
     const entity = {
       ...new Slice(),
-      sliceMode: this.createForm.get('sliceMode').value.toUpperCase(),
+      sliceMode: this.sliceMode.toUpperCase(),
       androidVersion: (this.createForm.get('androidVersion').value as IAndroidVersion).version,
       androidClassName: (this.createForm.get('androidClassName').value as IAndroidClass).name,
       javaSourcePath: this.createForm.get('javaSourcePath').value,

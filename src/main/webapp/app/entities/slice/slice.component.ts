@@ -16,6 +16,8 @@ import { SliceDeleteDialogComponent } from './slice-delete-dialog.component';
   templateUrl: './slice.component.html'
 })
 export class SliceComponent implements OnInit, OnDestroy {
+  sliceMode = 'x';
+
   slice: ISlice[];
   error: any;
   success: any;
@@ -45,6 +47,10 @@ export class SliceComponent implements OnInit, OnDestroy {
       this.reverse = data.pagingParams.ascending;
       this.predicate = data.pagingParams.predicate;
     });
+  }
+
+  onSliceModeChange(event: any) {
+    this.sliceMode = event;
   }
 
   loadAll() {

@@ -7,10 +7,7 @@
 
                 <div class="form-group">
                     <label class="form-control-label" for="field_sliceMode">Slicing mode</label><br >
-                    <p-selectButton id="field_sliceMode"
-                        [options]="sliceModes"
-                        formControlName="sliceMode" 
-                        (onChange)="onSliceModeChange($event)" ></p-selectButton>
+                    <jhi-slicemode-switch (sliceModeChange)="onSliceModeChange($event)"></jhi-slicemode-switch>
                 </div>
 
                 <div *ngIf="sliceMode == 'android'"><!-- android-specific part -->
