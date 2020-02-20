@@ -31,7 +31,10 @@ export class SliceMakeComponent implements OnInit {
   isSaving: boolean;
 
   sliceMode: String;
-  sliceModes: SelectItem[] = [{ label: 'Android', value: 'android' }, { label: 'Java', value: 'java' }];
+  sliceModes: SelectItem[] = [
+    { label: 'Android', value: 'android', icon: 'pi pi-android' },
+    { label: 'Java', value: 'java', icon: 'pi pi-desktop' }
+  ];
   versionOptions: IAndroidVersion[];
 
   classOptions: IAndroidClass[];
