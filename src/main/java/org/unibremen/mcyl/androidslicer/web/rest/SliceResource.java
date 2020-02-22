@@ -95,9 +95,15 @@ public class SliceResource {
      *         of slice in body.
      */
     @GetMapping("/slices")
-    public ResponseEntity<List<Slice>> getAllSlice(Pageable pageable) {
+    public ResponseEntity<List<Slice>> getAllSlice(Pageable pageable,
+            @RequestParam("sliceMode") Optional<String> sliceMode) {
         log.debug("REST request to get a page of Slice");
-        Page<Slice> page = sliceRepository.findAll(pageable);
+        Page<Slice> page;
+        if (sliceMode.isPresent()) {
+            page = sliceRepository.findBySliceMode(sliceMode.get(), pageable);
+        } else {
+            page = sliceRepository.findAll(pageable);
+        }
         HttpHeaders headers = PaginationUtil
                 .generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());

@@ -10,7 +10,7 @@
                     <jhi-slicemode-switch (sliceModeChange)="onSliceModeChange($event)"></jhi-slicemode-switch>
                 </div>
 
-                <div *ngIf="sliceMode == 'android'"><!-- android-specific part -->
+                <div *ngIf="sliceMode == SliceModeEnum.ANDROID"><!-- android-specific part -->
                     <div class="form-group">
                         <label class="form-control-label" for="field_androidVersion">Android Version</label>
                         <p-dropdown name="androidVersion"
@@ -58,7 +58,7 @@
                 </div> <!-- end of android specific part -->
 
                 <!-- java-specific part -->
-                <div *ngIf="sliceMode == 'java'">
+                <div *ngIf="sliceMode == SliceModeEnum.JAVA">
                     <div class="form-group">
                         <label class="form-control-label" for="field_jarPath">Systempath to jar</label>
                         <p-autoComplete [suggestions]="jarPaths"

@@ -4,6 +4,7 @@ import { SlicerSettingService } from 'app/entities/slicer-setting/slicer-setting
 import { ISlicerSetting } from 'app/shared/model/slicer-setting.model';
 import { JhiAlertService } from 'ng-jhipster';
 import { SelectItem } from 'primeng/api';
+import { SliceMode } from 'app/shared/model/enumerations/slice-mode.model';
 
 @Component({
   selector: 'jhi-slicemode-switch',
@@ -14,10 +15,10 @@ export class SlicemodeSwitchComponent implements OnInit {
   // INPUTS & OUTPUTS:
   @Output() sliceModeChange = new EventEmitter<string>();
 
-  sliceMode: string;
+  sliceMode: SliceMode;
   sliceModes: SelectItem[] = [
-    { label: 'Android', value: 'android', icon: 'pi pi-android' },
-    { label: 'Java', value: 'java', icon: 'pi pi-desktop' }
+    { label: 'Android', value: SliceMode.ANDROID, icon: 'pi pi-android' },
+    { label: 'Java', value: SliceMode.JAVA, icon: 'pi pi-desktop' }
   ];
 
   constructor(protected slicerSettingService: SlicerSettingService, protected jhiAlertService: JhiAlertService) {}
@@ -33,7 +34,7 @@ export class SlicemodeSwitchComponent implements OnInit {
   ngOnInit() {
     this.slicerSettingService.findByKey('Default_Slicing_Mode').subscribe(
       (res: HttpResponse<ISlicerSetting>) => {
-        this.sliceMode = res.body.value;
+        this.sliceMode = SliceMode[res.body.value.toUpperCase()];
         this.publishChange();
       },
       (res: HttpErrorResponse) => {

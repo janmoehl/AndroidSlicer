@@ -1,4 +1,4 @@
-export const enum SliceMode {
+export enum SliceMode {
   ANDROID = 'ANDROID',
   JAVA = 'JAVA'
 }

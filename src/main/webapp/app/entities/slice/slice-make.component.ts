@@ -19,16 +19,18 @@ import { SelectItem } from 'primeng/api';
 import { Observable } from 'rxjs';
 import { SlicerOptionService } from '../slicer-option/slicer-option.service';
 import { SliceService } from './slice.service';
+import { SliceMode } from 'app/shared/model/enumerations/slice-mode.model';
 
 @Component({
   selector: 'jhi-slice-make',
   templateUrl: './slice-make.component.html'
 })
 export class SliceMakeComponent implements OnInit {
+  SliceModeEnum = SliceMode; // "import" SliceMode-Enum for the template
   slice: ISlice;
   isSaving: boolean;
 
-  sliceMode: String;
+  sliceMode: SliceMode;
   versionOptions: IAndroidVersion[];
 
   classOptions: IAndroidClass[];
@@ -145,13 +147,13 @@ export class SliceMakeComponent implements OnInit {
     );
   }
 
-  onSliceModeChange(event: any) {
+  onSliceModeChange(event: SliceMode) {
     this.sliceMode = event;
     this.updateSliceModeForm();
   }
 
   updateSliceModeForm() {
-    if (this.sliceMode === 'java') {
+    if (this.sliceMode === 'JAVA') {
       this.createForm.get('javaSourcePath').enable();
       this.createForm.get('javaJarPath').enable();
       this.createForm.get('androidVersion').disable();
@@ -178,7 +180,7 @@ export class SliceMakeComponent implements OnInit {
   private createFromForm(): ISlice {
     const entity = {
       ...new Slice(),
-      sliceMode: this.sliceMode.toUpperCase(),
+      sliceMode: this.sliceMode,
       androidVersion: (this.createForm.get('androidVersion').value as IAndroidVersion).version,
       androidClassName: (this.createForm.get('androidClassName').value as IAndroidClass).name,
       javaSourcePath: this.createForm.get('javaSourcePath').value,

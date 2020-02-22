@@ -2,18 +2,20 @@
     <h2 id="page-heading" class="float-left">
         <span>Slices</span>
     </h2>
-        <jhi-slicemode-switch class="float-right"
-            (sliceModeChange)="onSliceModeChange($event)"></jhi-slicemode-switch>
         <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-slice" [routerLink]="['/slices/new']">
             <fa-icon [icon]="'plus'"></fa-icon>
             <span >
             Create a new Slice
             </span>
         </button>
+        <jhi-slicemode-switch
+            id="sliceModeSwitch"
+            class="float-right"
+            style="margin-right: 10px;"
+            (sliceModeChange)="onSliceModeChange($event)"></jhi-slicemode-switch>
     <jhi-alert-error></jhi-alert-error>
     <jhi-alert></jhi-alert>
     <br/>
-    Current Mode: {{sliceMode}}
     <div class="alert alert-warning" *ngIf="slice?.length === 0">
         <span>No slice found</span>
     </div>
@@ -21,22 +23,34 @@
         <table class="table table-striped" aria-describedby="page-heading">
             <thead>
             <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
-            <th scope="col" jhiSortBy="androidVersion"><span>Android Version</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th scope="col" jhiSortBy="androidClassName"><span>Android Class Name</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th scope="col" jhiSortBy="entryMethods"><span>Entry Methods</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th scope="col" jhiSortBy="seedStatements"><span>Seed Statements</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th scope="col" jhiSortBy="cfaOptions"><span>CFA Option</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th scope="col" jhiSortBy="reflectionOptions"><span>Reflection Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th scope="col" jhiSortBy="dataDependenceOptions"><span>Data Dependence Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th scope="col" jhiSortBy="controlDependenceOptions"><span>Control Dependence Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th scope="col" jhiSortBy="running"><span>Running</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th scope="col"></th>
+                <ng-template [ngIf]="sliceMode === SliceModeEnum.ANDROID">
+                    <th scope="col" jhiSortBy="androidVersion"><span>Android Version</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                    <th scope="col" jhiSortBy="androidClassName"><span>Android Class Name</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                </ng-template>
+                <ng-template [ngIf]="sliceMode === SliceModeEnum.JAVA">
+                    <th scope="col" jhiSortBy="javaJarPath"><span>Java Jar Path</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                    <th scope="col" jhiSortBy="javaSourcePath"><span>Java Source Path</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                </ng-template>
+                <th scope="col" jhiSortBy="entryMethods"><span>Entry Methods</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th scope="col" jhiSortBy="seedStatements"><span>Seed Statements</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th scope="col" jhiSortBy="cfaOptions"><span>CFA Option</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th scope="col" jhiSortBy="reflectionOptions"><span>Reflection Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th scope="col" jhiSortBy="dataDependenceOptions"><span>Data Dependence Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th scope="col" jhiSortBy="controlDependenceOptions"><span>Control Dependence Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th scope="col" jhiSortBy="running"><span>Running</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th scope="col"></th>
             </tr>
             </thead>
             <tbody>
             <tr *ngFor="let slice of slice ;trackBy: trackId">
-                <td><div>{{slice.androidVersion}}</div></td>
-                <td><div>{{slice.androidClassName}}</div></td>
+                <ng-template [ngIf]="sliceMode === SliceModeEnum.ANDROID">
+                    <td><div>{{slice.androidVersion}}</div></td>
+                    <td><div>{{slice.androidClassName}}</div></td>
+                </ng-template>
+                <ng-template [ngIf]="sliceMode === SliceModeEnum.JAVA">
+                    <td><div>{{slice.javaJarPath}}</div></td>
+                    <td><div>{{slice.javaSourcePath}}</div></td>
+                </ng-template>
                 <td><div>{{slice.entryMethods}}</div></td>
                 <td><div>{{slice.seedStatements}}</div></td>
                 <td><div>{{slice.cfaType}} <span *ngIf="slice.cfaLevel">, n={{slice.cfaLevel}}</span></div></td> 

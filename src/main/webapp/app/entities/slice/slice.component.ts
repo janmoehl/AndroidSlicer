@@ -6,6 +6,7 @@ import { JhiEventManager, JhiParseLinks, JhiDataUtils } from 'ng-jhipster';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ISlice } from 'app/shared/model/slice.model';
+import { SliceMode } from 'app/shared/model/enumerations/slice-mode.model';
 
 import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { SliceService } from './slice.service';
@@ -13,10 +14,12 @@ import { SliceDeleteDialogComponent } from './slice-delete-dialog.component';
 
 @Component({
   selector: 'jhi-slice',
-  templateUrl: './slice.component.html'
+  templateUrl: './slice.component.html',
+  styles: ['::ng-deep #sliceModeSwitch .ui-button { height: 38px; }']
 })
 export class SliceComponent implements OnInit, OnDestroy {
-  sliceMode = 'x';
+  SliceModeEnum = SliceMode; // "import" the SliceMode-Enum for the template...
+  sliceMode: SliceMode;
 
   slice: ISlice[];
   error: any;
@@ -49,7 +52,7 @@ export class SliceComponent implements OnInit, OnDestroy {
     });
   }
 
-  onSliceModeChange(event: any) {
+  onSliceModeChange(event: SliceMode) {
     this.sliceMode = event;
   }
 
@@ -58,7 +61,8 @@ export class SliceComponent implements OnInit, OnDestroy {
       .query({
         page: this.page - 1,
         size: this.itemsPerPage,
-        sort: this.sort()
+        sort: this.sort(),
+        sliceMode: this.sliceMode
       })
       .subscribe((res: HttpResponse<ISlice[]>) => this.paginateSlice(res.body, res.headers));
   }
