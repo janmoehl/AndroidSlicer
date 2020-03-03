@@ -22,8 +22,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.bson.BsonMaximumSizeExceededException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
 import org.unibremen.mcyl.androidslicer.config.Constants;
 import org.unibremen.mcyl.androidslicer.domain.Slice;
+import org.unibremen.mcyl.androidslicer.domain.enumeration.SliceMode;
 import org.unibremen.mcyl.androidslicer.domain.SlicedClass;
 import org.unibremen.mcyl.androidslicer.domain.SlicerSetting;
 import org.unibremen.mcyl.androidslicer.repository.SliceRepository;
@@ -82,20 +84,8 @@ public class SliceService {
             throw new CompletionException(e);
         }
 
-        SlicerSetting androidBinaryPathSetting = 
-        slicerSettingRepository.findOneByKey(Constants.ANDROID_PLATFORM_PATH_KEY).get();
-    
-        String androidBinaryPath = "";
-        if(androidBinaryPathSetting != null){
-            androidBinaryPath = androidBinaryPathSetting.getValue();
-        }
-
-        File appJar = 
-            new File(androidBinaryPath + File.separator + "android-" + slice.getAndroidVersion() + File.separator + "android.jar");
-
-        if (!appJar.exists()) {
-            logger.log("Android Binary Jar not found");
-        }
+        // find path to Jar
+        File appJar = findJarPath(slice, logger);
 
         // check if any seed statement is an invalid regex (and remove it)
         for (Iterator<String> seedStatementIterator =  slice.getSeedStatements().iterator(); seedStatementIterator.hasNext();) {
@@ -170,13 +160,20 @@ public class SliceService {
                 StringBuilder builder = new StringBuilder();
 
                 String packageAndJavaClass = sliceLineNumbersEntry.getKey(); //e.g. com/android/server/AlarmManagerService
-                String sourceLocation = slicerSettingRepository
-                    .findOneByKey(Constants.ANDROID_SOURCE_PATH_KEY).get().getValue()
-                    + File.separator
-                    + "android-"
-                    + slice.getAndroidVersion()
-                    + File.separator
-                    + packageAndJavaClass.replace("/", File.separator);
+                String sourceLocation;
+                if (slice.getSliceMode() == SliceMode.ANDROID) {
+                    sourceLocation = slicerSettingRepository
+                        .findOneByKey(Constants.ANDROID_SOURCE_PATH_KEY).get().getValue()
+                        + File.separator
+                        + "android-"
+                        + slice.getAndroidVersion()
+                        + File.separator
+                        + packageAndJavaClass.replace("/", File.separator);
+                } else { // SliceMode == JAVA
+                    sourceLocation = slice.getJavaSourcePath()
+                        + File.separator
+                        + packageAndJavaClass.replace("/", File.separator);
+                }
 
                 // use TreeSet to sort line numbers
                 logger.log("Slice line numbers for file " + packageAndJavaClass + ": " + new TreeSet<>(sliceLineNumbersEntry.getValue()));
@@ -225,6 +222,34 @@ public class SliceService {
         logger.log("Slicing took " + (end - start) + "ms.");
 
         return CompletableFuture.completedFuture(result);
+    }
+
+
+    public File findJarPath(Slice slice, SliceLogger logger) {
+        File appJar;
+        if (slice.getSliceMode() == SliceMode.ANDROID) {
+            SlicerSetting androidBinaryPathSetting = 
+                    slicerSettingRepository.findOneByKey(Constants.ANDROID_PLATFORM_PATH_KEY).get();
+    
+            String androidBinaryPath = "";
+            if(androidBinaryPathSetting != null){
+                androidBinaryPath = androidBinaryPathSetting.getValue();
+            }
+
+            appJar = new File(androidBinaryPath + File.separator + "android-" + slice.getAndroidVersion() + File.separator + "android.jar");
+            if (!appJar.exists()) {
+                logger.log("Android Binary Jar not found");
+            }
+        } else { // sliceMode == JAVA
+            appJar = new File(slice.getJavaJarPath());
+            if (!appJar.exists()) {
+                logger.log("Java Binary Jar not found");
+            }
+        }
+        if (!appJar.exists()) {
+            logger.log("Android Binary Jar not found");
+        }
+        return appJar;
     }
 
 

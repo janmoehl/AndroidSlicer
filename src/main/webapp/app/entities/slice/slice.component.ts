@@ -19,7 +19,7 @@ import { SliceDeleteDialogComponent } from './slice-delete-dialog.component';
 })
 export class SliceComponent implements OnInit, OnDestroy {
   SliceModeEnum = SliceMode; // "import" the SliceMode-Enum for the template...
-  sliceMode: SliceMode;
+  sliceMode: SliceMode = SliceMode.ANDROID;
 
   slice: ISlice[];
   error: any;
@@ -54,6 +54,7 @@ export class SliceComponent implements OnInit, OnDestroy {
 
   onSliceModeChange(event: SliceMode) {
     this.sliceMode = event;
+    this.loadAll();
   }
 
   loadAll() {
@@ -98,8 +99,9 @@ export class SliceComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.loadAll();
     this.registerChangeInSlice();
+    // this.loadAll(); -> done by onSliceModeChange, after initialising the
+    // sliceMode var
   }
 
   ngOnDestroy() {

@@ -24,9 +24,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.unibremen.mcyl.androidslicer.domain.Slice;
+import org.unibremen.mcyl.androidslicer.domain.enumeration.SliceMode;
 import org.unibremen.mcyl.androidslicer.repository.SliceRepository;
 import org.unibremen.mcyl.androidslicer.service.SliceService;
 import org.unibremen.mcyl.androidslicer.web.rest.errors.BadRequestAlertException;
@@ -90,17 +92,20 @@ public class SliceResource {
      *
      * 
      * @param pageable the pagination information.
+     *
+     * @throws BadRequestAlertException if sliceMode is invalid
      * 
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
      *         of slice in body.
      */
     @GetMapping("/slices")
     public ResponseEntity<List<Slice>> getAllSlice(Pageable pageable,
-            @RequestParam("sliceMode") Optional<String> sliceMode) {
-        log.debug("REST request to get a page of Slice");
+            @RequestParam("sliceMode") Optional<String> sliceModeOpt) {
+        log.debug("DBG REST request to get a page of Slice");
         Page<Slice> page;
-        if (sliceMode.isPresent()) {
-            page = sliceRepository.findBySliceMode(sliceMode.get(), pageable);
+        if (sliceModeOpt.isPresent()) {
+            SliceMode sliceMode = SliceMode.valueOf(sliceModeOpt.get().toUpperCase());
+            page = sliceRepository.findBySliceMode(sliceMode, pageable);
         } else {
             page = sliceRepository.findAll(pageable);
         }

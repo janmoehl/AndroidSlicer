@@ -66,10 +66,32 @@ public class WalaSlicer {
     // maximum number of wala slice statements that will be logged to not blow up the db (maximum BSON document size for a MongoDB entity is 16MB)
     private static final int MAX_DETAILED_LOG = 1000;
 
-    public static Map<String, Set<Integer>> doSlicing(File appJar, File exclusionFile, String androidClassName,
-            Set<String> entryMethods, Set<String> seedStatementNames, CFAType cfaType, Integer cfaLevel, ReflectionOptions reflectionOptions,
-            DataDependenceOptions dataDependenceOptions, ControlDependenceOptions controlDependenceOptions,
-            SliceLogger logger) throws WalaException, IOException, ClassHierarchyException, IllegalArgumentException,
+    /**
+     * @param appJar the analysed Jar-file
+     * @param exclusionFile file with excluded packages
+     * @param androidClassName the inspected class
+     * @param entryMethods
+     * @param seedStatements
+     * @param cfaType
+     * @param cfaLevel
+     * @param reflectionOptions
+     * @param dataDependenceOptions
+     * @param controlDependenceOptions
+     * @param logger
+     */
+    public static Map<String, Set<Integer>> doSlicing(
+                File appJar,
+                File exclusionFile,
+                String androidClassName,
+                Set<String> entryMethods,
+                Set<String> seedStatementNames,
+                CFAType cfaType,
+                Integer cfaLevel,
+                ReflectionOptions reflectionOptions,
+                DataDependenceOptions dataDependenceOptions,
+                ControlDependenceOptions controlDependenceOptions,
+                SliceLogger logger
+            ) throws WalaException, IOException, ClassHierarchyException, IllegalArgumentException,
             CallGraphBuilderCancelException, CancelException {
 
         long start = System.currentTimeMillis();
