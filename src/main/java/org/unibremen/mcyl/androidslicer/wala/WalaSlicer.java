@@ -56,9 +56,9 @@ import org.unibremen.mcyl.androidslicer.service.SliceLogger;
 
 /**
  * This is an implementation of the WALA slicing algorithm described here: http://wala.sourceforge.net/wiki/index.php/UserGuide:Slicer
- * The code based on the work by Markus Gulman (Masterthesis 2014) and Philip Phu Dang Hoan Nguyen (Masterthesis 2018) but has been 
+ * The code based on the work by Markus Gulman (Masterthesis 2014) and Philip Phu Dang Hoan Nguyen (Masterthesis 2018) but has been
  * heavily altered by Michael Cyl with bug fixed, improvements and refactorings. Most notable changes are the option to choose cfa level
- * for pointer analysis, the usage of multiple entry methods and seed statements (regex inclusive), a search for inner classes and a 
+ * for pointer analysis, the usage of multiple entry methods and seed statements (regex inclusive), a search for inner classes and a
  * deep search for seed statements.
  */
 public class WalaSlicer {
@@ -71,7 +71,7 @@ public class WalaSlicer {
      * @param exclusionFile file with excluded packages
      * @param androidClassName the inspected class
      * @param entryMethods
-     * @param seedStatements
+     * @param seedStatementNames
      * @param cfaType
      * @param cfaLevel
      * @param reflectionOptions
@@ -101,7 +101,7 @@ public class WalaSlicer {
         IClassHierarchy classHierarchy = ClassHierarchyFactory.make(scope);
 
         /* make entry points */
-        logger.log("\n== GET ENTRY POINTS =="); 
+        logger.log("\n== GET ENTRY POINTS ==");
         Iterable<Entrypoint> entrypoints = WalaSlicer.getEntrypoints(scope, classHierarchy, androidClassName, entryMethods, logger);
 
         if (!entrypoints.iterator().hasNext()) {
@@ -124,40 +124,40 @@ public class WalaSlicer {
             cfaOptionName+= " with n = " + cfaLevel;
         }
         logger.log("Computing Pointer Analysis with " + cfaOptionName + ".");
-        
+
         CallGraphBuilder cgBuilder = null;
-        
+
         switch(cfaType){
             case ZERO_CFA:
                 cgBuilder = Util.makeZeroCFABuilder(Language.JAVA, options, cache, classHierarchy, scope);
-                break; 
+                break;
             case ZERO_ONE_CFA:
                 cgBuilder = Util.makeZeroOneCFABuilder(Language.JAVA, options, cache, classHierarchy, scope);
-                break; 
+                break;
             case VANILLA_ZERO_ONE_CFA:
                 cgBuilder = Util.makeVanillaZeroOneCFABuilder(Language.JAVA, options, cache, classHierarchy, scope);
-                break; 
+                break;
             case N_CFA:
                 if(cfaLevel != null && cfaLevel >= 0)
                 cgBuilder = Util.makeNCFABuilder(cfaLevel, options, cache, classHierarchy, scope);
-                break; 
+                break;
             case VANILLA_N_CFA:
                 if(cfaLevel != null && cfaLevel >= 0)
                 cgBuilder = Util.makeVanillaNCFABuilder(cfaLevel, options, cache, classHierarchy, scope);
-                break; 
+                break;
             case ZERO_CONTAINER_CFA:
                 cgBuilder = Util.makeZeroContainerCFABuilder(options, cache, classHierarchy, scope);
-                break; 
+                break;
             case ZERO_ONE_CONTAINER_CFA:
                 cgBuilder = Util.makeZeroOneContainerCFABuilder(options, cache, classHierarchy, scope);
-                break; 
+                break;
             case VANILLA_ZERO_ONE_CONTAINER_CFA:
                 cgBuilder = Util.makeVanillaZeroOneContainerCFABuilder(options, cache, classHierarchy, scope);
-                break; 
+                break;
             default:
                 throw new WalaException("No CAF Option Type found to build Call Graph.");
         }
-        
+
         if(cgBuilder == null){
             throw new WalaException("Call Graph Builder could not be initialized.");
         }
@@ -192,7 +192,7 @@ public class WalaSlicer {
             }
         }
         logger.log("\nNumber of slice statements:  " + sliceList.size());
-        
+
         /* Its too much to log this for big slices... */
         //for (Statement seedStatement : sliceList) {
         //    logger.log("~ " + seedStatement.toString());
@@ -204,7 +204,7 @@ public class WalaSlicer {
 
     /**
      * This methods takes the slice statements collection found by the wala slicer and returns their line numbers corresponding to the source code.
-     * 
+     *
      * @param sliceStatements
      * @param logger
      * @return sourceFileLineNumbers: HashMap that has slice line numbers grouped by source file names of the class (e.g. [com/android/.../AlarmManagerService.java] : {3,5,6})
@@ -220,9 +220,9 @@ public class WalaSlicer {
 
         for (Statement statement : sliceStatements) {
             // ignore special kinds of statements
-            if (statement.getKind() != null && 
+            if (statement.getKind() != null &&
                 statement instanceof StatementWithInstructionIndex &&
-                    (statement.getKind() == Statement.Kind.NORMAL | 
+                    (statement.getKind() == Statement.Kind.NORMAL |
                     statement.getKind() == Statement.Kind.NORMAL_RET_CALLEE |
                     statement.getKind() == Statement.Kind.NORMAL_RET_CALLER)) {
 
@@ -247,7 +247,7 @@ public class WalaSlicer {
 
                     try {
                         if(doLogging){
-                            logger.logWithBuffer("+ Statement: " + statement.toString());                       
+                            logger.logWithBuffer("+ Statement: " + statement.toString());
                             logger.logWithBuffer("~ Source line number: " + srcLineNumber);
                         }
                         // construct java file path
@@ -271,7 +271,7 @@ public class WalaSlicer {
                     } catch (Exception e) {
                         if(doLogging){
                             logger.logWithBuffer("- Error getting line sourceFileLineNumbers: " + e);
-                        }                      
+                        }
                     }
                 } catch (Exception e) {
                     if(doLogging){
@@ -284,8 +284,8 @@ public class WalaSlicer {
     }
 
     /**
-     * This method searches for entry points inside the class hierarchy. 
-     * 
+     * This method searches for entry points inside the class hierarchy.
+     *
      * @param scope AnalysisScope
      * @param classHierarchy IClassHierarchy
      * @param androidClassName Android class name to compare type names to (e.g. Lcom/android/server/AlarmManagerService)
@@ -307,7 +307,7 @@ public class WalaSlicer {
                 String typeName = clazz.getName().toString();
 
                 // check if type name of current class equals android class name ...
-                if (typeName.equals(androidClassName) 
+                if (typeName.equals(androidClassName)
                     // .. also check inner class names as well (e.g Lcom/android/server/AlarmManagerService$[InnerClassName])
                     | typeName.startsWith(androidClassName + "$")) {
 
@@ -327,12 +327,12 @@ public class WalaSlicer {
     }
 
     /**
-     * Find the method nodes which belong to the entry methods of the call graph. Also look for any methods that are called within these methods recursively  {@link #getInnerMethodNames(CGNode node) getInnerMethodNames}. 
-     * 
-     * Based on the work by Markus Gulman (Masterthesis 2014) and Philip Phu Dang Hoan Nguyen (Masterthesis 2018). Modified by 
+     * Find the method nodes which belong to the entry methods of the call graph. Also look for any methods that are called within these methods recursively  {@link #getInnerMethodNames(CGNode node) getInnerMethodNames}.
+     *
+     * Based on the work by Markus Gulman (Masterthesis 2014) and Philip Phu Dang Hoan Nguyen (Masterthesis 2018). Modified by
      * Michael Cyl to search inner classes (like AlarmMangerService$1) and to add CGNode for all inner methods, i.e. callees of
      * the entry methods, as well.
-     * 
+     *
      * @param callGraph CallGraph
      * @param methodNames Method names to compare the method nodes to
      * @param methodNodes Collection of found method nodes to keep during recursion
@@ -363,7 +363,7 @@ public class WalaSlicer {
                         // add node if not already in set
                         if(!methodNodes.contains(node)){
                             methodNodes.add(node);
-                            logger.log("~ Found call graph method: " + methodName + "() with object class: " 
+                            logger.log("~ Found call graph method: " + methodName + "() with object class: "
                             + declaringClassName + " in " + node + ".");
                             // search inner method nodes
                             Set<String> innerMethodNames = getInnerMethodNames(node);
@@ -380,7 +380,7 @@ public class WalaSlicer {
 
     /**
      * This is a helper method for  {@link #findMethodNodes(CallGraph cg, Set<String> methodNames,  Set<CGNode> methodNodes, String androidClassName, SliceLogger logger) findMethodNodes} to find all methods (i.e their names) which are called inside of a given node.
-     * 
+     *
      * @param node to search.
      * @return innerMethodNames List of method names.
      */
@@ -396,7 +396,7 @@ public class WalaSlicer {
                 // search method invoke instructions
                 if (instruction instanceof SSAAbstractInvokeInstruction) {
                     SSAAbstractInvokeInstruction call = (SSAAbstractInvokeInstruction) instruction;
-                    innerMethodNames.add(call.getDeclaredTarget().getName().toString());             
+                    innerMethodNames.add(call.getDeclaredTarget().getName().toString());
                 }
             }
         }
@@ -406,7 +406,7 @@ public class WalaSlicer {
 
     /**
      * Search for the user specified seed statement inside the method nodes which have been found by. The algorithm also iterates over all method nodes found by {@link #findMethodNodes(CallGraph cg, Set<String> methodNames,  Set<CGNode> methodNodes, String androidClassName, SliceLogger logger) findMethodNodes}.
-     * 
+     *
      * @param nodes Method nodes to search
      * @param seedStatementNames User specified seed statement names to compare to.
      * @param logger
@@ -428,7 +428,7 @@ public class WalaSlicer {
                 SSAInstruction instruction = ir.getInstructions()[i];
 
                 // check for method- and new-instructions
-                // other types of instructions can be found here: 
+                // other types of instructions can be found here:
                 // http://wala.sourceforge.net/javadocs/trunk/com/ibm/wala/ssa/SSAInstruction.html
 
                 // add seed statements with method invoke instructions

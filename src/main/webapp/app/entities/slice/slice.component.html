@@ -1,7 +1,8 @@
 <div>
-    <h2 id="page-heading" class="float-left">
-        <span>Slices</span>
-    </h2>
+    <div class="clearfix">
+        <h2 id="page-heading" class="float-left">
+            <span>Slices</span>
+        </h2>
         <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-slice" [routerLink]="['/slices/new']">
             <fa-icon [icon]="'plus'"></fa-icon>
             <span >
@@ -13,9 +14,9 @@
             class="float-right"
             style="margin-right: 10px;"
             (sliceModeChange)="onSliceModeChange($event)"></jhi-slicemode-switch>
+    </div>
     <jhi-alert-error></jhi-alert-error>
     <jhi-alert></jhi-alert>
-    <br/>
     <div class="alert alert-warning" *ngIf="slice?.length === 0">
         <span>No slice found</span>
     </div>

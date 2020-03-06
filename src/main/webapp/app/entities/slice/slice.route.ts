@@ -4,13 +4,13 @@ import { Resolve, ActivatedRouteSnapshot, Routes } from '@angular/router';
 import { JhiResolvePagingParams } from 'ng-jhipster';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access-service';
 import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { Slice } from 'app/shared/model/slice.model';
 import { SliceService } from './slice.service';
 import { SliceComponent } from './slice.component';
 import { SliceDetailComponent } from './slice-detail.component';
 import { SliceMakeComponent } from './slice-make.component';
-import { SliceDeleteDialogComponent } from './slice-delete-dialog.component';
+import { SliceDeletePopupComponent } from './slice-delete-dialog.component';
 import { ISlice } from 'app/shared/model/slice.model';
 
 @Injectable({ providedIn: 'root' })
@@ -20,7 +20,10 @@ export class SliceResolve implements Resolve<ISlice> {
   resolve(route: ActivatedRouteSnapshot): Observable<ISlice> {
     const id = route.params['id'];
     if (id) {
-      return this.service.find(id).pipe(map((slice: HttpResponse<Slice>) => slice.body));
+      return this.service.find(id).pipe(
+        filter((response: HttpResponse<Slice>) => response.ok),
+        map((slice: HttpResponse<Slice>) => slice.body)
+      );
     }
     return of(new Slice());
   }
@@ -66,10 +69,10 @@ export const sliceRoute: Routes = [
   }
 ];
 
-export const sliceDialogRoute: Routes = [
+export const slicePopupRoute: Routes = [
   {
     path: ':id/delete',
-    component: SliceDeleteDialogComponent,
+    component: SliceDeletePopupComponent,
     resolve: {
       slice: SliceResolve
     },

@@ -3,14 +3,12 @@ import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { JhiEventManager, JhiParseLinks, JhiDataUtils } from 'ng-jhipster';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ISlice } from 'app/shared/model/slice.model';
 import { SliceMode } from 'app/shared/model/enumerations/slice-mode.model';
 
 import { ITEMS_PER_PAGE } from 'app/shared/constants/pagination.constants';
 import { SliceService } from './slice.service';
-import { SliceDeleteDialogComponent } from './slice-delete-dialog.component';
 
 @Component({
   selector: 'jhi-slice',
@@ -40,8 +38,7 @@ export class SliceComponent implements OnInit, OnDestroy {
     protected activatedRoute: ActivatedRoute,
     protected dataUtils: JhiDataUtils,
     protected router: Router,
-    protected eventManager: JhiEventManager,
-    protected modalService: NgbModal
+    protected eventManager: JhiEventManager
   ) {
     this.itemsPerPage = ITEMS_PER_PAGE;
     this.routeData = this.activatedRoute.data.subscribe(data => {
@@ -101,7 +98,7 @@ export class SliceComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.registerChangeInSlice();
     // this.loadAll(); -> done by onSliceModeChange, after initialising the
-    // sliceMode var
+    // sliceMode variable
   }
 
   ngOnDestroy() {
@@ -122,11 +119,6 @@ export class SliceComponent implements OnInit, OnDestroy {
 
   registerChangeInSlice() {
     this.eventSubscriber = this.eventManager.subscribe('sliceListModification', () => this.loadAll());
-  }
-
-  delete(slice: ISlice) {
-    const modalRef = this.modalService.open(SliceDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.slice = slice;
   }
 
   sort() {
