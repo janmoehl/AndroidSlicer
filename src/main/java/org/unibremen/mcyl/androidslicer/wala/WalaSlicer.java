@@ -16,17 +16,7 @@ import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.classLoader.Language;
 import com.ibm.wala.classLoader.ShrikeBTMethod;
 import com.ibm.wala.classLoader.ShrikeClass;
-import com.ibm.wala.ipa.callgraph.AnalysisCache;
-import com.ibm.wala.ipa.callgraph.AnalysisCacheImpl;
-import com.ibm.wala.ipa.callgraph.AnalysisOptions;
-import com.ibm.wala.ipa.callgraph.AnalysisOptions.ReflectionOptions;
-import com.ibm.wala.ipa.callgraph.AnalysisScope;
-import com.ibm.wala.ipa.callgraph.CGNode;
-import com.ibm.wala.ipa.callgraph.CallGraph;
-import com.ibm.wala.ipa.callgraph.CallGraphBuilder;
-import com.ibm.wala.ipa.callgraph.CallGraphBuilderCancelException;
-import com.ibm.wala.ipa.callgraph.CallGraphStats;
-import com.ibm.wala.ipa.callgraph.Entrypoint;
+import com.ibm.wala.ipa.callgraph.*;
 import com.ibm.wala.ipa.callgraph.impl.ArgumentTypeEntrypoint;
 import com.ibm.wala.ipa.callgraph.impl.Util;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
@@ -34,8 +24,6 @@ import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
 import com.ibm.wala.ipa.cha.IClassHierarchy;
 import com.ibm.wala.ipa.slicer.NormalStatement;
 import com.ibm.wala.ipa.slicer.Slicer;
-import com.ibm.wala.ipa.slicer.Slicer.ControlDependenceOptions;
-import com.ibm.wala.ipa.slicer.Slicer.DataDependenceOptions;
 import com.ibm.wala.ipa.slicer.Statement;
 import com.ibm.wala.ipa.slicer.StatementWithInstructionIndex;
 import com.ibm.wala.ssa.IR;
@@ -50,9 +38,11 @@ import com.ibm.wala.util.debug.UnimplementedError;
 import com.ibm.wala.util.intset.IntSet;
 import com.ibm.wala.util.strings.Atom;
 
-import org.bson.BSONException;
+import org.apache.commons.io.FilenameUtils;
+import org.unibremen.mcyl.androidslicer.domain.Slice;
 import org.unibremen.mcyl.androidslicer.domain.enumeration.CFAType;
 import org.unibremen.mcyl.androidslicer.service.SliceLogger;
+import org.unibremen.mcyl.androidslicer.domain.enumeration.SliceMode;
 
 /**
  * This is an implementation of the WALA slicing algorithm described here: http://wala.sourceforge.net/wiki/index.php/UserGuide:Slicer
@@ -69,57 +59,91 @@ public class WalaSlicer {
     /**
      * @param appJar the analysed Jar-file
      * @param exclusionFile file with excluded packages
-     * @param androidClassName the inspected class
-     * @param entryMethods
-     * @param seedStatementNames
-     * @param cfaType
-     * @param cfaLevel
-     * @param reflectionOptions
-     * @param dataDependenceOptions
-     * @param controlDependenceOptions
      * @param logger
      */
     public static Map<String, Set<Integer>> doSlicing(
                 File appJar,
                 File exclusionFile,
-                String androidClassName,
-                Set<String> entryMethods,
-                Set<String> seedStatementNames,
-                CFAType cfaType,
-                Integer cfaLevel,
-                ReflectionOptions reflectionOptions,
-                DataDependenceOptions dataDependenceOptions,
-                ControlDependenceOptions controlDependenceOptions,
+                Slice slice,
                 SliceLogger logger
             ) throws WalaException, IOException, ClassHierarchyException, IllegalArgumentException,
             CallGraphBuilderCancelException, CancelException {
 
         long start = System.currentTimeMillis();
 
+        // add "L" to class name and remove .java extension
+        // e.g. com/android/server/AlarmManagerService.java
+        // -> Lcom/android/server/AlarmManagerService
+        String className = "L" + FilenameUtils.removeExtension(slice.getAndroidClassName());
+
         /* create an analysis scope representing the appJar as a J2SE application */
         AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(appJar.getAbsolutePath(), exclusionFile);
         IClassHierarchy classHierarchy = ClassHierarchyFactory.make(scope);
 
         /* make entry points */
-        logger.log("\n== GET ENTRY POINTS ==");
-        Iterable<Entrypoint> entrypoints = WalaSlicer.getEntrypoints(scope, classHierarchy, androidClassName, entryMethods, logger);
+        Iterable<Entrypoint> entrypoints = getEntrypoints(slice, scope, classHierarchy, className, logger);
 
-        if (!entrypoints.iterator().hasNext()) {
-            throw new WalaException("Failed to find any entry points from " + entryMethods + "!");
-        } else {
-            logger.log("Number of entry points: " + StreamSupport.stream(entrypoints.spliterator(), false).count());
-        }
-
+        /* create the call graph */
         AnalysisOptions options = new AnalysisOptions(scope, entrypoints);
         /* you can dial down reflection handling if you like */
-        options.setReflectionOptions(reflectionOptions);
+        options.setReflectionOptions(slice.getReflectionOptions());
+        CallGraphBuilder callGraphBuilder = getCallGraphBuilder(slice, entrypoints, classHierarchy, options,  scope, logger);
+        CallGraph callGraph = callGraphBuilder.makeCallGraph(options, null);
+
+        long end = System.currentTimeMillis();
+        logger.log("Took " + (end - start) + "ms.");
+        logger.log(CallGraphStats.getStats(callGraph));
+
+        logger.log("\n== FIND ENTRY_METHOD(s)==");
+        Set<CGNode> methodNodes = new HashSet<CGNode>();
+        Set<String> entryMethods = slice.getEntryMethods();
+
+        WalaSlicer.findMethodNodes(callGraph, entryMethods, methodNodes, className, logger);
+        if (methodNodes.size() == 0) {
+            throw new WalaException("Failed to find any methods from" + entryMethods + "!");
+        }
+        logger.log("\n== SEED_STATEMENT(s) ==");
+        Set<Statement> seedStatements = WalaSlicer.findSeedStatements(methodNodes, slice.getSeedStatements(), logger);
+        if (seedStatements.size() == 0) {
+            throw new WalaException("No Seed Statements found!");
+        }
+
+        logger.log("\n== SLICING ==");
+        Collection<Statement> sliceList = new HashSet<Statement>();
+        for (Statement seedStatement : seedStatements) {
+            logger.log("+ Computing backward slice for " + seedStatement.getNode().toString());
+            try{
+            sliceList.addAll(Slicer.computeBackwardSlice(seedStatement, callGraph,
+                callGraphBuilder.getPointerAnalysis(), slice.getDataDependenceOptions(),
+                slice.getControlDependenceOptions()));
+            }
+            catch(UnimplementedError ue){
+                throw new WalaException("One of the parameters is not implemented yet: " + ue.getStackTrace());
+            }
+        }
+        logger.log("\nNumber of slice statements:  " + sliceList.size());
+
+        /* Its too much to log this for big slices... */
+        //for (Statement seedStatement : sliceList) {
+        //    logger.log("~ " + seedStatement.toString());
+        //}
+
+        logger.log("\n== GETTING SOURCE FILE LINE NUMBERS ==");
+        return WalaSlicer.getLineNumbersGroupedBySourceFiles(sliceList, logger);
+    }
+
+    private static CallGraphBuilder getCallGraphBuilder(Slice slice, Iterable<Entrypoint> entrypoints,
+                                                        IClassHierarchy classHierarchy, AnalysisOptions options,
+                                          AnalysisScope scope, SliceLogger logger) throws WalaException {
 
         logger.log("\n== BUILDING CALL GRAPH ==");
         /*  build the call graph  */
         AnalysisCache cache = new AnalysisCacheImpl();
         /* builders can be constructed with different Util methods (see: https://wala.github.io/javadoc/com/ibm/wala/ipa/callgraph/impl/Util.html)*/
 
+        CFAType cfaType = slice.getCfaType();
         String cfaOptionName = cfaType.toString();
+        Integer cfaLevel = slice.getCfaLevel();
         if(cfaLevel != null && cfaLevel > 0){
             cfaOptionName+= " with n = " + cfaLevel;
         }
@@ -139,11 +163,11 @@ public class WalaSlicer {
                 break;
             case N_CFA:
                 if(cfaLevel != null && cfaLevel >= 0)
-                cgBuilder = Util.makeNCFABuilder(cfaLevel, options, cache, classHierarchy, scope);
+                    cgBuilder = Util.makeNCFABuilder(cfaLevel, options, cache, classHierarchy, scope);
                 break;
             case VANILLA_N_CFA:
                 if(cfaLevel != null && cfaLevel >= 0)
-                cgBuilder = Util.makeVanillaNCFABuilder(cfaLevel, options, cache, classHierarchy, scope);
+                    cgBuilder = Util.makeVanillaNCFABuilder(cfaLevel, options, cache, classHierarchy, scope);
                 break;
             case ZERO_CONTAINER_CFA:
                 cgBuilder = Util.makeZeroContainerCFABuilder(options, cache, classHierarchy, scope);
@@ -162,44 +186,29 @@ public class WalaSlicer {
             throw new WalaException("Call Graph Builder could not be initialized.");
         }
 
-        CallGraph callGraph = cgBuilder.makeCallGraph(options, null);
-        long end = System.currentTimeMillis();
-        logger.log("Took " + (end - start) + "ms.");
-        logger.log(CallGraphStats.getStats(callGraph));
+        return cgBuilder;
 
-        logger.log("\n== FIND ENTRY_METHOD(s)==");
-        Set<CGNode> methodNodes = new HashSet<CGNode>();
-        WalaSlicer.findMethodNodes(callGraph, entryMethods, methodNodes, androidClassName, logger);
-        if (methodNodes.size() == 0) {
-            throw new WalaException("Failed to find any methods from" + entryMethods + "!");
+    }
+
+    private static Iterable<Entrypoint> getEntrypoints(Slice slice, AnalysisScope scope,
+                                      IClassHierarchy classHierarchy,
+                                      String className,
+                                      SliceLogger logger) throws WalaException {
+        Iterable<Entrypoint> entrypoints;
+        Set<String> entryMethods = slice.getEntryMethods();
+        if (slice.getSliceMode().equals(SliceMode.ANDROID)) {
+            logger.log("\n== GET ENTRY POINTS FOR ANDROID ==");
+            entrypoints = WalaSlicer.getAndroidEntrypoints(scope, classHierarchy, className, entryMethods, logger);
+        } else { // sliceMode == JAVA
+            logger.log("\n== GET ENTRY POINTS FOR JAVA==");
+            entrypoints = null; // TODO
         }
-        logger.log("\n== SEED_STATEMENT(s) ==");
-        Set<Statement> seedStatements = WalaSlicer.findSeedStatements(methodNodes, seedStatementNames, logger);
-        if (seedStatements.size() == 0) {
-            throw new WalaException("No Seed Statements found!");
+        if (!entrypoints.iterator().hasNext()) {
+            throw new WalaException("Failed to find any entry points from " + entryMethods + "!");
+        } else {
+            logger.log("Number of entry points: " + StreamSupport.stream(entrypoints.spliterator(), false).count());
         }
-
-        logger.log("\n== SLICING ==");
-        Collection<Statement> sliceList = new HashSet<Statement>();
-        for (Statement seedStatement : seedStatements) {
-            logger.log("+ Computing backward slice for " + seedStatement.getNode().toString());
-            try{
-            sliceList.addAll(Slicer.computeBackwardSlice(seedStatement, callGraph, cgBuilder.getPointerAnalysis(), dataDependenceOptions, controlDependenceOptions));
-            }
-            catch(UnimplementedError ue){
-                throw new WalaException("One of the parameters is not implemented yet: " + ue.getStackTrace());
-                // TOOO Stack Trace to string
-            }
-        }
-        logger.log("\nNumber of slice statements:  " + sliceList.size());
-
-        /* Its too much to log this for big slices... */
-        //for (Statement seedStatement : sliceList) {
-        //    logger.log("~ " + seedStatement.toString());
-        //}
-
-        logger.log("\n== GETTING SOURCE FILE LINE NUMBERS ==");
-        return WalaSlicer.getLineNumbersGroupedBySourceFiles(sliceList, logger);
+        return entrypoints;
     }
 
     /**
@@ -293,9 +302,8 @@ public class WalaSlicer {
      * @param logger
      * @return entrypoints: Set of entry points
      */
-    private static Set<Entrypoint> getEntrypoints(AnalysisScope scope, IClassHierarchy classHierarchy, String androidClassName,
-            Set<String> entryMethods, SliceLogger logger) {
-
+    private static Set<Entrypoint> getAndroidEntrypoints(AnalysisScope scope, IClassHierarchy classHierarchy, String androidClassName,
+                                                         Set<String> entryMethods, SliceLogger logger) {
         Set<Entrypoint> entrypoints = new HashSet<Entrypoint>();
 
         if (classHierarchy == null) {
@@ -379,7 +387,7 @@ public class WalaSlicer {
     }
 
     /**
-     * This is a helper method for  {@link #findMethodNodes(CallGraph cg, Set<String> methodNames,  Set<CGNode> methodNodes, String androidClassName, SliceLogger logger) findMethodNodes} to find all methods (i.e their names) which are called inside of a given node.
+     * This is a helper method for  {@link #findMethodNodes(CallGraph, Set, Set, String, SliceLogger)}  findMethodNodes} to find all methods (i.e their names) which are called inside of a given node.
      *
      * @param node to search.
      * @return innerMethodNames List of method names.
@@ -405,7 +413,9 @@ public class WalaSlicer {
     }
 
     /**
-     * Search for the user specified seed statement inside the method nodes which have been found by. The algorithm also iterates over all method nodes found by {@link #findMethodNodes(CallGraph cg, Set<String> methodNames,  Set<CGNode> methodNodes, String androidClassName, SliceLogger logger) findMethodNodes}.
+     * Search for the user specified seed statement inside the method nodes which have been found by.
+     * The algorithm also iterates over all method nodes found by
+     * {@link #findMethodNodes(CallGraph, Set, Set, String, SliceLogger)}  findMethodNodes}.
      *
      * @param nodes Method nodes to search
      * @param seedStatementNames User specified seed statement names to compare to.

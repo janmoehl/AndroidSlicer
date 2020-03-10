@@ -101,19 +101,9 @@ public class SliceService {
         Map<String, Set<Integer>> sliceLineNumbers = null;
         try {
             sliceLineNumbers = WalaSlicer.doSlicing(
-                    appJar, 
+                    appJar,
                     exclusionFile,
-                    // add "L" to class name and remove .java extension
-                    // e.g. com/android/server/AlarmManagerService.java
-                    // -> Lcom/android/server/AlarmManagerService
-                    "L" + FilenameUtils.removeExtension(slice.getAndroidClassName()),
-                    slice.getEntryMethods(), 
-                    slice.getSeedStatements(),
-                    slice.getCfaType(),
-                    slice.getCfaLevel(),
-                    slice.getReflectionOptions(), 
-                    slice.getDataDependenceOptions(),
-                    slice.getControlDependenceOptions(), 
+                    slice,
                     logger);
         } catch (Exception ex) {
             logger.log(ex.getMessage());
@@ -124,9 +114,9 @@ public class SliceService {
             logger.log("\n== RECONSTRUCTING CODE ==");
 
             // save to file if the setting is enabled
-            SlicerSetting saveToFileSetting = 
+            SlicerSetting saveToFileSetting =
             slicerSettingRepository.findOneByKey(Constants.SAVE_TO_FILE_KEY).get();
-            SlicerSetting outputDirSetting = 
+            SlicerSetting outputDirSetting =
             slicerSettingRepository.findOneByKey(Constants.OUTPUT_DIR_KEY).get();
             boolean saveToFile = false;
             File outputDirectory = null;
@@ -137,11 +127,11 @@ public class SliceService {
             // remove .java
             androidClassName = androidClassName.substring(0, androidClassName.lastIndexOf("."));
 
-            if(saveToFileSetting != null && 
+            if(saveToFileSetting != null &&
                 Boolean.parseBoolean(saveToFileSetting.getValue()) &&
-                outputDirSetting != null && 
+                outputDirSetting != null &&
                 !outputDirSetting.getValue().isEmpty()){
-                    
+
                     // check dir or create it
                     outputDirectory = new File(outputDirSetting.getValue() +
                     File.separator +
@@ -152,7 +142,7 @@ public class SliceService {
                     if (!outputDirectory.exists()){
                         outputDirectory.mkdirs();
                     }
-                    saveToFile = true;                                 
+                    saveToFile = true;
             }
 
             for (Map.Entry<String, Set<Integer>> sliceLineNumbersEntry : sliceLineNumbers.entrySet()) {
@@ -228,9 +218,9 @@ public class SliceService {
     public File findJarPath(Slice slice, SliceLogger logger) {
         File appJar;
         if (slice.getSliceMode() == SliceMode.ANDROID) {
-            SlicerSetting androidBinaryPathSetting = 
+            SlicerSetting androidBinaryPathSetting =
                     slicerSettingRepository.findOneByKey(Constants.ANDROID_PLATFORM_PATH_KEY).get();
-    
+
             String androidBinaryPath = "";
             if(androidBinaryPathSetting != null){
                 androidBinaryPath = androidBinaryPathSetting.getValue();
@@ -257,7 +247,7 @@ public class SliceService {
      * Start a vs code server with the slices as default directory. See
      * https://github.com/cdr/code-server/blob/master/doc/self-hosted/index.md for
      * documentation.
-     * 
+     *
      * @param slice Slice entity to find slice output directory.
      * @param hostname Hostname of this server which the client used. Needed for vs code server link.
      * @return serverLink
@@ -266,9 +256,9 @@ public class SliceService {
      */
     public String openVsCodeServer(Slice slice, String hostname) throws IOException, InterruptedException {
         // find vscode server settings
-        SlicerSetting vsCodeBinaryPathSetting = 
+        SlicerSetting vsCodeBinaryPathSetting =
         slicerSettingRepository.findOneByKey(Constants.CODE_SERVER_DIR_KEY).get();
-        SlicerSetting vsCodePortSetting = 
+        SlicerSetting vsCodePortSetting =
         slicerSettingRepository.findOneByKey(Constants.CODE_SERVER_PORT_KEY).get();
 
         if(vsCodeBinaryPathSetting != null && vsCodePortSetting != null){
@@ -290,10 +280,10 @@ public class SliceService {
 
             // find vscode server settings binary
             File vsCodeBinary = new File(vsCodeBinaryPathSetting.getValue()
-             + File.separator 
+             + File.separator
              + osPath
-             + File.separator 
-             + "code-server" 
+             + File.separator
+             + "code-server"
              + binaryFileExtension);
 
             if(vsCodeBinary.exists()){
@@ -301,14 +291,14 @@ public class SliceService {
 
                 /* get output directory for this slice */
                 File outputDirectory = null;
-                SlicerSetting outputDirSetting = 
+                SlicerSetting outputDirSetting =
                 slicerSettingRepository.findOneByKey(Constants.OUTPUT_DIR_KEY).get();
                 String androidClassName = slice.getAndroidClassName()
                     .substring(slice.getAndroidClassName().lastIndexOf("/") + 1, slice.getAndroidClassName().length());
                 // remove .java
                 androidClassName = androidClassName.substring(0, androidClassName.lastIndexOf("."));
 
-                if(outputDirSetting != null && !outputDirSetting.getValue().isEmpty()){                     
+                if(outputDirSetting != null && !outputDirSetting.getValue().isEmpty()){
                         // check dir or create it
                         outputDirectory = new File(outputDirSetting.getValue() +
                         File.separator +
@@ -318,9 +308,9 @@ public class SliceService {
 
                         if (!outputDirectory.exists()){
                             throw new BadRequestAlertException("Slice output directory not found.", null, null);
-                        }                           
+                        }
                 }
-              
+
                 if(vsCodeServerProcess == null){
                     String dataDir = vsCodeBinaryPathSetting.getValue() + File.separator + osPath + File.separator;
                     String installCommand = vsCodeBinary.getAbsolutePath() + " --install-extension=redhat.java --user-data-dir=" + dataDir;

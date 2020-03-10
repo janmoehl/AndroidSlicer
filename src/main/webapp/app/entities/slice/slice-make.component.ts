@@ -401,11 +401,11 @@ export class SliceMakeComponent implements OnInit {
     }
   }
 
-  addAllEntryMethods() {
+  addAllAndroidEntryMethods() {
     this.createForm.get(['androidEntryMethods']).patchValue(this.androidEntryMethodOptions);
   }
 
-  clearEntryMethods() {
+  clearAndroidEntryMethods() {
     this.createForm.get(['androidEntryMethods']).patchValue([]);
   }
 
@@ -413,7 +413,7 @@ export class SliceMakeComponent implements OnInit {
     this.createForm.get(['androidSeedStatements']).patchValue(this.androidSeedStatementOptions);
   }
 
-  clearSeedStatements() {
+  clearAndroidSeedStatements() {
     this.createForm.get(['androidSeedStatements']).patchValue([]);
   }
 

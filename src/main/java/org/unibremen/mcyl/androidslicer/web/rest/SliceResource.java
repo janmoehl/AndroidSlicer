@@ -90,11 +90,11 @@ public class SliceResource {
     /**
      * {@code GET  /slice} : get all the slice.
      *
-     * 
+     *
      * @param pageable the pagination information.
      *
      * @throws BadRequestAlertException if sliceMode is invalid
-     * 
+     *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
      *         of slice in body.
      */
