@@ -1,19 +1,5 @@
 package org.unibremen.mcyl.androidslicer.web.rest;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
@@ -33,6 +19,13 @@ import org.unibremen.mcyl.androidslicer.repository.SlicerSettingRepository;
 import org.unibremen.mcyl.androidslicer.web.rest.errors.BadRequestAlertException;
 import org.unibremen.mcyl.androidslicer.web.rest.vm.AndroidServiceClassesVM;
 import org.unibremen.mcyl.androidslicer.web.rest.vm.AndroidVersionVM;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * REST controller for managing SlicerSetting.
@@ -66,14 +59,14 @@ public class AndroidOptionsResource {
     public ResponseEntity<List<AndroidVersionVM>> getAndroidVersions() {
         log.debug("REST request to get android versions");
 
-        SlicerSetting androidSourcesPathSetting = 
+        SlicerSetting androidSourcesPathSetting =
             slicerSettingRepository.findOneByKey(Constants.ANDROID_SOURCE_PATH_KEY).get();
-        
+
         String androidSourcesPath = "";
         if(androidSourcesPathSetting != null){
             androidSourcesPath = androidSourcesPathSetting.getValue();
         }
-        
+
         if (!androidSourcesPath.isEmpty()) {
             // get android versions from folder names (e.g. android-28 -> 28)
             File file = new File(androidSourcesPath);
@@ -95,7 +88,7 @@ public class AndroidOptionsResource {
                     }
                 }
                 return ResponseEntity.ok().body(androidVersions);
-            }     
+            }
         }
         throw new BadRequestAlertException("Android Sources not found in " + androidSourcesPath + " !", ENTITY_NAME, "idnull");
     }

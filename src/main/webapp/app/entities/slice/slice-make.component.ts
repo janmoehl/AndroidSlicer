@@ -224,12 +224,15 @@ export class SliceMakeComponent implements OnInit {
     const currentEntryMethods =
       this.sliceMode === 'JAVA' ? this.createForm.get(['javaEntryMethods']).value : this.createForm.get(['androidEntryMethods']).value;
     const androidVersionField = this.createForm.get('androidVersion').value as IAndroidVersion;
-    const androidClassNameField = this.createForm.get('androidClassName').value as IAndroidClass;
+    const currentNameValue =
+      this.sliceMode === 'JAVA'
+        ? this.createForm.get('javaClassName').value
+        : (this.createForm.get('androidClassName').value as IAndroidClass).name;
     const entity = {
       ...new Slice(),
       sliceMode: this.sliceMode,
       androidVersion: androidVersionField != null ? androidVersionField.version : null,
-      androidClassName: androidClassNameField != null ? androidClassNameField.name : null,
+      className: currentNameValue,
       javaSourcePath: this.createForm.get('javaSourcePath').value,
       javaJarPath: this.createForm.get('javaJarPath').value,
       entryMethods: currentEntryMethods,

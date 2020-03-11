@@ -11,13 +11,10 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.StreamSupport;
 
-import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.classLoader.Language;
 import com.ibm.wala.classLoader.ShrikeBTMethod;
-import com.ibm.wala.classLoader.ShrikeClass;
 import com.ibm.wala.ipa.callgraph.*;
-import com.ibm.wala.ipa.callgraph.impl.ArgumentTypeEntrypoint;
 import com.ibm.wala.ipa.callgraph.impl.Util;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
@@ -74,7 +71,7 @@ public class WalaSlicer {
         // add "L" to class name and remove .java extension
         // e.g. com/android/server/AlarmManagerService.java
         // -> Lcom/android/server/AlarmManagerService
-        String className = "L" + FilenameUtils.removeExtension(slice.getAndroidClassName());
+        String className = "L" + FilenameUtils.removeExtension(slice.getClassName());
 
         /* create an analysis scope representing the appJar as a J2SE application */
         AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(appJar.getAbsolutePath(), exclusionFile);
@@ -94,15 +91,15 @@ public class WalaSlicer {
         logger.log("Took " + (end - start) + "ms.");
         logger.log(CallGraphStats.getStats(callGraph));
 
-        logger.log("\n== FIND ENTRY_METHOD(s)==");
+        logger.log("\n== FIND ENTRY_METHOD(s) ==");
         Set<CGNode> methodNodes = new HashSet<CGNode>();
         Set<String> entryMethods = slice.getEntryMethods();
-
         WalaSlicer.findMethodNodes(callGraph, entryMethods, methodNodes, className, logger);
         if (methodNodes.size() == 0) {
             throw new WalaException("Failed to find any methods from" + entryMethods + "!");
         }
-        logger.log("\n== SEED_STATEMENT(s) ==");
+
+        logger.log("\n== FIND SEED_STATEMENT(s) ==");
         Set<Statement> seedStatements = WalaSlicer.findSeedStatements(methodNodes, slice.getSeedStatements(), logger);
         if (seedStatements.size() == 0) {
             throw new WalaException("No Seed Statements found!");
@@ -198,13 +195,14 @@ public class WalaSlicer {
         Set<String> entryMethods = slice.getEntryMethods();
         if (slice.getSliceMode().equals(SliceMode.ANDROID)) {
             logger.log("\n== GET ENTRY POINTS FOR ANDROID ==");
-            entrypoints = WalaSlicer.getAndroidEntrypoints(scope, classHierarchy, className, entryMethods, logger);
+            entrypoints = EntryPointAlgorithms.getAndroidEntrypoints(scope, classHierarchy, className, entryMethods, logger);
         } else { // sliceMode == JAVA
             logger.log("\n== GET ENTRY POINTS FOR JAVA==");
-            entrypoints = null; // TODO
+            entrypoints = com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(scope, classHierarchy);
         }
         if (!entrypoints.iterator().hasNext()) {
-            throw new WalaException("Failed to find any entry points from " + entryMethods + "!");
+            throw new WalaException("Failed to find any entry points from " + entryMethods
+                + " in " + className +"!");
         } else {
             logger.log("Number of entry points: " + StreamSupport.stream(entrypoints.spliterator(), false).count());
         }
@@ -292,47 +290,6 @@ public class WalaSlicer {
         return sourceFileLineNumbers;
     }
 
-    /**
-     * This method searches for entry points inside the class hierarchy.
-     *
-     * @param scope AnalysisScope
-     * @param classHierarchy IClassHierarchy
-     * @param androidClassName Android class name to compare type names to (e.g. Lcom/android/server/AlarmManagerService)
-     * @param entryMethods The list of user specified enty method names to search for
-     * @param logger
-     * @return entrypoints: Set of entry points
-     */
-    private static Set<Entrypoint> getAndroidEntrypoints(AnalysisScope scope, IClassHierarchy classHierarchy, String androidClassName,
-                                                         Set<String> entryMethods, SliceLogger logger) {
-        Set<Entrypoint> entrypoints = new HashSet<Entrypoint>();
-
-        if (classHierarchy == null) {
-            throw new IllegalArgumentException("ClassHierarchy is null!");
-        }
-
-        for (IClass clazz : classHierarchy) {
-            if (clazz instanceof ShrikeClass & !clazz.isInterface() & isApplicationClass(scope, clazz)) {
-                String typeName = clazz.getName().toString();
-
-                // check if type name of current class equals android class name ...
-                if (typeName.equals(androidClassName)
-                    // .. also check inner class names as well (e.g Lcom/android/server/AlarmManagerService$[InnerClassName])
-                    | typeName.startsWith(androidClassName + "$")) {
-
-                    for (Iterator<? extends IMethod> methodIt = clazz.getDeclaredMethods().iterator(); methodIt.hasNext();) {
-                        IMethod method = (IMethod) methodIt.next();
-                        for (String entryMethod : entryMethods) {
-                            if (!method.isAbstract() && method.getName().equals(Atom.findOrCreateUnicodeAtom(entryMethod))) {
-                                entrypoints.add(new ArgumentTypeEntrypoint(method, classHierarchy));
-                                logger.log("~ Found entry method: " + entryMethod + "() with object class: " + typeName + ".");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return entrypoints;
-    }
 
     /**
      * Find the method nodes which belong to the entry methods of the call graph. Also look for any methods that are called within these methods recursively  {@link #getInnerMethodNames(CGNode node) getInnerMethodNames}.
@@ -349,7 +306,9 @@ public class WalaSlicer {
      * @return methodNodes: Collection of found method nodes
      * @throws WalaException
      */
-    private static Set<CGNode> findMethodNodes(CallGraph callGraph, Set<String> methodNames,  Set<CGNode> methodNodes, String androidClassName, SliceLogger logger) throws WalaException {
+    private static Set<CGNode> findMethodNodes(CallGraph callGraph, Set<String> methodNames,
+                                               Set<CGNode> methodNodes, String androidClassName,
+                                               SliceLogger logger) throws WalaException {
 
         for (Iterator<? extends CGNode> nodeIt = callGraph.iterator(); nodeIt.hasNext();) {
             CGNode node = nodeIt.next();
@@ -483,7 +442,5 @@ public class WalaSlicer {
         return statements;
     }
 
-    private static boolean isApplicationClass(AnalysisScope scope, IClass clazz) {
-        return scope.getApplicationLoader().equals(clazz.getClassLoader().getReference());
-    }
+
 }

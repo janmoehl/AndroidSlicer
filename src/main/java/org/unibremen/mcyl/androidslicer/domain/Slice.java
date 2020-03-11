@@ -32,13 +32,13 @@ public class Slice implements Serializable {
     @Field("android_version")
     private Integer androidVersion;
 
-    @Field("android_class_name")
-    private String androidClassName;
+    @Field("class_name")
+    private String className;
 
     /**
      * JSON-List with entry method names
      */
-    
+
     @ApiModelProperty(value = "JSON-List with entry method names", required = true)
     @Field("entry_methods")
     private Set<String> entryMethods = new HashSet<String>();
@@ -46,7 +46,7 @@ public class Slice implements Serializable {
     /**
      * JSON-List with seed statement names
      */
-    
+
     @ApiModelProperty(value = "JSON-List with seed statement names", required = true)
     @Field("seed_statements")
     private Set<String> seedStatements = new HashSet<String>();
@@ -130,17 +130,17 @@ public class Slice implements Serializable {
         this.androidVersion = androidVersion;
     }
 
-    public String getAndroidClassName() {
-        return androidClassName;
+    public String getClassName() {
+        return className;
     }
 
     public Slice androidClassName(String androidClassName) {
-        this.androidClassName = androidClassName;
+        this.className = androidClassName;
         return this;
     }
 
-    public void setAndroidClassName(String androidClassName) {
-        this.androidClassName = androidClassName;
+    public void setClassName(String className) {
+        this.className = className;
     }
 
     public Set<String> getEntryMethods() {
@@ -316,7 +316,7 @@ public class Slice implements Serializable {
         return "Slice{" +
             "id=" + getId() +
             ", androidVersion=" + getAndroidVersion() +
-            ", androidClassName='" + getAndroidClassName() + "'" +
+            ", androidClassName='" + getClassName() + "'" +
             ", entryMethods='" + getEntryMethods() + "'" +
             ", seedStatements='" + getSeedStatements() + "'" +
             ", slice='" + getSlicedClasses() + "'" +

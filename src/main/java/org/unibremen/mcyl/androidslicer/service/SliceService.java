@@ -15,14 +15,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import com.ibm.wala.util.CancelException;
-import com.ibm.wala.util.WalaException;
-
-import org.apache.commons.io.FilenameUtils;
-import org.bson.BsonMaximumSizeExceededException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
 import org.unibremen.mcyl.androidslicer.config.Constants;
 import org.unibremen.mcyl.androidslicer.domain.Slice;
 import org.unibremen.mcyl.androidslicer.domain.enumeration.SliceMode;
@@ -122,8 +116,8 @@ public class SliceService {
             File outputDirectory = null;
 
             /* e.g. "com/android/server/AlarmManagerService.java" -> "AlarmManagerService" */
-            String androidClassName = slice.getAndroidClassName()
-                .substring(slice.getAndroidClassName().lastIndexOf("/") + 1, slice.getAndroidClassName().length());
+            String androidClassName = slice.getClassName()
+                .substring(slice.getClassName().lastIndexOf("/") + 1, slice.getClassName().length());
             // remove .java
             androidClassName = androidClassName.substring(0, androidClassName.lastIndexOf("."));
 
@@ -293,8 +287,8 @@ public class SliceService {
                 File outputDirectory = null;
                 SlicerSetting outputDirSetting =
                 slicerSettingRepository.findOneByKey(Constants.OUTPUT_DIR_KEY).get();
-                String androidClassName = slice.getAndroidClassName()
-                    .substring(slice.getAndroidClassName().lastIndexOf("/") + 1, slice.getAndroidClassName().length());
+                String androidClassName = slice.getClassName()
+                    .substring(slice.getClassName().lastIndexOf("/") + 1, slice.getClassName().length());
                 // remove .java
                 androidClassName = androidClassName.substring(0, androidClassName.lastIndexOf("."));
 

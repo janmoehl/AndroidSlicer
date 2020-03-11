@@ -17,7 +17,7 @@ export class SlicedClass implements ISlicedClass {
 export interface ISlice {
   id?: string;
   androidVersion?: number;
-  androidClassName?: string;
+  className?: string;
   entryMethods?: string[];
   seedStatements?: string[];
   slicedClasses?: ISlicedClass[];
@@ -38,7 +38,7 @@ export class Slice implements ISlice {
   constructor(
     public id?: string,
     public androidVersion?: number,
-    public androidClassName?: string,
+    public className?: string,
     public entryMethods = [],
     public seedStatements = [],
     public slice?: any,

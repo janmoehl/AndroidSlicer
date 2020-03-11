@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ISlice } from 'app/shared/model/slice.model';
 import { AndroidOptionsService } from 'app/shared/services/android-options.service';
+import { JavaService } from 'app/shared/services/java.service';
 import { saveAs } from 'file-saver';
 import * as JSZip from 'jszip';
 import { JhiAlertService, JhiDataUtils } from 'ng-jhipster';
@@ -51,7 +52,8 @@ export class SliceDetailComponent implements OnInit {
     protected activatedRoute: ActivatedRoute,
     private sliceService: SliceService,
     private router: Router,
-    protected androidOptionsService: AndroidOptionsService
+    protected androidOptionsService: AndroidOptionsService,
+    private javaService: JavaService
   ) {}
 
   ngOnInit() {
@@ -112,7 +114,7 @@ export class SliceDetailComponent implements OnInit {
   private onSlicingFinished(): void {
     this.slice.slicedClasses.forEach(slicedClass => {
       const slicedPathAndClassName = slicedClass.packagePath + '/' + slicedClass.className;
-      if (slicedPathAndClassName === this.slice.androidClassName) {
+      if (slicedPathAndClassName === this.slice.className) {
         // add android main class (i.e. entry class) to first position
         this.sliceCodes.unshift(slicedClass.code);
         this.classesIndexMap.unshift(slicedClass.className);
@@ -142,17 +144,33 @@ export class SliceDetailComponent implements OnInit {
   private loadSourceFiles() {
     this.slice.slicedClasses.forEach(slicedClass => {
       // get source file for comparison
-      const slicedPathAndClassName = slicedClass.packagePath + '/' + slicedClass.className;
-      this.androidOptionsService.getServiceSource(this.slice.androidVersion, slicedPathAndClassName).subscribe(
-        (res: any) => {
-          this.sourceCodes[this.classesIndexMap.indexOf(slicedClass.className)] = res.body;
-          // remove loading overlay if all source classes are loaded
-          if (this.sourceCodes.length === this.sliceCodes.length) {
-            this.isCodeLoadingOrPrecessing = false;
-          }
-        },
-        (res: HttpErrorResponse) => this.onError(res.message)
-      );
+      let slicedPathAndClassName = this.slice.sliceMode === 'JAVA' ? this.slice.javaSourcePath + '/' : '';
+      slicedPathAndClassName += slicedClass.packagePath + '/' + slicedClass.className;
+
+      if (this.slice.sliceMode === 'ANDROID') {
+        this.androidOptionsService.getServiceSource(this.slice.androidVersion, slicedPathAndClassName).subscribe(
+          (res: any) => {
+            this.sourceCodes[this.classesIndexMap.indexOf(slicedClass.className)] = res.body;
+            // remove loading overlay if all source classes are loaded
+            if (this.sourceCodes.length === this.sliceCodes.length) {
+              this.isCodeLoadingOrPrecessing = false;
+            }
+          },
+          (res: HttpErrorResponse) => this.onError(res.message)
+        );
+      } else {
+        // sliceMode === 'JAVA'
+        this.javaService.getSource(slicedPathAndClassName).subscribe(
+          (res: any) => {
+            this.sourceCodes[this.classesIndexMap.indexOf(slicedClass.className)] = res.body;
+            // remove loading overlay if all source classes are loaded
+            if (this.sourceCodes.length === this.sliceCodes.length) {
+              this.isCodeLoadingOrPrecessing = false;
+            }
+          },
+          (res: HttpErrorResponse) => this.onError(res.message)
+        );
+      }
     });
   }
 
@@ -194,7 +212,7 @@ export class SliceDetailComponent implements OnInit {
     zip.generateAsync({ type: 'blob' }).then(blob => {
       saveAs(
         blob,
-        this.slice.androidClassName.replace(/\.[^/.]+$/, '') + '.zip' // remove .java extension
+        this.slice.className.replace(/\.[^/.]+$/, '') + '.zip' // remove .java extension
       );
     });
   }

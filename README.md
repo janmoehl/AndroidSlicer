@@ -2,6 +2,10 @@
 
 This application was generated using JHipster 6.5.1, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v6.5.1](https://www.jhipster.tech/documentation-archive/v6.5.1).
 
+## Security
+
+With the enhancement of this program, to slice also generic Java programs and not only the android source code, the API was added with the possibility, to get the source code or file content of any file. This is needed to show the user the contents of the Java files he has sliced. But the given file path parameter for this API (`GET /api/java/source-code`) is not checked, so an attacker might be able to read the file contents of every file, to which the Java server has the read-permission on. Since the user can set the Java source-path of a slice, it would not be sufficient to restrict the paths to that parameter of a slice. **So don't make the server public accessible!**
+
 ## Development
 
 ### Requirements (tested on Linux)
@@ -51,7 +55,7 @@ Or run embedded mongo db with (use `gradle clean` before)
 
 ### Use local WALA
 
-**Note, that WALA 1.5.4 requires Java 8, as Version 9 has some breaking changes**.
+**Note, that WALA 1.5.4 requires Java 8, as Java Version 9 has some breaking changes**.
 
 It could be necessary, to compile a local version of WALA to provide it with the correct paths.
 
@@ -79,6 +83,10 @@ Run the following commands in two separate terminals to create a blissful develo
 Npm is also used to manage CSS and JavaScript dependencies used in this application. You can upgrade dependencies by specifying a newer version in [package.json](package.json). You can also run `npm update` and `npm install` to manage dependencies. Add the `help` flag on any command to see how you can use it. For example, `npm help update`.
 
 The `npm run` command will list all of the scripts available to run for this project.
+
+### Debugging Help
+
+Its sometimes helpful, to lookup the current values of the component properties. Instead of just printing them in the template, its much more easier to use a browser plugin for this. Maybe you want to try out [Augury](https://augury.rangle.io/).
 
 ### PWA Support
 
@@ -219,7 +227,8 @@ For more information refer to [Using Docker and Docker-Compose][], this page als
 
 ## TODO
 
-- Transform the slice-make.component-form into a nested one, with layers for Java and Android specific fields.
+- Transform the slice-make.component-form into a nested one, with layers for Java and Android specific fields -> better maintainability, better performance when disable/enable these fields .
+- Close the security issues with the `GET /api/java/source-code` API (by restricting valid paths to a specific subdirectory?)
 
 ## Continuous Integration (optional)
 

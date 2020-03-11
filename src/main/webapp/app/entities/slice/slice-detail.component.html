@@ -12,7 +12,7 @@
                     </dd>
                     <dt><span>Android Class Name</span></dt>
                     <dd>
-                        <span>{{slice.androidClassName}}</span>
+                        <span>{{slice.className}}</span>
                     </dd>
                 </ng-template>
                 <ng-template [ngIf]="slice.sliceMode == 'JAVA'">
@@ -23,6 +23,10 @@
                     <dt><span>Java Jar Path</span></dt>
                     <dd>
                         <span>{{slice.javaJarPath}}</span>
+                    </dd>
+                    <dt><span>Java Class Name</span></dt>
+                    <dd>
+                        <span>{{slice.className}}</span>
                     </dd>
                 </ng-template>
                 <dt><span>Entry Methods</span></dt>

@@ -2,7 +2,6 @@ package org.unibremen.mcyl.androidslicer.web.rest;
 
 import org.unibremen.mcyl.androidslicer.AndroidSlicerApp;
 import org.unibremen.mcyl.androidslicer.domain.Slice;
-import org.unibremen.mcyl.androidslicer.domain.SlicedClass;
 import org.unibremen.mcyl.androidslicer.repository.SliceRepository;
 import org.unibremen.mcyl.androidslicer.service.SliceService;
 import org.unibremen.mcyl.androidslicer.web.rest.errors.ExceptionTranslator;
@@ -18,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.util.Base64Utils;
 import org.springframework.validation.Validator;
 
 import java.util.Arrays;
@@ -138,7 +136,7 @@ public class SliceResourceIT {
         assertThat(sliceList).hasSize(databaseSizeBeforeCreate + 1);
         Slice testSlice = sliceList.get(sliceList.size() - 1);
         assertThat(testSlice.getAndroidVersion()).isEqualTo(DEFAULT_ANDROID_VERSION);
-        assertThat(testSlice.getAndroidClassName()).isEqualTo(DEFAULT_ANDROID_CLASS_NAME);
+        assertThat(testSlice.getClassName()).isEqualTo(DEFAULT_ANDROID_CLASS_NAME);
         assertThat(testSlice.getEntryMethods()).isEqualTo(DEFAULT_ENTRY_METHODS);
         assertThat(testSlice.getSeedStatements()).isEqualTo(DEFAULT_SEED_STATEMENTS);
         assertThat(testSlice.getCfaType()).isEqualTo(DEFAULT_CFA_TYPE);
@@ -188,7 +186,7 @@ public class SliceResourceIT {
     public void checkAndroidClassNameIsRequired() throws Exception {
         int databaseSizeBeforeTest = sliceRepository.findAll().size();
         // set the field null
-        slice.setAndroidClassName(null);
+        slice.setClassName(null);
 
         // Create the Slice, which fails.
 
@@ -287,7 +285,7 @@ public class SliceResourceIT {
             .andExpect(jsonPath("$.[*].dataDependenceOptions").value(hasItem(DEFAULT_DATA_DEPENDENCE_OPTIONS.toString())))
             .andExpect(jsonPath("$.[*].controlDependenceOptions").value(hasItem(DEFAULT_CONTROL_DEPENDENCE_OPTIONS.toString())));
     }
-    
+
     @Test
     public void getSlice() throws Exception {
         // Initialize the database
