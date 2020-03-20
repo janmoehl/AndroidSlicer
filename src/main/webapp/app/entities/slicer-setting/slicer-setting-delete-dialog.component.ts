@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 
@@ -10,7 +9,7 @@ import { SlicerSettingService } from './slicer-setting.service';
   templateUrl: './slicer-setting-delete-dialog.component.html'
 })
 export class SlicerSettingDeleteDialogComponent {
-  slicerSetting: ISlicerSetting;
+  slicerSetting?: ISlicerSetting;
 
   constructor(
     protected slicerSettingService: SlicerSettingService,
@@ -18,17 +17,14 @@ export class SlicerSettingDeleteDialogComponent {
     protected eventManager: JhiEventManager
   ) {}
 
-  clear() {
-    this.activeModal.dismiss('cancel');
+  clear(): void {
+    this.activeModal.dismiss();
   }
 
-  confirmDelete(id: string) {
+  confirmDelete(id: string): void {
     this.slicerSettingService.delete(id).subscribe(() => {
-      this.eventManager.broadcast({
-        name: 'slicerSettingListModification',
-        content: 'Deleted an slicerSetting'
-      });
-      this.activeModal.dismiss(true);
+      this.eventManager.broadcast('slicerSettingListModification');
+      this.activeModal.close();
     });
   }
 }

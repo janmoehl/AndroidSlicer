@@ -1,20 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { HttpResponse } from '@angular/common/http';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { JhiAlertService, JhiDataUtils } from 'ng-jhipster';
+import { JhiDataUtils, JhiFileLoadError, JhiEventManager, JhiEventWithContent } from 'ng-jhipster';
+
 import { ISlicerOption, SlicerOption } from 'app/shared/model/slicer-option.model';
 import { SlicerOptionService } from './slicer-option.service';
+import { AlertError } from 'app/shared/alert/alert-error.model';
 
 @Component({
   selector: 'jhi-slicer-option-update',
   templateUrl: './slicer-option-update.component.html'
 })
 export class SlicerOptionUpdateComponent implements OnInit {
-  isSaving: boolean;
+  isSaving = false;
 
   editForm = this.fb.group({
     id: [],
@@ -26,20 +27,19 @@ export class SlicerOptionUpdateComponent implements OnInit {
 
   constructor(
     protected dataUtils: JhiDataUtils,
-    protected jhiAlertService: JhiAlertService,
+    protected eventManager: JhiEventManager,
     protected slicerOptionService: SlicerOptionService,
     protected activatedRoute: ActivatedRoute,
     private fb: FormBuilder
   ) {}
 
-  ngOnInit() {
-    this.isSaving = false;
+  ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ slicerOption }) => {
       this.updateForm(slicerOption);
     });
   }
 
-  updateForm(slicerOption: ISlicerOption) {
+  updateForm(slicerOption: ISlicerOption): void {
     this.editForm.patchValue({
       id: slicerOption.id,
       type: slicerOption.type,
@@ -49,44 +49,27 @@ export class SlicerOptionUpdateComponent implements OnInit {
     });
   }
 
-  byteSize(field) {
-    return this.dataUtils.byteSize(field);
+  byteSize(base64String: string): string {
+    return this.dataUtils.byteSize(base64String);
   }
 
-  openFile(contentType, field) {
-    return this.dataUtils.openFile(contentType, field);
+  openFile(contentType: string, base64String: string): void {
+    this.dataUtils.openFile(contentType, base64String);
   }
 
-  setFileData(event, field: string, isImage) {
-    return new Promise((resolve, reject) => {
-      if (event && event.target && event.target.files && event.target.files[0]) {
-        const file: File = event.target.files[0];
-        if (isImage && !file.type.startsWith('image/')) {
-          reject(`File was expected to be an image but was found to be ${file.type}`);
-        } else {
-          const filedContentType: string = field + 'ContentType';
-          this.dataUtils.toBase64(file, base64Data => {
-            this.editForm.patchValue({
-              [field]: base64Data,
-              [filedContentType]: file.type
-            });
-          });
-        }
-      } else {
-        reject(`Base64 data was not set as file could not be extracted from passed parameter: ${event}`);
-      }
-    }).then(
-      // eslint-disable-next-line no-console
-      () => console.log('blob added'), // success
-      this.onError
-    );
+  setFileData(event: Event, field: string, isImage: boolean): void {
+    this.dataUtils.loadFileToForm(event, this.editForm, field, isImage).subscribe(null, (err: JhiFileLoadError) => {
+      this.eventManager.broadcast(
+        new JhiEventWithContent<AlertError>('androidSlicerApp.error', { message: err.message })
+      );
+    });
   }
 
-  previousState() {
+  previousState(): void {
     window.history.back();
   }
 
-  save() {
+  save(): void {
     this.isSaving = true;
     const slicerOption = this.createFromForm();
     if (slicerOption.id !== undefined) {
@@ -99,27 +82,27 @@ export class SlicerOptionUpdateComponent implements OnInit {
   private createFromForm(): ISlicerOption {
     return {
       ...new SlicerOption(),
-      id: this.editForm.get(['id']).value,
-      type: this.editForm.get(['type']).value,
-      key: this.editForm.get(['key']).value,
-      description: this.editForm.get(['description']).value,
-      isDefault: this.editForm.get(['isDefault']).value
+      id: this.editForm.get(['id'])!.value,
+      type: this.editForm.get(['type'])!.value,
+      key: this.editForm.get(['key'])!.value,
+      description: this.editForm.get(['description'])!.value,
+      isDefault: this.editForm.get(['isDefault'])!.value
     };
   }
 
-  protected subscribeToSaveResponse(result: Observable<HttpResponse<ISlicerOption>>) {
-    result.subscribe(() => this.onSaveSuccess(), () => this.onSaveError());
+  protected subscribeToSaveResponse(result: Observable<HttpResponse<ISlicerOption>>): void {
+    result.subscribe(
+      () => this.onSaveSuccess(),
+      () => this.onSaveError()
+    );
   }
 
-  protected onSaveSuccess() {
+  protected onSaveSuccess(): void {
     this.isSaving = false;
     this.previousState();
   }
 
-  protected onSaveError() {
+  protected onSaveError(): void {
     this.isSaving = false;
-  }
-  protected onError(errorMessage: string) {
-    this.jhiAlertService.error(errorMessage, null, null);
   }
 }

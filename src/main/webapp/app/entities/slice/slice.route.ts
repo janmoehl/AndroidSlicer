@@ -1,25 +1,34 @@
 import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { Resolve, ActivatedRouteSnapshot, Routes } from '@angular/router';
+import { Resolve, ActivatedRouteSnapshot, Routes, Router } from '@angular/router';
 import { JhiResolvePagingParams } from 'ng-jhipster';
+import { Observable, of, EMPTY } from 'rxjs';
+import { flatMap } from 'rxjs/operators';
+
 import { UserRouteAccessService } from 'app/core/auth/user-route-access-service';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { Slice } from 'app/shared/model/slice.model';
+import { ISlice, Slice } from 'app/shared/model/slice.model';
 import { SliceService } from './slice.service';
 import { SliceComponent } from './slice.component';
 import { SliceDetailComponent } from './slice-detail.component';
 import { SliceUpdateComponent } from './slice-update.component';
-import { ISlice } from 'app/shared/model/slice.model';
 
 @Injectable({ providedIn: 'root' })
 export class SliceResolve implements Resolve<ISlice> {
-  constructor(private service: SliceService) {}
+  constructor(private service: SliceService, private router: Router) {}
 
-  resolve(route: ActivatedRouteSnapshot): Observable<ISlice> {
+  resolve(route: ActivatedRouteSnapshot): Observable<ISlice> | Observable<never> {
     const id = route.params['id'];
     if (id) {
-      return this.service.find(id).pipe(map((slice: HttpResponse<Slice>) => slice.body));
+      return this.service.find(id).pipe(
+        flatMap((slice: HttpResponse<Slice>) => {
+          if (slice.body) {
+            return of(slice.body);
+          } else {
+            this.router.navigate(['404']);
+            return EMPTY;
+          }
+        })
+      );
     }
     return of(new Slice());
   }

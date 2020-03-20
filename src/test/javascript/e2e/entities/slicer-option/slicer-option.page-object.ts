@@ -5,19 +5,19 @@ export class SlicerOptionComponentsPage {
   deleteButtons = element.all(by.css('jhi-slicer-option div table .btn-danger'));
   title = element.all(by.css('jhi-slicer-option div h2#page-heading span')).first();
 
-  async clickOnCreateButton() {
+  async clickOnCreateButton(): Promise<void> {
     await this.createButton.click();
   }
 
-  async clickOnLastDeleteButton() {
+  async clickOnLastDeleteButton(): Promise<void> {
     await this.deleteButtons.last().click();
   }
 
-  async countDeleteButtons() {
+  async countDeleteButtons(): Promise<number> {
     return this.deleteButtons.count();
   }
 
-  async getTitle() {
+  async getTitle(): Promise<string> {
     return this.title.getText();
   }
 }
@@ -31,49 +31,49 @@ export class SlicerOptionUpdatePage {
   descriptionInput = element(by.id('field_description'));
   isDefaultInput = element(by.id('field_isDefault'));
 
-  async getPageTitle() {
+  async getPageTitle(): Promise<string> {
     return this.pageTitle.getText();
   }
 
-  async setTypeSelect(type) {
+  async setTypeSelect(type: string): Promise<void> {
     await this.typeSelect.sendKeys(type);
   }
 
-  async getTypeSelect() {
+  async getTypeSelect(): Promise<string> {
     return await this.typeSelect.element(by.css('option:checked')).getText();
   }
 
-  async typeSelectLastOption() {
+  async typeSelectLastOption(): Promise<void> {
     await this.typeSelect
       .all(by.tagName('option'))
       .last()
       .click();
   }
 
-  async setKeyInput(key) {
+  async setKeyInput(key: string): Promise<void> {
     await this.keyInput.sendKeys(key);
   }
 
-  async getKeyInput() {
+  async getKeyInput(): Promise<string> {
     return await this.keyInput.getAttribute('value');
   }
 
-  async setDescriptionInput(description) {
+  async setDescriptionInput(description: string): Promise<void> {
     await this.descriptionInput.sendKeys(description);
   }
 
-  async getDescriptionInput() {
+  async getDescriptionInput(): Promise<string> {
     return await this.descriptionInput.getAttribute('value');
   }
 
-  getIsDefaultInput() {
+  getIsDefaultInput(): ElementFinder {
     return this.isDefaultInput;
   }
-  async save() {
+  async save(): Promise<void> {
     await this.saveButton.click();
   }
 
-  async cancel() {
+  async cancel(): Promise<void> {
     await this.cancelButton.click();
   }
 
@@ -86,11 +86,11 @@ export class SlicerOptionDeleteDialog {
   private dialogTitle = element(by.id('jhi-delete-slicerOption-heading'));
   private confirmButton = element(by.id('jhi-confirm-delete-slicerOption'));
 
-  async getDialogTitle() {
+  async getDialogTitle(): Promise<string> {
     return this.dialogTitle.getText();
   }
 
-  async clickOnConfirmButton() {
+  async clickOnConfirmButton(): Promise<void> {
     await this.confirmButton.click();
   }
 }

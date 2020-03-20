@@ -1,8 +1,8 @@
 package org.unibremen.mcyl.androidslicer;
 
 import org.unibremen.mcyl.androidslicer.config.ApplicationProperties;
-import org.unibremen.mcyl.androidslicer.config.DefaultProfileUtil;
 
+import io.github.jhipster.config.DefaultProfileUtil;
 import io.github.jhipster.config.JHipsterConstants;
 
 import org.apache.commons.lang3.StringUtils;

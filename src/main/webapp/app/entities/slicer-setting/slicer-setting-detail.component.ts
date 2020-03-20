@@ -8,17 +8,17 @@ import { ISlicerSetting } from 'app/shared/model/slicer-setting.model';
   templateUrl: './slicer-setting-detail.component.html'
 })
 export class SlicerSettingDetailComponent implements OnInit {
-  slicerSetting: ISlicerSetting;
+  slicerSetting: ISlicerSetting | null = null;
 
   constructor(protected activatedRoute: ActivatedRoute) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ slicerSetting }) => {
       this.slicerSetting = slicerSetting;
     });
   }
 
-  previousState() {
+  previousState(): void {
     window.history.back();
   }
 }

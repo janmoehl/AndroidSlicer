@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 
@@ -10,7 +9,7 @@ import { SlicerOptionService } from './slicer-option.service';
   templateUrl: './slicer-option-delete-dialog.component.html'
 })
 export class SlicerOptionDeleteDialogComponent {
-  slicerOption: ISlicerOption;
+  slicerOption?: ISlicerOption;
 
   constructor(
     protected slicerOptionService: SlicerOptionService,
@@ -18,17 +17,14 @@ export class SlicerOptionDeleteDialogComponent {
     protected eventManager: JhiEventManager
   ) {}
 
-  clear() {
-    this.activeModal.dismiss('cancel');
+  clear(): void {
+    this.activeModal.dismiss();
   }
 
-  confirmDelete(id: string) {
+  confirmDelete(id: string): void {
     this.slicerOptionService.delete(id).subscribe(() => {
-      this.eventManager.broadcast({
-        name: 'slicerOptionListModification',
-        content: 'Deleted an slicerOption'
-      });
-      this.activeModal.dismiss(true);
+      this.eventManager.broadcast('slicerOptionListModification');
+      this.activeModal.close();
     });
   }
 }

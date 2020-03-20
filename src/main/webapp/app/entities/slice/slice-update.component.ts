@@ -1,20 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { HttpResponse } from '@angular/common/http';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { JhiAlertService, JhiDataUtils } from 'ng-jhipster';
+import { JhiDataUtils, JhiFileLoadError, JhiEventManager, JhiEventWithContent } from 'ng-jhipster';
+
 import { ISlice, Slice } from 'app/shared/model/slice.model';
 import { SliceService } from './slice.service';
+import { AlertError } from 'app/shared/alert/alert-error.model';
 
 @Component({
   selector: 'jhi-slice-update',
   templateUrl: './slice-update.component.html'
 })
 export class SliceUpdateComponent implements OnInit {
-  isSaving: boolean;
+  isSaving = false;
 
   editForm = this.fb.group({
     id: [],
@@ -33,20 +34,19 @@ export class SliceUpdateComponent implements OnInit {
 
   constructor(
     protected dataUtils: JhiDataUtils,
-    protected jhiAlertService: JhiAlertService,
+    protected eventManager: JhiEventManager,
     protected sliceService: SliceService,
     protected activatedRoute: ActivatedRoute,
     private fb: FormBuilder
   ) {}
 
-  ngOnInit() {
-    this.isSaving = false;
+  ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ slice }) => {
       this.updateForm(slice);
     });
   }
 
-  updateForm(slice: ISlice) {
+  updateForm(slice: ISlice): void {
     this.editForm.patchValue({
       id: slice.id,
       androidVersion: slice.androidVersion,
@@ -63,44 +63,27 @@ export class SliceUpdateComponent implements OnInit {
     });
   }
 
-  byteSize(field) {
-    return this.dataUtils.byteSize(field);
+  byteSize(base64String: string): string {
+    return this.dataUtils.byteSize(base64String);
   }
 
-  openFile(contentType, field) {
-    return this.dataUtils.openFile(contentType, field);
+  openFile(contentType: string, base64String: string): void {
+    this.dataUtils.openFile(contentType, base64String);
   }
 
-  setFileData(event, field: string, isImage) {
-    return new Promise((resolve, reject) => {
-      if (event && event.target && event.target.files && event.target.files[0]) {
-        const file: File = event.target.files[0];
-        if (isImage && !file.type.startsWith('image/')) {
-          reject(`File was expected to be an image but was found to be ${file.type}`);
-        } else {
-          const filedContentType: string = field + 'ContentType';
-          this.dataUtils.toBase64(file, base64Data => {
-            this.editForm.patchValue({
-              [field]: base64Data,
-              [filedContentType]: file.type
-            });
-          });
-        }
-      } else {
-        reject(`Base64 data was not set as file could not be extracted from passed parameter: ${event}`);
-      }
-    }).then(
-      // eslint-disable-next-line no-console
-      () => console.log('blob added'), // success
-      this.onError
-    );
+  setFileData(event: Event, field: string, isImage: boolean): void {
+    this.dataUtils.loadFileToForm(event, this.editForm, field, isImage).subscribe(null, (err: JhiFileLoadError) => {
+      this.eventManager.broadcast(
+        new JhiEventWithContent<AlertError>('androidSlicerApp.error', { message: err.message })
+      );
+    });
   }
 
-  previousState() {
+  previousState(): void {
     window.history.back();
   }
 
-  save() {
+  save(): void {
     this.isSaving = true;
     const slice = this.createFromForm();
     if (slice.id !== undefined) {
@@ -113,34 +96,34 @@ export class SliceUpdateComponent implements OnInit {
   private createFromForm(): ISlice {
     return {
       ...new Slice(),
-      id: this.editForm.get(['id']).value,
-      androidVersion: this.editForm.get(['androidVersion']).value,
-      androidClassName: this.editForm.get(['androidClassName']).value,
-      entryMethods: this.editForm.get(['entryMethods']).value,
-      seedStatements: this.editForm.get(['seedStatements']).value,
-      slice: this.editForm.get(['slice']).value,
-      log: this.editForm.get(['log']).value,
-      threadId: this.editForm.get(['threadId']).value,
-      running: this.editForm.get(['running']).value,
-      reflectionOptions: this.editForm.get(['reflectionOptions']).value,
-      dataDependenceOptions: this.editForm.get(['dataDependenceOptions']).value,
-      controlDependenceOptions: this.editForm.get(['controlDependenceOptions']).value
+      id: this.editForm.get(['id'])!.value,
+      androidVersion: this.editForm.get(['androidVersion'])!.value,
+      androidClassName: this.editForm.get(['androidClassName'])!.value,
+      entryMethods: this.editForm.get(['entryMethods'])!.value,
+      seedStatements: this.editForm.get(['seedStatements'])!.value,
+      slice: this.editForm.get(['slice'])!.value,
+      log: this.editForm.get(['log'])!.value,
+      threadId: this.editForm.get(['threadId'])!.value,
+      running: this.editForm.get(['running'])!.value,
+      reflectionOptions: this.editForm.get(['reflectionOptions'])!.value,
+      dataDependenceOptions: this.editForm.get(['dataDependenceOptions'])!.value,
+      controlDependenceOptions: this.editForm.get(['controlDependenceOptions'])!.value
     };
   }
 
-  protected subscribeToSaveResponse(result: Observable<HttpResponse<ISlice>>) {
-    result.subscribe(() => this.onSaveSuccess(), () => this.onSaveError());
+  protected subscribeToSaveResponse(result: Observable<HttpResponse<ISlice>>): void {
+    result.subscribe(
+      () => this.onSaveSuccess(),
+      () => this.onSaveError()
+    );
   }
 
-  protected onSaveSuccess() {
+  protected onSaveSuccess(): void {
     this.isSaving = false;
     this.previousState();
   }
 
-  protected onSaveError() {
+  protected onSaveError(): void {
     this.isSaving = false;
-  }
-  protected onError(errorMessage: string) {
-    this.jhiAlertService.error(errorMessage, null, null);
   }
 }
