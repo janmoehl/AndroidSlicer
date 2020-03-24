@@ -4,6 +4,8 @@ export class SlicerOptionComponentsPage {
   createButton = element(by.id('jh-create-entity'));
   deleteButtons = element.all(by.css('jhi-slicer-option div table .btn-danger'));
   title = element.all(by.css('jhi-slicer-option div h2#page-heading span')).first();
+  noResult = element(by.id('no-result'));
+  entities = element(by.id('entities'));
 
   async clickOnCreateButton(): Promise<void> {
     await this.createButton.click();
@@ -26,6 +28,7 @@ export class SlicerOptionUpdatePage {
   pageTitle = element(by.id('jhi-slicer-option-heading'));
   saveButton = element(by.id('save-entity'));
   cancelButton = element(by.id('cancel-save'));
+
   typeSelect = element(by.id('field_type'));
   keyInput = element(by.id('field_key'));
   descriptionInput = element(by.id('field_description'));
@@ -69,6 +72,7 @@ export class SlicerOptionUpdatePage {
   getIsDefaultInput(): ElementFinder {
     return this.isDefaultInput;
   }
+
   async save(): Promise<void> {
     await this.saveButton.click();
   }

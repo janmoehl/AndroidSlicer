@@ -25,6 +25,7 @@ describe('Slice e2e test', () => {
     sliceComponentsPage = new SliceComponentsPage();
     await browser.wait(ec.visibilityOf(sliceComponentsPage.title), 5000);
     expect(await sliceComponentsPage.getTitle()).to.eq('Slice');
+    await browser.wait(ec.or(ec.visibilityOf(sliceComponentsPage.entities), ec.visibilityOf(sliceComponentsPage.noResult)), 1000);
   });
 
   it('should load create Slice page', async () => {
@@ -38,6 +39,7 @@ describe('Slice e2e test', () => {
     const nbButtonsBeforeCreate = await sliceComponentsPage.countDeleteButtons();
 
     await sliceComponentsPage.clickOnCreateButton();
+
     await promise.all([
       sliceUpdatePage.setAndroidVersionInput('5'),
       sliceUpdatePage.setAndroidClassNameInput('androidClassName'),
@@ -50,6 +52,7 @@ describe('Slice e2e test', () => {
       sliceUpdatePage.dataDependenceOptionsSelectLastOption(),
       sliceUpdatePage.controlDependenceOptionsSelectLastOption()
     ]);
+
     expect(await sliceUpdatePage.getAndroidVersionInput()).to.eq('5', 'Expected androidVersion value to be equals to 5');
     expect(await sliceUpdatePage.getAndroidClassNameInput()).to.eq(
       'androidClassName',
@@ -71,6 +74,7 @@ describe('Slice e2e test', () => {
       await sliceUpdatePage.getRunningInput().click();
       expect(await sliceUpdatePage.getRunningInput().isSelected(), 'Expected running to be selected').to.be.true;
     }
+
     await sliceUpdatePage.save();
     expect(await sliceUpdatePage.getSaveButton().isPresent(), 'Expected save button disappear').to.be.false;
 

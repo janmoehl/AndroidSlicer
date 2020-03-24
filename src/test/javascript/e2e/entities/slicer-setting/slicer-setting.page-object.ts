@@ -4,6 +4,8 @@ export class SlicerSettingComponentsPage {
   createButton = element(by.id('jh-create-entity'));
   deleteButtons = element.all(by.css('jhi-slicer-setting div table .btn-danger'));
   title = element.all(by.css('jhi-slicer-setting div h2#page-heading span')).first();
+  noResult = element(by.id('no-result'));
+  entities = element(by.id('entities'));
 
   async clickOnCreateButton(): Promise<void> {
     await this.createButton.click();
@@ -26,6 +28,7 @@ export class SlicerSettingUpdatePage {
   pageTitle = element(by.id('jhi-slicer-setting-heading'));
   saveButton = element(by.id('save-entity'));
   cancelButton = element(by.id('cancel-save'));
+
   keyInput = element(by.id('field_key'));
   valueInput = element(by.id('field_value'));
 

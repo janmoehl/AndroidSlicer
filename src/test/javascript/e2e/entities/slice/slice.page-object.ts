@@ -4,6 +4,8 @@ export class SliceComponentsPage {
   createButton = element(by.id('jh-create-entity'));
   deleteButtons = element.all(by.css('jhi-slice div table .btn-danger'));
   title = element.all(by.css('jhi-slice div h2#page-heading span')).first();
+  noResult = element(by.id('no-result'));
+  entities = element(by.id('entities'));
 
   async clickOnCreateButton(): Promise<void> {
     await this.createButton.click();
@@ -26,6 +28,7 @@ export class SliceUpdatePage {
   pageTitle = element(by.id('jhi-slice-heading'));
   saveButton = element(by.id('save-entity'));
   cancelButton = element(by.id('cancel-save'));
+
   androidVersionInput = element(by.id('field_androidVersion'));
   androidClassNameInput = element(by.id('field_androidClassName'));
   entryMethodsInput = element(by.id('field_entryMethods'));
@@ -101,6 +104,7 @@ export class SliceUpdatePage {
   getRunningInput(): ElementFinder {
     return this.runningInput;
   }
+
   async setReflectionOptionsSelect(reflectionOptions: string): Promise<void> {
     await this.reflectionOptionsSelect.sendKeys(reflectionOptions);
   }

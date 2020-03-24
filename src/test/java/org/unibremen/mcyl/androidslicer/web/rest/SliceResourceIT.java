@@ -159,7 +159,7 @@ public class SliceResourceIT {
 
         // Create the Slice
         restSliceMockMvc.perform(post("/api/slice")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(TestUtil.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(slice)))
             .andExpect(status().isCreated());
 
@@ -189,7 +189,7 @@ public class SliceResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restSliceMockMvc.perform(post("/api/slice")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(TestUtil.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(slice)))
             .andExpect(status().isBadRequest());
 
@@ -208,7 +208,7 @@ public class SliceResourceIT {
         // Create the Slice, which fails.
 
         restSliceMockMvc.perform(post("/api/slice")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(TestUtil.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(slice)))
             .andExpect(status().isBadRequest());
 
@@ -225,7 +225,7 @@ public class SliceResourceIT {
         // Create the Slice, which fails.
 
         restSliceMockMvc.perform(post("/api/slice")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(TestUtil.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(slice)))
             .andExpect(status().isBadRequest());
 
@@ -242,7 +242,7 @@ public class SliceResourceIT {
         // Create the Slice, which fails.
 
         restSliceMockMvc.perform(post("/api/slice")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(TestUtil.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(slice)))
             .andExpect(status().isBadRequest());
 
@@ -259,7 +259,7 @@ public class SliceResourceIT {
         // Create the Slice, which fails.
 
         restSliceMockMvc.perform(post("/api/slice")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(TestUtil.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(slice)))
             .andExpect(status().isBadRequest());
 
@@ -276,7 +276,7 @@ public class SliceResourceIT {
         // Create the Slice, which fails.
 
         restSliceMockMvc.perform(post("/api/slice")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(TestUtil.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(slice)))
             .andExpect(status().isBadRequest());
 
@@ -292,7 +292,7 @@ public class SliceResourceIT {
         // Get all the sliceList
         restSliceMockMvc.perform(get("/api/slice?sort=id,desc"))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(slice.getId())))
             .andExpect(jsonPath("$.[*].androidVersion").value(hasItem(DEFAULT_ANDROID_VERSION)))
             .andExpect(jsonPath("$.[*].androidClassName").value(hasItem(DEFAULT_ANDROID_CLASS_NAME)))
@@ -315,7 +315,7 @@ public class SliceResourceIT {
         // Get the slice
         restSliceMockMvc.perform(get("/api/slice/{id}", slice.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(slice.getId()))
             .andExpect(jsonPath("$.androidVersion").value(DEFAULT_ANDROID_VERSION))
             .andExpect(jsonPath("$.androidClassName").value(DEFAULT_ANDROID_CLASS_NAME))
@@ -360,7 +360,7 @@ public class SliceResourceIT {
             .controlDependenceOptions(UPDATED_CONTROL_DEPENDENCE_OPTIONS);
 
         restSliceMockMvc.perform(put("/api/slice")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(TestUtil.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(updatedSlice)))
             .andExpect(status().isOk());
 
@@ -389,7 +389,7 @@ public class SliceResourceIT {
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restSliceMockMvc.perform(put("/api/slice")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(TestUtil.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(slice)))
             .andExpect(status().isBadRequest());
 
@@ -407,7 +407,7 @@ public class SliceResourceIT {
 
         // Delete the slice
         restSliceMockMvc.perform(delete("/api/slice/{id}", slice.getId())
-            .accept(TestUtil.APPLICATION_JSON_UTF8))
+            .accept(TestUtil.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

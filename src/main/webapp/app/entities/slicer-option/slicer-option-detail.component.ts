@@ -14,9 +14,7 @@ export class SlicerOptionDetailComponent implements OnInit {
   constructor(protected dataUtils: JhiDataUtils, protected activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.activatedRoute.data.subscribe(({ slicerOption }) => {
-      this.slicerOption = slicerOption;
-    });
+    this.activatedRoute.data.subscribe(({ slicerOption }) => (this.slicerOption = slicerOption));
   }
 
   byteSize(base64String: string): string {

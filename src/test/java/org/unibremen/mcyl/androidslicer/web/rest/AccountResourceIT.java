@@ -30,25 +30,25 @@ public class AccountResourceIT {
     public void setup() {
         AccountResource accountUserMockResource = new AccountResource();
         this.mockMvc = MockMvcBuilders.standaloneSetup(accountUserMockResource)
-                .setControllerAdvice(exceptionTranslator)
-                .build();
+            .setControllerAdvice(exceptionTranslator)
+            .build();
     }
 
     @Test
     @WithMockUser(username = "test", roles = "ADMIN")
     public void testGetExistingAccount() throws Exception {
         mockMvc.perform(get("/api/account")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.login").value("test"))
-                .andExpect(jsonPath("$.authorities").value(AuthoritiesConstants.ADMIN));
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.login").value("test"))
+            .andExpect(jsonPath("$.authorities").value(AuthoritiesConstants.ADMIN));
     }
 
     @Test
     public void testGetUnknownAccount() throws Exception {
         mockMvc.perform(get("/api/account")
-                .accept(MediaType.APPLICATION_PROBLEM_JSON))
-                .andExpect(status().isInternalServerError());
+            .accept(MediaType.APPLICATION_PROBLEM_JSON))
+            .andExpect(status().isInternalServerError());
     }
 }

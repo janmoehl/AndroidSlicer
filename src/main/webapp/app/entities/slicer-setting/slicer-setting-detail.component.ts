@@ -13,9 +13,7 @@ export class SlicerSettingDetailComponent implements OnInit {
   constructor(protected activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.activatedRoute.data.subscribe(({ slicerSetting }) => {
-      this.slicerSetting = slicerSetting;
-    });
+    this.activatedRoute.data.subscribe(({ slicerSetting }) => (this.slicerSetting = slicerSetting));
   }
 
   previousState(): void {

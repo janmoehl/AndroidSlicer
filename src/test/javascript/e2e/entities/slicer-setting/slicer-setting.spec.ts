@@ -25,6 +25,10 @@ describe('SlicerSetting e2e test', () => {
     slicerSettingComponentsPage = new SlicerSettingComponentsPage();
     await browser.wait(ec.visibilityOf(slicerSettingComponentsPage.title), 5000);
     expect(await slicerSettingComponentsPage.getTitle()).to.eq('Slicer Settings');
+    await browser.wait(
+      ec.or(ec.visibilityOf(slicerSettingComponentsPage.entities), ec.visibilityOf(slicerSettingComponentsPage.noResult)),
+      1000
+    );
   });
 
   it('should load create SlicerSetting page', async () => {
@@ -38,9 +42,12 @@ describe('SlicerSetting e2e test', () => {
     const nbButtonsBeforeCreate = await slicerSettingComponentsPage.countDeleteButtons();
 
     await slicerSettingComponentsPage.clickOnCreateButton();
+
     await promise.all([slicerSettingUpdatePage.setKeyInput('key'), slicerSettingUpdatePage.setValueInput('value')]);
+
     expect(await slicerSettingUpdatePage.getKeyInput()).to.eq('key', 'Expected Key value to be equals to key');
     expect(await slicerSettingUpdatePage.getValueInput()).to.eq('value', 'Expected Value value to be equals to value');
+
     await slicerSettingUpdatePage.save();
     expect(await slicerSettingUpdatePage.getSaveButton().isPresent(), 'Expected save button disappear').to.be.false;
 

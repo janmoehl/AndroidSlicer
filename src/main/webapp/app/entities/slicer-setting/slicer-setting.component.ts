@@ -34,7 +34,8 @@ export class SlicerSettingComponent implements OnInit, OnDestroy {
   ) {}
 
   loadPage(page?: number): void {
-    const pageToLoad: number = page ? page : this.page;
+    const pageToLoad: number = page || this.page;
+
     this.slicerSettingService
       .query({
         page: pageToLoad - 1,
@@ -96,7 +97,7 @@ export class SlicerSettingComponent implements OnInit, OnDestroy {
         sort: this.predicate + ',' + (this.ascending ? 'asc' : 'desc')
       }
     });
-    this.slicerSettings = data ? data : [];
+    this.slicerSettings = data || [];
   }
 
   protected onError(): void {

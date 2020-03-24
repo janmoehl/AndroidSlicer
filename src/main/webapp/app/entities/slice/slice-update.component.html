@@ -2,13 +2,15 @@
     <div class="col-8">
         <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
             <h2 id="jhi-slice-heading">Create or edit a Slice</h2>
+
             <div>
                 <jhi-alert-error></jhi-alert-error>
+
                 <div class="form-group" [hidden]="!editForm.get('id')!.value">
                     <label for="id">ID</label>
-                    <input type="text" class="form-control" id="id" name="id" formControlName="id"
-                        readonly />
+                    <input type="text" class="form-control" id="id" name="id" formControlName="id" readonly />
                 </div>
+
                 <div class="form-group">
                     <label class="form-control-label" for="field_androidVersion">Android Version</label>
                     <input type="number" class="form-control" name="androidVersion" id="field_androidVersion"
@@ -24,6 +26,7 @@
                         </small>
                     </div>
                 </div>
+
                 <div class="form-group">
                     <label class="form-control-label" for="field_androidClassName">Android Class Name</label>
                     <input type="text" class="form-control" name="androidClassName" id="field_androidClassName"
@@ -35,6 +38,7 @@
                         </small>
                     </div>
                 </div>
+
                 <div class="form-group">
                     <label class="form-control-label" for="field_entryMethods" ngbTooltip="JSON-List with entry method names">Entry Methods</label>
                     <textarea class="form-control" name="entryMethods" id="field_entryMethods"
@@ -46,6 +50,7 @@
                         </small>
                     </div>
                 </div>
+
                 <div class="form-group">
                     <label class="form-control-label" for="field_seedStatements" ngbTooltip="JSON-List with seed statement names">Seed Statements</label>
                     <textarea class="form-control" name="seedStatements" id="field_seedStatements"
@@ -57,26 +62,31 @@
                         </small>
                     </div>
                 </div>
+
                 <div class="form-group">
                     <label class="form-control-label" for="field_slice">Slice</label>
                     <textarea class="form-control" name="slice" id="field_slice"
                               formControlName="slice"></textarea>
                 </div>
+
                 <div class="form-group">
                     <label class="form-control-label" for="field_log">Log</label>
                     <textarea class="form-control" name="log" id="field_log"
                               formControlName="log"></textarea>
                 </div>
+
                 <div class="form-group">
                     <label class="form-control-label" for="field_threadId">Thread Id</label>
                     <input type="text" class="form-control" name="threadId" id="field_threadId"
                            formControlName="threadId"/>
                 </div>
+
                 <div class="form-group">
                     <label class="form-control-label" for="field_running">Running</label>
                     <input type="checkbox" class="form-control" name="running" id="field_running"
                            formControlName="running"/>
                 </div>
+
                 <div class="form-group">
                     <label class="form-control-label" for="field_reflectionOptions" ngbTooltip="com.ibm.wala.ipa.callgraph.AnalysisOptions.ReflectionOptions">Reflection Options</label>
                     <select class="form-control" name="reflectionOptions" formControlName="reflectionOptions" id="field_reflectionOptions">
@@ -95,6 +105,7 @@
                         </small>
                     </div>
                 </div>
+
                 <div class="form-group">
                     <label class="form-control-label" for="field_dataDependenceOptions" ngbTooltip="com.ibm.wala.ipa.slicer.Slicer.DataDependenceOptions">Data Dependence Options</label>
                     <select class="form-control" name="dataDependenceOptions" formControlName="dataDependenceOptions" id="field_dataDependenceOptions">
@@ -116,6 +127,7 @@
                         </small>
                     </div>
                 </div>
+
                 <div class="form-group">
                     <label class="form-control-label" for="field_controlDependenceOptions" ngbTooltip="com.ibm.wala.ipa.slicer.Slicer.ControlDependenceOptions">Control Dependence Options</label>
                     <select class="form-control" name="controlDependenceOptions" formControlName="controlDependenceOptions" id="field_controlDependenceOptions">
@@ -130,14 +142,15 @@
                         </small>
                     </div>
                 </div>
-
             </div>
+
             <div>
-                <button type="button" id="cancel-save" class="btn btn-secondary"  (click)="previousState()">
-                    <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span>Cancel</span>
+                <button type="button" id="cancel-save" class="btn btn-secondary" (click)="previousState()">
+                    <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
                 </button>
+
                 <button type="submit" id="save-entity" [disabled]="editForm.invalid || isSaving" class="btn btn-primary">
-                    <fa-icon [icon]="'save'"></fa-icon>&nbsp;<span>Save</span>
+                    <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
                 </button>
             </div>
         </form>

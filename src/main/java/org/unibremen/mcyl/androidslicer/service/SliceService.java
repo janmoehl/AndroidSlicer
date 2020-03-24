@@ -47,7 +47,6 @@ public class SliceService {
         return sliceRepository.findAll(pageable);
     }
 
-
     /**
      * Get one slice by id.
      *

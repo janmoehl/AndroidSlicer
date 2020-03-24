@@ -1,4 +1,5 @@
 package org.unibremen.mcyl.androidslicer.domain;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.Document;

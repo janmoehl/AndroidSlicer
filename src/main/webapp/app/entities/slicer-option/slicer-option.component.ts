@@ -35,7 +35,8 @@ export class SlicerOptionComponent implements OnInit, OnDestroy {
   ) {}
 
   loadPage(page?: number): void {
-    const pageToLoad: number = page ? page : this.page;
+    const pageToLoad: number = page || this.page;
+
     this.slicerOptionService
       .query({
         page: pageToLoad - 1,
@@ -105,7 +106,7 @@ export class SlicerOptionComponent implements OnInit, OnDestroy {
         sort: this.predicate + ',' + (this.ascending ? 'asc' : 'desc')
       }
     });
-    this.slicerOptions = data ? data : [];
+    this.slicerOptions = data || [];
   }
 
   protected onError(): void {

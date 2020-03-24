@@ -106,7 +106,7 @@ public class SlicerSettingResourceIT {
 
         // Create the SlicerSetting
         restSlicerSettingMockMvc.perform(post("/api/slicer-settings")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(TestUtil.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(slicerSetting)))
             .andExpect(status().isCreated());
 
@@ -127,7 +127,7 @@ public class SlicerSettingResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restSlicerSettingMockMvc.perform(post("/api/slicer-settings")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(TestUtil.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(slicerSetting)))
             .andExpect(status().isBadRequest());
 
@@ -146,7 +146,7 @@ public class SlicerSettingResourceIT {
         // Create the SlicerSetting, which fails.
 
         restSlicerSettingMockMvc.perform(post("/api/slicer-settings")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(TestUtil.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(slicerSetting)))
             .andExpect(status().isBadRequest());
 
@@ -163,7 +163,7 @@ public class SlicerSettingResourceIT {
         // Create the SlicerSetting, which fails.
 
         restSlicerSettingMockMvc.perform(post("/api/slicer-settings")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(TestUtil.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(slicerSetting)))
             .andExpect(status().isBadRequest());
 
@@ -179,7 +179,7 @@ public class SlicerSettingResourceIT {
         // Get all the slicerSettingList
         restSlicerSettingMockMvc.perform(get("/api/slicer-settings?sort=id,desc"))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(slicerSetting.getId())))
             .andExpect(jsonPath("$.[*].key").value(hasItem(DEFAULT_KEY)))
             .andExpect(jsonPath("$.[*].value").value(hasItem(DEFAULT_VALUE)));
@@ -193,7 +193,7 @@ public class SlicerSettingResourceIT {
         // Get the slicerSetting
         restSlicerSettingMockMvc.perform(get("/api/slicer-settings/{id}", slicerSetting.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(slicerSetting.getId()))
             .andExpect(jsonPath("$.key").value(DEFAULT_KEY))
             .andExpect(jsonPath("$.value").value(DEFAULT_VALUE));
@@ -220,7 +220,7 @@ public class SlicerSettingResourceIT {
             .value(UPDATED_VALUE);
 
         restSlicerSettingMockMvc.perform(put("/api/slicer-settings")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(TestUtil.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(updatedSlicerSetting)))
             .andExpect(status().isOk());
 
@@ -240,7 +240,7 @@ public class SlicerSettingResourceIT {
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restSlicerSettingMockMvc.perform(put("/api/slicer-settings")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(TestUtil.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(slicerSetting)))
             .andExpect(status().isBadRequest());
 
@@ -258,7 +258,7 @@ public class SlicerSettingResourceIT {
 
         // Delete the slicerSetting
         restSlicerSettingMockMvc.perform(delete("/api/slicer-settings/{id}", slicerSetting.getId())
-            .accept(TestUtil.APPLICATION_JSON_UTF8))
+            .accept(TestUtil.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

@@ -25,6 +25,10 @@ describe('SlicerOption e2e test', () => {
     slicerOptionComponentsPage = new SlicerOptionComponentsPage();
     await browser.wait(ec.visibilityOf(slicerOptionComponentsPage.title), 5000);
     expect(await slicerOptionComponentsPage.getTitle()).to.eq('Slicer Options');
+    await browser.wait(
+      ec.or(ec.visibilityOf(slicerOptionComponentsPage.entities), ec.visibilityOf(slicerOptionComponentsPage.noResult)),
+      1000
+    );
   });
 
   it('should load create SlicerOption page', async () => {
@@ -38,11 +42,13 @@ describe('SlicerOption e2e test', () => {
     const nbButtonsBeforeCreate = await slicerOptionComponentsPage.countDeleteButtons();
 
     await slicerOptionComponentsPage.clickOnCreateButton();
+
     await promise.all([
       slicerOptionUpdatePage.typeSelectLastOption(),
       slicerOptionUpdatePage.setKeyInput('key'),
       slicerOptionUpdatePage.setDescriptionInput('description')
     ]);
+
     expect(await slicerOptionUpdatePage.getKeyInput()).to.eq('key', 'Expected Key value to be equals to key');
     expect(await slicerOptionUpdatePage.getDescriptionInput()).to.eq(
       'description',
@@ -56,6 +62,7 @@ describe('SlicerOption e2e test', () => {
       await slicerOptionUpdatePage.getIsDefaultInput().click();
       expect(await slicerOptionUpdatePage.getIsDefaultInput().isSelected(), 'Expected isDefault to be selected').to.be.true;
     }
+
     await slicerOptionUpdatePage.save();
     expect(await slicerOptionUpdatePage.getSaveButton().isPresent(), 'Expected save button disappear').to.be.false;
 
