@@ -33,11 +33,11 @@ export class SliceDeleteDialogComponent {
   template: ''
 })
 export class SliceDeletePopupComponent implements OnInit, OnDestroy {
-  protected ngbModalRef: NgbModalRef;
+  protected ngbModalRef!: NgbModalRef | null;
 
   constructor(protected activatedRoute: ActivatedRoute, protected router: Router, protected modalService: NgbModal) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ slice }) => {
       setTimeout(() => {
         this.ngbModalRef = this.modalService.open(SliceDeleteDialogComponent as Component, { size: 'lg', backdrop: 'static' });
@@ -56,7 +56,7 @@ export class SliceDeletePopupComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.ngbModalRef = null;
   }
 }

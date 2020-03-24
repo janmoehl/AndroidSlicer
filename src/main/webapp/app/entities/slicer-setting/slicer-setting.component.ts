@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { JhiEventManager } from 'ng-jhipster';
+import { JhiEventManager, JhiParseLinks } from 'ng-jhipster';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ISlicerSetting } from 'app/shared/model/slicer-setting.model';
@@ -16,38 +16,53 @@ import { SlicerSettingService } from './slicer-setting.service';
 })
 export class SlicerSettingComponent implements OnInit, OnDestroy {
   slicerSettings?: ISlicerSetting[];
+  error: any;
+  success: any;
   eventSubscriber?: Subscription;
-  totalItems = 0;
-  itemsPerPage = ITEMS_PER_PAGE;
-  page!: number;
-  predicate!: string;
-  ascending!: boolean;
-  ngbPaginationPage = 1;
+  routeData: any;
+  links: any;
+  totalItems: any;
+  itemsPerPage: any;
+  page: any;
+  predicate: any;
+  previousPage: any;
+  reverse: any;
 
   constructor(
     protected slicerSettingService: SlicerSettingService,
+    protected parseLinks: JhiParseLinks,
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
     protected eventManager: JhiEventManager,
     protected modalService: NgbModal
-  ) {}
+  ) {
+    this.itemsPerPage = ITEMS_PER_PAGE;
+    this.routeData = this.activatedRoute.data.subscribe(data => {
+      this.page = data.pagingParams.page;
+      this.previousPage = data.pagingParams.page;
+      this.reverse = data.pagingParams.ascending;
+      this.predicate = data.pagingParams.predicate;
+    });
+  }
 
-  loadPage(page?: number): void {
-    const pageToLoad: number = page || this.page;
-
+  loadAll(): void {
     this.slicerSettingService
       .query({
-        page: pageToLoad - 1,
+        page: this.page - 1,
         size: this.itemsPerPage,
         sort: this.sort()
       })
-      .subscribe(
-        (res: HttpResponse<ISlicerSetting[]>) => this.onSuccess(res.body, res.headers, pageToLoad),
-        () => this.onError()
-      );
+      .subscribe((res: HttpResponse<ISlicerSetting[]>) => this.paginateSlicerSettings(res.body, res.headers));
   }
 
-  transition() {
+  loadPage(page: number): void {
+    if (page !== this.previousPage) {
+      this.previousPage = page;
+      this.transition();
+    }
+  }
+
+  transition(): void {
     this.router.navigate(['/slicer-settings'], {
       queryParams: {
         page: this.page,
@@ -58,7 +73,7 @@ export class SlicerSettingComponent implements OnInit, OnDestroy {
     this.loadAll();
   }
 
-  clear() {
+  clear(): void {
     this.page = 0;
     this.router.navigate([
       '/slicer-settings',
@@ -70,7 +85,7 @@ export class SlicerSettingComponent implements OnInit, OnDestroy {
     this.loadAll();
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadAll();
     this.registerChangeInSlicerSettings();
   }
@@ -81,16 +96,15 @@ export class SlicerSettingComponent implements OnInit, OnDestroy {
     }
   }
 
-  trackId(index: number, item: ISlicerSetting): string {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    return item.id!;
+  trackId(index: number, item: ISlicerSetting): string | undefined {
+    return item.id;
   }
 
   registerChangeInSlicerSettings(): void {
-    this.eventSubscriber = this.eventManager.subscribe('slicerSettingListModification', () => this.loadPage());
+    this.eventSubscriber = this.eventManager.subscribe('slicerSettingListModification', () => this.loadAll());
   }
 
-  sort() {
+  sort(): string[] {
     const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
     if (this.predicate !== 'id') {
       result.push('id');
@@ -98,20 +112,12 @@ export class SlicerSettingComponent implements OnInit, OnDestroy {
     return result;
   }
 
-  protected onSuccess(data: ISlicerSetting[] | null, headers: HttpHeaders, page: number): void {
+  protected paginateSlicerSettings(data: ISlicerSetting[] | null, headers: HttpHeaders): void {
+    if (data == null) {
+      return;
+    }
+    this.links = this.parseLinks.parse(headers.get('link'));
     this.totalItems = Number(headers.get('X-Total-Count'));
-    this.page = page;
-    this.router.navigate(['/slicer-setting'], {
-      queryParams: {
-        page: this.page,
-        size: this.itemsPerPage,
-        sort: this.predicate + ',' + (this.ascending ? 'asc' : 'desc')
-      }
-    });
-    this.slicerSettings = data || [];
-  }
-
-  protected onError(): void {
-    this.ngbPaginationPage = this.page;
+    this.slicerSettings = data;
   }
 }

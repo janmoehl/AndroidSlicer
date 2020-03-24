@@ -24,9 +24,9 @@
                                 lazy="true"
                                 [style]="{'display':'block','width':'100%'}"
                                 (onChange)="onVersionSelection()"></p-dropdown>
-                        <div *ngIf="createForm.get('androidVersion').invalid && (createForm.get('androidVersion').dirty || createForm.get('androidVersion').touched)">
+                        <div *ngIf="createForm.get('androidVersion')!.invalid && (createForm.get('androidVersion')!.dirty || createForm.get('androidVersion')!.touched)">
                             <small class="form-text text-danger"
-                                *ngIf="createForm.get('androidVersion').errors.required">
+                                *ngIf="createForm.get('androidVersion')!.errors!.required">
                                 This field is required.
                             </small>
                             <small class="form-text text-danger"
@@ -48,9 +48,9 @@
                                 lazy="true"
                                 [style]="{'display':'block','width':'100%'}"
                                 (onChange)="onClassSelection()"></p-dropdown>
-                        <div *ngIf="createForm.get('androidClassName').invalid && (createForm.get('androidClassName').dirty || createForm.get('androidClassName').touched)">
+                        <div *ngIf="createForm.get('androidClassName')!.invalid && (createForm.get('androidClassName')!.dirty || createForm.get('androidClassName')!.touched)">
                             <small class="form-text text-danger"
-                                *ngIf="createForm.get('androidClassName').errors.required">
+                                *ngIf="createForm.get('androidClassName')!.errors!.required">
                                 This field is required.
                             </small>
                         </div>
@@ -88,9 +88,9 @@
                             (click)="clearAndroidEntryMethods()">Clear</button>
                         </div>
                         </div>
-                        <div *ngIf="createForm.get('androidEntryMethods').invalid && (createForm.get('androidEntryMethods').dirty || createForm.get('androidEntryMethods').touched)">
+                        <div *ngIf="createForm.get('androidEntryMethods')!.invalid && (createForm.get('androidEntryMethods')!.dirty || createForm.get('androidEntryMethods')!.touched)">
                             <small class="form-text text-danger"
-                                *ngIf="createForm.get('androidEntryMethods').errors.required">
+                                *ngIf="createForm.get('androidEntryMethods')!.errors!.required">
                                 This field is required.
                             </small>
                         </div>
@@ -106,7 +106,7 @@
                                 required="true" [dropdown]="true"
                             [multiple]="true" [minLength]="1"
                             placeholder="Select Seed Statement..."
-                            (completeMethod)="filterAndroidSeedStatementOptions($event)" (onKeyUp)="addSeedStatementOption($event)"></p-autoComplete>
+                            (completeMethod)="filterAndroidSeedStatementOptions($event)" (onKeyUp)="addAndroidSeedStatementOption($event)"></p-autoComplete>
                             </div>
                             <div class="btn-group col-2 px-lg-1" role="group">
                                 <button type="button"
@@ -117,9 +117,9 @@
                                 (click)="clearAndroidSeedStatements()">Clear</button>
                             </div>
                         </div>
-                        <div *ngIf="createForm.get('androidSeedStatements').invalid && (createForm.get('androidSeedStatements').dirty || createForm.get('androidSeedStatements').touched)">
+                        <div *ngIf="createForm.get('androidSeedStatements')!.invalid && (createForm.get('androidSeedStatements')!.dirty || createForm.get('androidSeedStatements')!.touched)">
                             <small class="form-text text-danger"
-                                *ngIf="createForm.get('androidSeedStatements').errors.required">
+                                *ngIf="createForm.get('androidSeedStatements')!.errors!.required">
                                 This field is required.
                             </small>
                         </div>
@@ -193,9 +193,9 @@
                             </div> -->
                         </div>
                         <!--
-                        <div *ngIf="createForm.get('androidEntryMethods').invalid && (createForm.get('androidEntryMethods').dirty || createForm.get('androidEntryMethods').touched)">
+                        <div *ngIf="createForm.get('androidEntryMethods')!.invalid && (createForm.get('androidEntryMethods')!.dirty || createForm.get('androidEntryMethods')!.touched)">
                             <small class="form-text text-danger"
-                                *ngIf="createForm.get('androidEntryMethods').errors.required">
+                                *ngIf="createForm.get('androidEntryMethods')!.errors!.required">
                                 This field is required.
                             </small>
                         </div>-->
@@ -218,9 +218,9 @@
                             -->
                         </div>
                         <!--
-                        <div *ngIf="createForm.get('javaSeedStatements').invalid && (createForm.get('javaSeedStatements').dirty || createForm.get('javaSeedStatements').touched)">
+                        <div *ngIf="createForm.get('javaSeedStatements')!.invalid && (createForm.get('javaSeedStatements')!.dirty || createForm.get('javaSeedStatements')!.touched)">
                             <small class="form-text text-danger"
-                                *ngIf="createForm.get('javaSeedStatements').errors.required">
+                                *ngIf="createForm.get('javaSeedStatements')!.errors!.required">
                                 This field is required.
                             </small>
                         </div> -->
@@ -249,11 +249,11 @@
                         </div>
                     </div>
                     </div>
-                    <div *ngIf="(createForm.get('cfaOptions').invalid && (createForm.get('cfaOptions').dirty || createForm.get('cfaOptions').touched)) ||
-                                (cfaLevelNeeded && (createForm.get('cfaLevel').invalid && (createForm.get('cfaLevel').dirty || createForm.get('cfaLevel').touched)))">
+                    <div *ngIf="(createForm.get('cfaOptions')!.invalid && (createForm.get('cfaOptions')!.dirty || createForm.get('cfaOptions')!.touched)) ||
+                                (cfaLevelNeeded && (createForm.get('cfaLevel')!.invalid && (createForm.get('cfaLevel')!.dirty || createForm.get('cfaLevel')!.touched)))">
                         <small class="form-text text-danger"
-                            *ngIf="(createForm.get('cfaOptions').errors && createForm.get('cfaOptions').errors.required) ||
-                                   (cfaLevelNeeded && (createForm.get('cfaLevel').errors && createForm.get('cfaLevel').errors.required))">
+                            *ngIf="(createForm.get('cfaOptions')!.errors && createForm.get('cfaOptions')!.errors!.required) ||
+                                   (cfaLevelNeeded && (createForm.get('cfaLevel')!.errors && createForm.get('cfaLevel')!.errors!.required))">
                             This field is required.
                         </small>
                     </div>
@@ -269,9 +269,9 @@
                        </ng-template>
                    </p-dropdown>
                 </div>
-                <div *ngIf="createForm.get('reflectionOptions').invalid && (createForm.get('reflectionOptions').dirty || createForm.get('reflectionOptions').touched)">
+                <div *ngIf="createForm.get('reflectionOptions')!.invalid && (createForm.get('reflectionOptions')!.dirty || createForm.get('reflectionOptions')!.touched)">
                     <small class="form-text text-danger"
-                        *ngIf="createForm.get('reflectionOptions').errors.required">
+                        *ngIf="createForm.get('reflectionOptions')!.errors!.required">
                         This field is required.
                     </small>
                 </div>
@@ -285,9 +285,9 @@
                         </ng-template>
                     </p-dropdown>
                 </div>
-                <div *ngIf="createForm.get('dataDependenceOptions').invalid && (createForm.get('dataDependenceOptions').dirty || createForm.get('dataDependenceOptions').touched)">
+                <div *ngIf="createForm.get('dataDependenceOptions')!.invalid && (createForm.get('dataDependenceOptions')!.dirty || createForm.get('dataDependenceOptions')!.touched)">
                     <small class="form-text text-danger"
-                        *ngIf="createForm.get('dataDependenceOptions').errors.required">
+                        *ngIf="createForm.get('dataDependenceOptions')!.errors!.required">
                         This field is required.
                     </small>
                 </div>
@@ -301,9 +301,9 @@
                         </ng-template>
                     </p-dropdown>
                 </div>
-                <div *ngIf="createForm.get('controlDependenceOptions').invalid && (createForm.get('controlDependenceOptions').dirty || createForm.get('controlDependenceOptions').touched)">
+                <div *ngIf="createForm.get('controlDependenceOptions')!.invalid && (createForm.get('controlDependenceOptions')!.dirty || createForm.get('controlDependenceOptions')!.touched)">
                     <small class="form-text text-danger"
-                        *ngIf="createForm.get('controlDependenceOptions').errors.required">
+                        *ngIf="createForm.get('controlDependenceOptions')!.errors!.required">
                         This field is required.
                     </small>
                 </div>

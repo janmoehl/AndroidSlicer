@@ -54,10 +54,10 @@ export class SlicerSettingUpdateComponent implements OnInit {
   private createFromForm(): ISlicerSetting {
     return {
       ...new SlicerSetting(),
-      id: this.editForm.get(['id']).value,
-      key: this.editForm.get(['key']).value,
-      value: this.editForm.get(['value']).value,
-      description: this.editForm.get(['description']).value
+      id: this.editForm.get(['id'])!.value,
+      key: this.editForm.get(['key'])!.value,
+      value: this.editForm.get(['value'])!.value,
+      description: this.editForm.get(['description'])!.value
     };
   }
 

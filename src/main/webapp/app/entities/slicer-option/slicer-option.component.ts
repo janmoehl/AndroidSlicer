@@ -23,6 +23,7 @@ export class SlicerOptionComponent implements OnInit, OnDestroy {
   predicate!: string;
   ascending!: boolean;
   ngbPaginationPage = 1;
+  reverse: any;
 
   constructor(
     protected slicerOptionService: SlicerOptionService,
@@ -31,7 +32,11 @@ export class SlicerOptionComponent implements OnInit, OnDestroy {
     protected router: Router,
     protected eventManager: JhiEventManager,
     protected modalService: NgbModal
-  ) {}
+  ) {
+    this.activatedRoute.data.subscribe(data => {
+      this.reverse = data.pagingParams.ascending;
+    });
+  }
 
   loadPage(page?: number): void {
     const pageToLoad: number = page || this.page;
@@ -48,7 +53,7 @@ export class SlicerOptionComponent implements OnInit, OnDestroy {
       );
   }
 
-  transition() {
+  transition(): void {
     this.router.navigate(['/slicer-options'], {
       queryParams: {
         page: this.page,
@@ -56,10 +61,10 @@ export class SlicerOptionComponent implements OnInit, OnDestroy {
         sort: this.predicate + ',' + (this.reverse ? 'asc' : 'desc')
       }
     });
-    this.loadAll();
+    this.loadPage();
   }
 
-  clear() {
+  clear(): void {
     this.page = 0;
     this.router.navigate([
       '/slicer-options',
@@ -68,11 +73,11 @@ export class SlicerOptionComponent implements OnInit, OnDestroy {
         sort: this.predicate + ',' + (this.reverse ? 'asc' : 'desc')
       }
     ]);
-    this.loadAll();
+    this.loadPage();
   }
 
-  ngOnInit() {
-    this.loadAll();
+  ngOnInit(): void {
+    this.loadPage();
     this.registerChangeInSlicerOptions();
   }
 
@@ -91,7 +96,7 @@ export class SlicerOptionComponent implements OnInit, OnDestroy {
     return this.dataUtils.byteSize(base64String);
   }
 
-  openFile(contentType: string, base64String: string): void {
+  openFile(contentType: string, base64String: string): any {
     return this.dataUtils.openFile(contentType, base64String);
   }
 
@@ -99,7 +104,7 @@ export class SlicerOptionComponent implements OnInit, OnDestroy {
     this.eventSubscriber = this.eventManager.subscribe('slicerOptionListModification', () => this.loadPage());
   }
 
-  sort() {
+  sort(): string[] {
     const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
     if (this.predicate !== 'id') {
       result.push('id');

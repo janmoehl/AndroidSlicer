@@ -19,10 +19,10 @@ export class SliceComponent implements OnInit, OnDestroy {
   SliceModeEnum = SliceMode; // "import" the SliceMode-Enum for the template...
   sliceMode: SliceMode = SliceMode.ANDROID;
 
-  slice: ISlice[];
+  slice?: ISlice[];
   error: any;
   success: any;
-  eventSubscriber: Subscription;
+  eventSubscriber?: Subscription;
   routeData: any;
   links: any;
   totalItems: any;
@@ -34,6 +34,7 @@ export class SliceComponent implements OnInit, OnDestroy {
 
   constructor(
     protected sliceService: SliceService,
+    protected parseLinks: JhiParseLinks,
     protected activatedRoute: ActivatedRoute,
     protected dataUtils: JhiDataUtils,
     protected router: Router,
@@ -48,26 +49,30 @@ export class SliceComponent implements OnInit, OnDestroy {
     });
   }
 
-  onSliceModeChange(event: SliceMode) {
+  onSliceModeChange(event: SliceMode): void {
     this.sliceMode = event;
     this.loadAll();
   }
 
-  loadAll() {
+  loadAll(): void {
     this.sliceService
       .query({
-        page: pageToLoad - 1,
+        page: this.page - 1,
         size: this.itemsPerPage,
         sort: this.sort(),
         sliceMode: this.sliceMode
       })
-      .subscribe(
-        (res: HttpResponse<ISlice[]>) => this.onSuccess(res.body, res.headers, pageToLoad),
-        () => this.onError()
-      );
+      .subscribe((res: HttpResponse<ISlice[]>) => this.paginateSlice(res.body!, res.headers));
   }
 
-  transition() {
+  loadPage(page: number): void {
+    if (page !== this.previousPage) {
+      this.previousPage = page;
+      this.transition();
+    }
+  }
+
+  transition(): void {
     this.router.navigate(['/slices'], {
       queryParams: {
         page: this.page,
@@ -78,7 +83,7 @@ export class SliceComponent implements OnInit, OnDestroy {
     this.loadAll();
   }
 
-  clear() {
+  clear(): void {
     this.page = 0;
     this.router.navigate([
       '/slices',
@@ -90,36 +95,35 @@ export class SliceComponent implements OnInit, OnDestroy {
     this.loadAll();
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.registerChangeInSlice();
     // this.loadAll(); -> done by onSliceModeChange, after initialising the
     // sliceMode variable
   }
 
   ngOnDestroy(): void {
-    if (this.eventSubscriber) {
+    if (this.eventSubscriber != null) {
       this.eventManager.destroy(this.eventSubscriber);
     }
   }
 
-  trackId(index: number, item: ISlice): string {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    return item.id!;
+  trackId(index: number, item: ISlice): any {
+    return item.id;
   }
 
-  byteSize(base64String: string): string {
-    return this.dataUtils.byteSize(base64String);
+  byteSize(field: any): any {
+    return this.dataUtils.byteSize(field);
   }
 
-  openFile(contentType: string, base64String: string): void {
-    return this.dataUtils.openFile(contentType, base64String);
+  openFile(contentType: any, field: any): any {
+    return this.dataUtils.openFile(contentType, field);
   }
 
   registerChangeInSlice(): void {
-    this.eventSubscriber = this.eventManager.subscribe('sliceListModification', () => this.loadPage());
+    this.eventSubscriber = this.eventManager.subscribe('sliceListModification', () => this.loadAll());
   }
 
-  sort() {
+  sort(): any {
     const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
     if (this.predicate !== 'id') {
       result.push('id');
@@ -127,20 +131,11 @@ export class SliceComponent implements OnInit, OnDestroy {
     return result;
   }
 
-  protected onSuccess(data: ISlice[] | null, headers: HttpHeaders, page: number): void {
+  protected paginateSlice(data: ISlice[], headers: HttpHeaders): void {
+    if (headers.get('link') != null) {
+      this.links = this.parseLinks.parse(headers.get('link')!);
+    }
     this.totalItems = Number(headers.get('X-Total-Count'));
-    this.page = page;
-    this.router.navigate(['/slice'], {
-      queryParams: {
-        page: this.page,
-        size: this.itemsPerPage,
-        sort: this.predicate + ',' + (this.ascending ? 'asc' : 'desc')
-      }
-    });
-    this.slice = data || [];
-  }
-
-  protected onError(): void {
-    this.ngbPaginationPage = this.page;
+    this.slice = data;
   }
 }

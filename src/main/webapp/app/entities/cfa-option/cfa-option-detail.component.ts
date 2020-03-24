@@ -9,24 +9,24 @@ import { ICFAOption } from 'app/shared/model/cfa-option.model';
   templateUrl: './cfa-option-detail.component.html'
 })
 export class CFAOptionDetailComponent implements OnInit {
-  cFAOption: ICFAOption;
+  cFAOption?: ICFAOption;
 
   constructor(protected dataUtils: JhiDataUtils, protected activatedRoute: ActivatedRoute) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ cFAOption }) => {
       this.cFAOption = cFAOption;
     });
   }
 
-  byteSize(field) {
+  byteSize(field: any): string {
     return this.dataUtils.byteSize(field);
   }
 
-  openFile(contentType, field) {
+  openFile(contentType: any, field: any): any {
     return this.dataUtils.openFile(contentType, field);
   }
-  previousState() {
+  previousState(): void {
     window.history.back();
   }
 }

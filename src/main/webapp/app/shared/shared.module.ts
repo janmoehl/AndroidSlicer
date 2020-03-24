@@ -9,13 +9,13 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 
 @NgModule({
   imports: [AndroidSlicerSharedLibsModule, SelectButtonModule],
-  declarations: [JhiAlertComponent, JhiAlertErrorComponent, JhiLoginModalComponent, HasAnyAuthorityDirective, SlicemodeSwitchComponent],
-  entryComponents: [JhiLoginModalComponent],
+  declarations: [AlertComponent, AlertErrorComponent, LoginModalComponent, HasAnyAuthorityDirective, SlicemodeSwitchComponent],
+  entryComponents: [LoginModalComponent],
   exports: [
     AndroidSlicerSharedLibsModule,
-    JhiAlertComponent,
-    JhiAlertErrorComponent,
-    JhiLoginModalComponent,
+    AlertComponent,
+    AlertErrorComponent,
+    LoginModalComponent,
     HasAnyAuthorityDirective,
     SlicemodeSwitchComponent
   ]

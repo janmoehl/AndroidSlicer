@@ -12,7 +12,7 @@ import { CFAOptionService } from './cfa-option.service';
   templateUrl: './cfa-option-update.component.html'
 })
 export class CFAOptionUpdateComponent implements OnInit {
-  isSaving: boolean;
+  isSaving = false;
 
   editForm = this.fb.group({
     id: [],
@@ -29,14 +29,13 @@ export class CFAOptionUpdateComponent implements OnInit {
     private fb: FormBuilder
   ) {}
 
-  ngOnInit() {
-    this.isSaving = false;
+  ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ cFAOption }) => {
       this.updateForm(cFAOption);
     });
   }
 
-  updateForm(cFAOption: ICFAOption) {
+  updateForm(cFAOption: ICFAOption): void {
     this.editForm.patchValue({
       id: cFAOption.id,
       type: cFAOption.type,
@@ -45,11 +44,11 @@ export class CFAOptionUpdateComponent implements OnInit {
     });
   }
 
-  previousState() {
+  previousState(): void {
     window.history.back();
   }
 
-  save() {
+  save(): void {
     this.isSaving = true;
     const cFAOption = this.createFromForm();
     if (cFAOption.id !== undefined) {
@@ -60,26 +59,29 @@ export class CFAOptionUpdateComponent implements OnInit {
   private createFromForm(): ICFAOption {
     return {
       ...new CFAOption(),
-      id: this.editForm.get(['id']).value,
-      type: this.editForm.get(['type']).value,
-      description: this.editForm.get(['description']).value,
-      isDefault: this.editForm.get(['isDefault']).value
+      id: this.editForm.get(['id'])!.value,
+      type: this.editForm.get(['type'])!.value,
+      description: this.editForm.get(['description'])!.value,
+      isDefault: this.editForm.get(['isDefault'])!.value
     };
   }
 
-  protected subscribeToSaveResponse(result: Observable<HttpResponse<ICFAOption>>) {
-    result.subscribe(() => this.onSaveSuccess(), () => this.onSaveError());
+  protected subscribeToSaveResponse(result: Observable<HttpResponse<ICFAOption>>): void {
+    result.subscribe(
+      () => this.onSaveSuccess(),
+      () => this.onSaveError()
+    );
   }
 
-  protected onSaveSuccess() {
+  protected onSaveSuccess(): void {
     this.isSaving = false;
     this.previousState();
   }
 
-  protected onSaveError() {
+  protected onSaveError(): void {
     this.isSaving = false;
   }
-  protected onError(errorMessage: string) {
-    this.jhiAlertService.error(errorMessage, null, null);
+  protected onError(errorMessage: string): void {
+    this.jhiAlertService.error(errorMessage, null, undefined);
   }
 }

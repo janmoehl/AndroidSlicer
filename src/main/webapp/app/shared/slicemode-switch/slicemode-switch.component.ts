@@ -15,7 +15,7 @@ export class SlicemodeSwitchComponent implements OnInit {
   // INPUTS & OUTPUTS:
   @Output() sliceModeChange = new EventEmitter<string>();
 
-  sliceMode: SliceMode;
+  sliceMode!: SliceMode;
   sliceModes: SelectItem[] = [
     { label: 'Android', value: SliceMode.ANDROID, icon: 'pi pi-android' },
     { label: 'Java', value: SliceMode.JAVA, icon: 'pi pi-desktop' }
@@ -23,22 +23,22 @@ export class SlicemodeSwitchComponent implements OnInit {
 
   constructor(protected slicerSettingService: SlicerSettingService, protected jhiAlertService: JhiAlertService) {}
 
-  onSliceModeChange() {
+  onSliceModeChange(): void {
     this.publishChange();
   }
 
-  publishChange() {
+  publishChange(): void {
     this.sliceModeChange.emit(this.sliceMode);
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.slicerSettingService.findByKey('Default_Slicing_Mode').subscribe(
       (res: HttpResponse<ISlicerSetting>) => {
-        this.sliceMode = SliceMode[res.body.value.toUpperCase()];
+        this.sliceMode = SliceMode[res.body!.value!.toUpperCase()];
         this.publishChange();
       },
       (res: HttpErrorResponse) => {
-        this.jhiAlertService.error(res.message, null, null);
+        this.jhiAlertService.error(res.message, null, undefined);
       }
     );
   }

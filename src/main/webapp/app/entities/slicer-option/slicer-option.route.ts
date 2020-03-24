@@ -5,7 +5,6 @@ import { JhiResolvePagingParams } from 'ng-jhipster';
 import { Observable, of, EMPTY } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
-import { Authority } from 'app/shared/constants/authority.constants';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access-service';
 import { ISlicerOption, SlicerOption } from 'app/shared/model/slicer-option.model';
 import { SlicerOptionService } from './slicer-option.service';

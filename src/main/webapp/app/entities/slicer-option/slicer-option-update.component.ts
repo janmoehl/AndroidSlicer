@@ -4,11 +4,10 @@ import { HttpResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { JhiDataUtils, JhiFileLoadError, JhiEventManager, JhiEventWithContent } from 'ng-jhipster';
+import { JhiDataUtils, JhiEventManager } from 'ng-jhipster';
 
 import { ISlicerOption, SlicerOption } from 'app/shared/model/slicer-option.model';
 import { SlicerOptionService } from './slicer-option.service';
-import { AlertError } from 'app/shared/alert/alert-error.model';
 
 @Component({
   selector: 'jhi-slicer-option-update',
@@ -49,7 +48,7 @@ export class SlicerOptionUpdateComponent implements OnInit {
     });
   }
 
-  previousState() {
+  previousState(): void {
     window.history.back();
   }
 

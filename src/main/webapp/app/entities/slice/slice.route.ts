@@ -2,13 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Resolve, ActivatedRouteSnapshot, Routes, Router } from '@angular/router';
 import { JhiResolvePagingParams } from 'ng-jhipster';
+
+import { UserRouteAccessService } from 'app/core/auth/user-route-access-service';
 import { Observable, of, EMPTY } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
-
-import { Authority } from 'app/shared/constants/authority.constants';
-import { UserRouteAccessService } from 'app/core/auth/user-route-access-service';
-import { Observable, of } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
 import { Slice } from 'app/shared/model/slice.model';
 import { SliceService } from './slice.service';
 import { SliceComponent } from './slice.component';
@@ -25,8 +22,14 @@ export class SliceResolve implements Resolve<ISlice> {
     const id = route.params['id'];
     if (id) {
       return this.service.find(id).pipe(
-        filter((response: HttpResponse<Slice>) => response.ok),
-        map((slice: HttpResponse<Slice>) => slice.body)
+        flatMap((slice: HttpResponse<ISlice>) => {
+          if (slice.body) {
+            return of(slice.body);
+          } else {
+            this.router.navigate(['404']);
+            return EMPTY;
+          }
+        })
       );
     }
     return of(new Slice());

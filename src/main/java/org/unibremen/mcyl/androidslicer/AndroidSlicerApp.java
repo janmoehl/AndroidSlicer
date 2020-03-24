@@ -1,5 +1,7 @@
 package org.unibremen.mcyl.androidslicer;
 
+import javax.annotation.PostConstruct;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;

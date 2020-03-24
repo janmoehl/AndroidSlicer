@@ -26,19 +26,19 @@ import { SliceMode } from 'app/shared/model/enumerations/slice-mode.model';
   templateUrl: './slice-make.component.html'
 })
 export class SliceMakeComponent implements OnInit {
-  slice: ISlice;
-  isSaving: boolean;
+  slice?: ISlice;
+  isSaving?: boolean;
 
   // sliceMode
   SliceModeEnum = SliceMode; // "import" SliceMode-Enum for the template
-  sliceMode: SliceMode;
+  sliceMode?: SliceMode;
 
   // android
-  versionOptions: IAndroidVersion[];
-  classOptions: IAndroidClass[];
-  androidEntryMethodOptions: string[] = [];
+  versionOptions?: IAndroidVersion[] | null;
+  classOptions?: IAndroidClass[] | null;
+  androidEntryMethodOptions: string[] | null = [];
   filteredAndroidEntryMethodOptions: string[] = [];
-  androidSeedStatementOptions: string[];
+  androidSeedStatementOptions?: string[] | null;
   filteredAndroidSeedStatementOptions: string[] = [];
 
   // java
@@ -54,7 +54,7 @@ export class SliceMakeComponent implements OnInit {
   controlDependenceOptionsList: SelectItem[] = [];
 
   editorOptions = { theme: 'vs', language: 'java' };
-  sourceFile: String;
+  sourceFile?: String;
 
   createForm = this.fb.group({
     javaSourcePath: [null, [Validators.required]],
@@ -85,7 +85,7 @@ export class SliceMakeComponent implements OnInit {
     private fb: FormBuilder
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.isSaving = false;
     this.slice = new Slice();
 
@@ -95,7 +95,7 @@ export class SliceMakeComponent implements OnInit {
 
         // preselect if only one
         if (this.versionOptions && this.versionOptions.length === 1) {
-          this.createForm.get('androidVersion').patchValue(this.versionOptions[0]);
+          this.createForm.get('androidVersion')!.patchValue(this.versionOptions[0]);
           this.onVersionSelection();
         }
       },
@@ -110,12 +110,12 @@ export class SliceMakeComponent implements OnInit {
 
     this.cfaOptionService.getAll().subscribe(
       (res: HttpResponse<ICFAOption[]>) => {
-        for (const cfaOption of res.body) {
+        for (const cfaOption of res.body!) {
           const cfaOptionItem: SelectItem = { label: cfaOption.type, value: cfaOption };
           this.cfaOptionsList.push(cfaOptionItem);
 
           if (cfaOption.isDefault) {
-            this.createForm.get(['cfaOptions']).setValue(cfaOption);
+            this.createForm.get(['cfaOptions'])!.setValue(cfaOption);
           }
         }
       },
@@ -124,28 +124,28 @@ export class SliceMakeComponent implements OnInit {
 
     this.slicerOptionService.getAll().subscribe(
       (res: HttpResponse<ISlicerOption[]>) => {
-        for (const slicerOption of res.body) {
+        for (const slicerOption of res.body!) {
           const slicerOptionItem: SelectItem = { label: slicerOption.key, value: slicerOption };
 
           switch (slicerOption.type) {
             case SlicerOptionType.REFLECTION_OPTION: {
               this.reflectionOptionsList.push(slicerOptionItem);
               if (slicerOption.isDefault) {
-                this.createForm.get(['reflectionOptions']).setValue(slicerOption);
+                this.createForm.get(['reflectionOptions'])!.setValue(slicerOption);
               }
               break;
             }
             case SlicerOptionType.DATA_DEPENDENCE_OPTION: {
               this.dataDependenceOptionsList.push(slicerOptionItem);
               if (slicerOption.isDefault) {
-                this.createForm.get(['dataDependenceOptions']).setValue(slicerOption);
+                this.createForm.get(['dataDependenceOptions'])!.setValue(slicerOption);
               }
               break;
             }
             case SlicerOptionType.CONTROL_DEPENDENCE_OPTION: {
               this.controlDependenceOptionsList.push(slicerOptionItem);
               if (slicerOption.isDefault) {
-                this.createForm.get(['controlDependenceOptions']).setValue(slicerOption);
+                this.createForm.get(['controlDependenceOptions'])!.setValue(slicerOption);
               }
               break;
             }
@@ -157,7 +157,7 @@ export class SliceMakeComponent implements OnInit {
   }
 
   // TODO
-  onJarPathChange(event) {
+  onJarPathChange(event: any): void {
     this.filteredJavaJarPaths = [event.query.toString()];
     this.filterMultiSelectOptions(
       event,
@@ -167,7 +167,7 @@ export class SliceMakeComponent implements OnInit {
   }
 
   // TODO
-  onSourcePathChange(event) {
+  onSourcePathChange(event: any): void {
     this.filteredJavaSourcePaths = [event.query.toString()];
     this.filterMultiSelectOptions(
       event,
@@ -176,43 +176,43 @@ export class SliceMakeComponent implements OnInit {
     );
   }
 
-  onSliceModeChange(event: SliceMode) {
+  onSliceModeChange(event: SliceMode): void {
     this.sliceMode = event;
     this.updateSliceModeForm();
   }
 
-  updateSliceModeForm() {
+  updateSliceModeForm(): void {
     if (this.sliceMode === 'JAVA') {
-      this.createForm.get('javaSourcePath').enable();
-      this.createForm.get('javaJarPath').enable();
-      this.createForm.get('javaClassName').enable();
-      this.createForm.get('javaEntryMethods').enable();
-      this.createForm.get('javaSeedStatements').enable();
+      this.createForm.get('javaSourcePath')!.enable();
+      this.createForm.get('javaJarPath')!.enable();
+      this.createForm.get('javaClassName')!.enable();
+      this.createForm.get('javaEntryMethods')!.enable();
+      this.createForm.get('javaSeedStatements')!.enable();
 
-      this.createForm.get('androidVersion').disable();
-      this.createForm.get('androidClassName').disable();
-      this.createForm.get('androidEntryMethods').disable();
-      this.createForm.get('androidSeedStatements').disable();
+      this.createForm.get('androidVersion')!.disable();
+      this.createForm.get('androidClassName')!.disable();
+      this.createForm.get('androidEntryMethods')!.disable();
+      this.createForm.get('androidSeedStatements')!.disable();
     } else {
       // this.sliceMode == 'android'
-      this.createForm.get('javaSourcePath').disable();
-      this.createForm.get('javaJarPath').disable();
-      this.createForm.get('javaClassName').disable();
-      this.createForm.get('javaEntryMethods').disable();
-      this.createForm.get('javaSeedStatements').disable();
+      this.createForm.get('javaSourcePath')!.disable();
+      this.createForm.get('javaJarPath')!.disable();
+      this.createForm.get('javaClassName')!.disable();
+      this.createForm.get('javaEntryMethods')!.disable();
+      this.createForm.get('javaSeedStatements')!.disable();
 
-      this.createForm.get('androidVersion').enable();
-      this.createForm.get('androidClassName').enable();
-      this.createForm.get('androidEntryMethods').enable();
-      this.createForm.get('androidSeedStatements').enable();
+      this.createForm.get('androidVersion')!.enable();
+      this.createForm.get('androidClassName')!.enable();
+      this.createForm.get('androidEntryMethods')!.enable();
+      this.createForm.get('androidSeedStatements')!.enable();
     }
   }
 
-  previousState() {
+  previousState(): void {
     window.history.back();
   }
 
-  save() {
+  save(): void {
     this.isSaving = true;
     const slice = this.createFromForm();
     this.subscribeToSaveResponse(this.sliceService.create(slice));
@@ -220,57 +220,59 @@ export class SliceMakeComponent implements OnInit {
 
   private createFromForm(): ISlice {
     const currentSeedStatements =
-      this.sliceMode === 'JAVA' ? this.createForm.get(['javaSeedStatements']).value : this.createForm.get(['androidSeedStatements']).value;
+      this.sliceMode === 'JAVA'
+        ? this.createForm.get(['javaSeedStatements'])!.value
+        : this.createForm.get(['androidSeedStatements'])!.value;
     const currentEntryMethods =
-      this.sliceMode === 'JAVA' ? this.createForm.get(['javaEntryMethods']).value : this.createForm.get(['androidEntryMethods']).value;
-    const androidVersionField = this.createForm.get('androidVersion').value as IAndroidVersion;
+      this.sliceMode === 'JAVA' ? this.createForm.get(['javaEntryMethods'])!.value : this.createForm.get(['androidEntryMethods'])!.value;
+    const androidVersionField = this.createForm.get('androidVersion')!.value as IAndroidVersion;
     const currentNameValue =
       this.sliceMode === 'JAVA'
-        ? this.createForm.get('javaClassName').value
-        : (this.createForm.get('androidClassName').value as IAndroidClass).name;
+        ? this.createForm.get('javaClassName')!.value
+        : (this.createForm.get('androidClassName')!.value as IAndroidClass).name;
     const entity = {
       ...new Slice(),
       sliceMode: this.sliceMode,
       androidVersion: androidVersionField != null ? androidVersionField.version : null,
       className: currentNameValue,
-      javaSourcePath: this.createForm.get('javaSourcePath').value,
-      javaJarPath: this.createForm.get('javaJarPath').value,
+      javaSourcePath: this.createForm.get('javaSourcePath')!.value,
+      javaJarPath: this.createForm.get('javaJarPath')!.value,
       entryMethods: currentEntryMethods,
       seedStatements: currentSeedStatements,
-      cfaType: (this.createForm.get(['cfaOptions']).value as ICFAOption).type,
-      cfaLevel: this.createForm.get(['cfaLevel']).value,
-      reflectionOptions: (this.createForm.get(['reflectionOptions']).value as ISlicerOption).key as ReflectionOptions,
-      dataDependenceOptions: (this.createForm.get(['dataDependenceOptions']).value as ISlicerOption).key as DataDependenceOptions,
-      controlDependenceOptions: (this.createForm.get(['controlDependenceOptions']).value as ISlicerOption).key as ControlDependenceOptions
+      cfaType: (this.createForm.get(['cfaOptions'])!.value as ICFAOption).type,
+      cfaLevel: this.createForm.get(['cfaLevel'])!.value,
+      reflectionOptions: (this.createForm.get(['reflectionOptions'])!.value as ISlicerOption).key as ReflectionOptions,
+      dataDependenceOptions: (this.createForm.get(['dataDependenceOptions'])!.value as ISlicerOption).key as DataDependenceOptions,
+      controlDependenceOptions: (this.createForm.get(['controlDependenceOptions'])!.value as ISlicerOption).key as ControlDependenceOptions
     };
     return entity;
   }
 
-  protected subscribeToSaveResponse(result: Observable<HttpResponse<ISlice>>) {
+  protected subscribeToSaveResponse(result: Observable<HttpResponse<ISlice>>): void {
     result.subscribe(
       (res: HttpResponse<ISlice>) => this.onSaveSuccess(), // eslint-disable-line
       (res: HttpErrorResponse) => this.onSaveError() // eslint-disable-line
     );
   }
 
-  protected onSaveSuccess() {
+  protected onSaveSuccess(): void {
     this.isSaving = false;
     this.previousState();
   }
 
-  protected onSaveError() {
+  protected onSaveError(): void {
     this.isSaving = false;
   }
 
-  protected onError(errorMessage: string) {
-    this.jhiAlertService.error(errorMessage, null, null);
+  protected onError(errorMessage: string): void {
+    this.jhiAlertService.error(errorMessage, null, undefined);
   }
 
-  onVersionSelection() {
-    this.createForm.get('androidClassName').disable();
+  onVersionSelection(): void {
+    this.createForm.get('androidClassName')!.disable();
 
     this.androidOptionsService
-      .getAndroidClasses((this.createForm.get('androidVersion').value as IAndroidVersion).path)
+      .getAndroidClasses((this.createForm.get('androidVersion')!.value as IAndroidVersion).path)
       .subscribe(
         // ok
         (res: HttpResponse<IAndroidClass[]>) => {
@@ -281,21 +283,21 @@ export class SliceMakeComponent implements OnInit {
       )
       .add(() => {
         // finally
-        this.createForm.get('androidClassName').enable();
+        this.createForm.get('androidClassName')!.enable();
       });
   }
 
-  onClassSelection() {
-    const androidVersion: number = (this.createForm.get('androidVersion').value as IAndroidVersion).version;
-    const serviceClassName: string = (this.createForm.get('androidClassName').value as IAndroidClass).name;
-    const sourceFilePath: string = (this.createForm.get('androidClassName').value as IAndroidClass).path;
+  onClassSelection(): void {
+    const androidVersion: number | undefined = (this.createForm.get('androidVersion')!.value as IAndroidVersion).version;
+    const serviceClassName: string | undefined = (this.createForm.get('androidClassName')!.value as IAndroidClass).name;
+    const sourceFilePath: string | undefined = (this.createForm.get('androidClassName')!.value as IAndroidClass).path;
 
-    this.createForm.get(['androidEntryMethods']).disable();
+    this.createForm.get(['androidEntryMethods'])!.disable();
 
     this.androidOptionsService.getServiceSource(androidVersion, serviceClassName).subscribe(
       (res: any) => {
         this.sourceFile = res.body;
-        this.createForm.get('editor').setValue(this.sourceFile);
+        this.createForm.get('editor')!.setValue(this.sourceFile);
       },
       (res: HttpErrorResponse) => this.onError(res.message)
     );
@@ -315,11 +317,11 @@ export class SliceMakeComponent implements OnInit {
       )
       .add(() => {
         // finally
-        this.createForm.get(['androidEntryMethods']).enable();
+        this.createForm.get(['androidEntryMethods'])!.enable();
       });
   }
 
-  filterAndroidEntryMethodOptions(event) {
+  filterAndroidEntryMethodOptions(event: any): void {
     if (event) {
       this.filteredAndroidEntryMethodOptions = [];
       this.filterMultiSelectOptions(event, this.androidEntryMethodOptions, this.filteredAndroidEntryMethodOptions);
@@ -327,14 +329,14 @@ export class SliceMakeComponent implements OnInit {
   }
 
   // TODO
-  filterJavaEntryMethodOptions(event) {
+  filterJavaEntryMethodOptions(event: any): void {
     if (event) {
       this.filteredJavaEntryMethodOptions = [event.query.toString()];
       this.filterMultiSelectOptions(event, ['main'], this.filteredJavaEntryMethodOptions);
     }
   }
 
-  filterAndroidSeedStatementOptions(event) {
+  filterAndroidSeedStatementOptions(event: any): void {
     if (event) {
       this.filteredAndroidSeedStatementOptions = [];
       this.filterMultiSelectOptions(event, this.androidSeedStatementOptions, this.filteredAndroidSeedStatementOptions);
@@ -342,14 +344,14 @@ export class SliceMakeComponent implements OnInit {
   }
 
   // TODO
-  filterJavaSeedStatementOptions(event) {
+  filterJavaSeedStatementOptions(event: any): void {
     if (event) {
       this.filteredJavaSeedStatementOptions = [event.query.toString()];
       this.filterMultiSelectOptions(event, ['doFinal'], this.filteredJavaSeedStatementOptions);
     }
   }
 
-  private filterMultiSelectOptions(event, options, filterdOptions) {
+  private filterMultiSelectOptions(event: any, options: any, filterdOptions: any): void {
     for (let i = 0; i < options.length; i++) {
       const option = options[i];
       if (
@@ -367,19 +369,19 @@ export class SliceMakeComponent implements OnInit {
   // eslint-disable-next-line
   addJavaEntryMethodOption(event: KeyboardEvent) {}
 
-  addAndroidEntryMethodOption(event: KeyboardEvent) {
+  addAndroidEntryMethodOption(event: KeyboardEvent): void {
     if (event && event.key === 'Enter') {
-      const selectedEntryMethodOptions = this.createForm.get(['androidEntryMethods']).value || [];
+      const selectedEntryMethodOptions = this.createForm.get(['androidEntryMethods'])!.value || [];
       this.addMultiSelectOption(event, this.androidEntryMethodOptions, selectedEntryMethodOptions);
-      this.createForm.get(['androidEntryMethods']).patchValue(selectedEntryMethodOptions);
+      this.createForm.get(['androidEntryMethods'])!.patchValue(selectedEntryMethodOptions);
     }
   }
 
-  addAndroidSeedStatementOption(event: KeyboardEvent) {
+  addAndroidSeedStatementOption(event: KeyboardEvent): void {
     if (event && event.key === 'Enter') {
-      const selectedSeedStatementOptions = this.createForm.get(['seedStatements']).value || [];
+      const selectedSeedStatementOptions = this.createForm.get(['seedStatements'])!.value || [];
       this.addMultiSelectOption(event, this.androidSeedStatementOptions, selectedSeedStatementOptions);
-      this.createForm.get(['seedStatements']).patchValue(selectedSeedStatementOptions);
+      this.createForm.get(['seedStatements'])!.patchValue(selectedSeedStatementOptions);
     }
   }
 
@@ -387,7 +389,7 @@ export class SliceMakeComponent implements OnInit {
   // eslint-disable-next-line
   addJavaSeedStatementOption(event: KeyboardEvent) {}
 
-  private addMultiSelectOption(event, options, selectedOptions) {
+  private addMultiSelectOption(event: any, options: any, selectedOptions: any): void {
     if (event.key === 'Enter') {
       const tokenInput = event.srcElement || event.target;
       if (tokenInput.value) {
@@ -404,32 +406,32 @@ export class SliceMakeComponent implements OnInit {
     }
   }
 
-  addAllAndroidEntryMethods() {
-    this.createForm.get(['androidEntryMethods']).patchValue(this.androidEntryMethodOptions);
+  addAllAndroidEntryMethods(): void {
+    this.createForm.get(['androidEntryMethods'])!.patchValue(this.androidEntryMethodOptions);
   }
 
-  clearAndroidEntryMethods() {
-    this.createForm.get(['androidEntryMethods']).patchValue([]);
+  clearAndroidEntryMethods(): void {
+    this.createForm.get(['androidEntryMethods'])!.patchValue([]);
   }
 
-  addAllAndroidSeedStatements() {
-    this.createForm.get(['androidSeedStatements']).patchValue(this.androidSeedStatementOptions);
+  addAllAndroidSeedStatements(): void {
+    this.createForm.get(['androidSeedStatements'])!.patchValue(this.androidSeedStatementOptions);
   }
 
-  clearAndroidSeedStatements() {
-    this.createForm.get(['androidSeedStatements']).patchValue([]);
+  clearAndroidSeedStatements(): void {
+    this.createForm.get(['androidSeedStatements'])!.patchValue([]);
   }
 
-  onCfaOptionSelection() {
-    const selectedCfaType = (this.createForm.get(['cfaOptions']).value as ICFAOption).type;
+  onCfaOptionSelection(): void {
+    const selectedCfaType = (this.createForm.get(['cfaOptions'])!.value as ICFAOption).type;
     if (selectedCfaType === CFAType.N_CFA || selectedCfaType === CFAType.VANILLA_N_CFA) {
       this.cfaLevelNeeded = true;
-      this.createForm.get(['cfaLevel']).setValidators([Validators.required]);
+      this.createForm.get(['cfaLevel'])!.setValidators([Validators.required]);
     } else {
-      this.createForm.get(['cfaLevel']).patchValue(null);
-      this.createForm.get(['cfaLevel']).setValidators(null);
+      this.createForm.get(['cfaLevel'])!.patchValue(null);
+      this.createForm.get(['cfaLevel'])!.setValidators(null);
       this.cfaLevelNeeded = false;
     }
-    this.createForm.get(['cfaLevel']).updateValueAndValidity();
+    this.createForm.get(['cfaLevel'])!.updateValueAndValidity();
   }
 }

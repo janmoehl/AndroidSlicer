@@ -4,8 +4,8 @@ import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot, Routes } from '@a
 import { UserRouteAccessService } from 'app/core/auth/user-route-access-service';
 import { CFAOption, ICFAOption } from 'app/shared/model/cfa-option.model';
 import { JhiResolvePagingParams } from 'ng-jhipster';
-import { Observable, of } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { Observable, of, EMPTY } from 'rxjs';
+import { flatMap } from 'rxjs/operators';
 import { CFAOptionDetailComponent } from './cfa-option-detail.component';
 import { CFAOptionUpdateComponent } from './cfa-option-update.component';
 import { CFAOptionComponent } from './cfa-option.component';
@@ -20,8 +20,13 @@ export class CFAOptionResolve implements Resolve<ICFAOption> {
     const id = route.params['id'];
     if (id) {
       return this.service.find(id).pipe(
-        filter((response: HttpResponse<CFAOption>) => response.ok),
-        map((cFAOption: HttpResponse<CFAOption>) => cFAOption.body)
+        flatMap((response: HttpResponse<CFAOption>) => {
+          if (response.body) {
+            return of(response.body);
+          } else {
+            return EMPTY;
+          }
+        })
       );
     }
     return of(new CFAOption());

@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ISlice } from 'app/shared/model/slice.model';
@@ -21,7 +21,7 @@ export class SliceDetailComponent implements OnInit {
   slice: ISlice | null = null;
 
   slicedClassItems: MenuItem[] = [];
-  activeItem: MenuItem;
+  activeItem?: MenuItem;
 
   editorOptions = { theme: 'vs', language: 'java', followsCaret: true, ignoreCharChanges: true };
 
@@ -29,17 +29,17 @@ export class SliceDetailComponent implements OnInit {
   sideBySide = false;
   diffEditorOptions = { theme: 'vs', language: 'java', renderSideBySide: this.sideBySide, followsCaret: true, ignoreCharChanges: true };
 
-  sliceCodes: string[] = [];
+  sliceCodes?: string[] = [];
   sourceCodes: string[] = [];
   // keep track of the slice code positions in sliceCodes to bring source codes in the right order after they have loaded
   private classesIndexMap: string[] = [];
 
-  sliceCodeDiffModel: DiffEditorModel;
-  sourceFileDiffModel: DiffEditorModel;
+  sliceCodeDiffModel?: DiffEditorModel;
+  sourceFileDiffModel?: DiffEditorModel;
 
-  currentSliceIndex: number;
+  currentSliceIndex = 0;
 
-  private poll: boolean;
+  private poll = false;
 
   isCodeLoadingOrPrecessing = true;
   slicingFinished = false;
@@ -56,7 +56,7 @@ export class SliceDetailComponent implements OnInit {
     private javaService: JavaService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ slice }) => {
       this.slice = slice;
 
@@ -77,51 +77,51 @@ export class SliceDetailComponent implements OnInit {
     });
   }
 
-  previousState() {
+  previousState(): void {
     window.history.back();
   }
 
   // poll updates every 10 seconds
-  private refresh() {
+  private refresh(): void {
     interval(10000)
       .pipe(
         startWith(0),
-        switchMap(() => this.sliceService.find(this.slice.id))
+        switchMap(() => this.sliceService.find(this.slice!.id!))
       )
-      .pipe(takeWhile(() => this.slice.running && this.poll))
-      .subscribe(httpResponse => {
+      .pipe(takeWhile(() => this.slice!.running! && this.poll))
+      .subscribe((httpResponse: any) => {
         this.slice = httpResponse.body;
 
         // scroll log to bottom
         setTimeout(() => {
           // allow time for DOM update
           const logTxt = document.getElementById('logTxt');
-          if (this.slice.log && logTxt && logTxt.scrollHeight && this.scrollLog) {
+          if (this.slice!.log && logTxt && logTxt.scrollHeight && this.scrollLog) {
             logTxt.scrollTop = logTxt.scrollHeight;
           }
         }, 100);
 
-        if (!this.slice.running) {
+        if (!this.slice!.running) {
           this.onSlicingFinished();
         }
       });
   }
 
-  protected onError(errorMessage: string) {
-    this.jhiAlertService.error(errorMessage, null, null);
+  protected onError(errorMessage: string): void {
+    this.jhiAlertService.error(errorMessage, null, undefined);
   }
 
   private onSlicingFinished(): void {
-    this.slice.slicedClasses.forEach(slicedClass => {
+    this.slice!.slicedClasses!.forEach(slicedClass => {
       const slicedPathAndClassName = slicedClass.packagePath + '/' + slicedClass.className;
-      if (slicedPathAndClassName === this.slice.className) {
+      if (slicedPathAndClassName === this.slice!.className) {
         // add android main class (i.e. entry class) to first position
-        this.sliceCodes.unshift(slicedClass.code);
-        this.classesIndexMap.unshift(slicedClass.className);
+        this.sliceCodes!.unshift(slicedClass.code!);
+        this.classesIndexMap.unshift(slicedClass.className!);
         this.slicedClassItems.unshift({ title: slicedPathAndClassName, label: slicedClass.className });
       } else {
-        this.sliceCodes.push(slicedClass.code);
-        this.classesIndexMap.push(slicedClass.className);
+        this.sliceCodes!.push(slicedClass.code!);
+        this.classesIndexMap.push(slicedClass.className!);
         this.slicedClassItems.push({ title: slicedPathAndClassName, label: slicedClass.className });
       }
     });
@@ -134,25 +134,25 @@ export class SliceDetailComponent implements OnInit {
     this.slicingFinished = true;
   }
 
-  onSliceClassSelected(event, index) {
+  onSliceClassSelected(event: any, index: any): void {
     this.currentSliceIndex = index;
     this.activeItem = this.slicedClassItems[index];
     this.setDiffEditorModels();
     event.preventDefault();
   }
 
-  private loadSourceFiles() {
-    this.slice.slicedClasses.forEach(slicedClass => {
+  private loadSourceFiles(): void {
+    this.slice!.slicedClasses!.forEach(slicedClass => {
       // get source file for comparison
-      let slicedPathAndClassName = this.slice.sliceMode === 'JAVA' ? this.slice.javaSourcePath + '/' : '';
+      let slicedPathAndClassName = this.slice!.sliceMode === 'JAVA' ? this.slice!.javaSourcePath + '/' : '';
       slicedPathAndClassName += slicedClass.packagePath + '/' + slicedClass.className;
 
-      if (this.slice.sliceMode === 'ANDROID') {
-        this.androidOptionsService.getServiceSource(this.slice.androidVersion, slicedPathAndClassName).subscribe(
-          (res: any) => {
-            this.sourceCodes[this.classesIndexMap.indexOf(slicedClass.className)] = res.body;
+      if (this.slice!.sliceMode === 'ANDROID') {
+        this.androidOptionsService.getServiceSource(this.slice!.androidVersion, slicedPathAndClassName).subscribe(
+          (res: HttpResponse<string>) => {
+            this.sourceCodes[this.classesIndexMap.indexOf(slicedClass.className!)] = res.body!;
             // remove loading overlay if all source classes are loaded
-            if (this.sourceCodes.length === this.sliceCodes.length) {
+            if (this.sourceCodes.length === this.sliceCodes!.length) {
               this.isCodeLoadingOrPrecessing = false;
             }
           },
@@ -161,10 +161,10 @@ export class SliceDetailComponent implements OnInit {
       } else {
         // sliceMode === 'JAVA'
         this.javaService.getSource(slicedPathAndClassName).subscribe(
-          (res: any) => {
-            this.sourceCodes[this.classesIndexMap.indexOf(slicedClass.className)] = res.body;
+          (res: HttpResponse<string>) => {
+            this.sourceCodes[this.classesIndexMap.indexOf(slicedClass.className!)] = res.body!;
             // remove loading overlay if all source classes are loaded
-            if (this.sourceCodes.length === this.sliceCodes.length) {
+            if (this.sourceCodes.length === this.sliceCodes!.length) {
               this.isCodeLoadingOrPrecessing = false;
             }
           },
@@ -174,14 +174,14 @@ export class SliceDetailComponent implements OnInit {
     });
   }
 
-  onInitDiffEditor(editor) {
+  onInitDiffEditor(editor: any): void {
     this.diffEditor = editor;
     this.diffEditor.onDidUpdateDiff(() => {
       this.isCodeLoadingOrPrecessing = false;
     });
   }
 
-  updateDiff() {
+  updateDiff(): void {
     if (this.showDiff && this.diffEditor) {
       this.isCodeLoadingOrPrecessing = true;
       this.diffEditorOptions = {
@@ -196,7 +196,7 @@ export class SliceDetailComponent implements OnInit {
   }
 
   setDiffEditorModels(): void {
-    if (this.showDiff && this.sliceCodes[this.currentSliceIndex] && this.sourceCodes[this.currentSliceIndex]) {
+    if (this.showDiff && this.sliceCodes && this.sliceCodes[this.currentSliceIndex] && this.sourceCodes[this.currentSliceIndex]) {
       this.sliceCodeDiffModel = { language: 'java', code: this.sliceCodes[this.currentSliceIndex] };
       this.sourceFileDiffModel = { language: 'java', code: this.sourceCodes[this.currentSliceIndex] };
       this.isCodeLoadingOrPrecessing = true;
@@ -206,25 +206,30 @@ export class SliceDetailComponent implements OnInit {
 
   downloadSlices(): void {
     const zip: JSZip = new JSZip();
-    this.slice.slicedClasses.forEach(slicedClass => {
-      zip.file(slicedClass.className, slicedClass.code);
+    this.slice!.slicedClasses!.forEach(slicedClass => {
+      if (slicedClass.className != null && slicedClass.code != null) {
+        zip.file(slicedClass.className, slicedClass.code);
+      }
     });
     zip.generateAsync({ type: 'blob' }).then(blob => {
       saveAs(
         blob,
-        this.slice.className.replace(/\.[^/.]+$/, '') + '.zip' // remove .java extension
+        this.slice!.className!.replace(/\.[^/.]+$/, '')! + '.zip' // remove .java extension
       );
     });
   }
 
   openIDE(): void {
+    if (this.slice == null || this.slice.id == null) {
+      return;
+    }
     document.body.style.cursor = 'wait';
     this.sliceService
       .openIDE(this.slice.id)
       .subscribe(
-        (res: any) => {
+        (res: HttpResponse<any>) => {
           const win = window.open(res.body, '_blank');
-          win.focus();
+          win && win.focus();
         },
         (res: HttpErrorResponse) => this.onError(res.message)
       )

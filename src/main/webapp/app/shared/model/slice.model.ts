@@ -16,7 +16,7 @@ export class SlicedClass implements ISlicedClass {
 
 export interface ISlice {
   id?: string;
-  androidVersion?: number;
+  androidVersion?: number | null;
   className?: string;
   entryMethods?: string[];
   seedStatements?: string[];

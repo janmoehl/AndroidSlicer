@@ -16,9 +16,9 @@
                         <option value="ZERO_ONE_CONTAINER_CFA">0-1-Container-CFA</option>
                         <option value="VANILLA_ZERO_ONE_CONTAINER_CFA">Vanilla 0-1-Container-CFA</option>
                     </select>
-                    <div *ngIf="editForm.get('type').invalid && (editForm.get('type').dirty || editForm.get('type').touched)">
+                    <div *ngIf="editForm.get('type')!.invalid && (editForm.get('type')!.dirty || editForm.get('type')!.touched)">
                         <small class="form-text text-danger"
-                               *ngIf="editForm.get('type').errors.required">
+                               *ngIf="editForm.get('type')!.errors!.required">
                         This field is required.
                         </small>
                     </div>

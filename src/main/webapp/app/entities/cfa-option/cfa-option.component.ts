@@ -14,10 +14,10 @@ import { CFAOptionService } from './cfa-option.service';
 })
 export class CFAOptionComponent implements OnInit, OnDestroy {
   currentAccount: any;
-  cFAOptions: ICFAOption[];
+  cFAOptions?: ICFAOption[] | null;
   error: any;
   success: any;
-  eventSubscriber: Subscription;
+  eventSubscriber?: Subscription;
   routeData: any;
   links: any;
   totalItems: any;
@@ -46,7 +46,7 @@ export class CFAOptionComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadAll() {
+  loadAll(): void {
     this.cFAOptionService
       .query({
         page: this.page - 1,
@@ -59,14 +59,14 @@ export class CFAOptionComponent implements OnInit, OnDestroy {
       );
   }
 
-  loadPage(page: number) {
+  loadPage(page: number): void {
     if (page !== this.previousPage) {
       this.previousPage = page;
       this.transition();
     }
   }
 
-  transition() {
+  transition(): void {
     this.router.navigate(['/cfa-options'], {
       queryParams: {
         page: this.page,
@@ -77,7 +77,7 @@ export class CFAOptionComponent implements OnInit, OnDestroy {
     this.loadAll();
   }
 
-  clear() {
+  clear(): void {
     this.page = 0;
     this.router.navigate([
       '/cfa-options',
@@ -89,7 +89,7 @@ export class CFAOptionComponent implements OnInit, OnDestroy {
     this.loadAll();
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadAll();
     this.accountService.identity().subscribe(account => {
       this.currentAccount = account;
@@ -97,27 +97,29 @@ export class CFAOptionComponent implements OnInit, OnDestroy {
     this.registerChangeInCFAOptions();
   }
 
-  ngOnDestroy() {
-    this.eventManager.destroy(this.eventSubscriber);
+  ngOnDestroy(): void {
+    if (this.eventSubscriber) {
+      this.eventManager.destroy(this.eventSubscriber);
+    }
   }
 
-  trackId(index: number, item: ICFAOption) {
+  trackId(index: number, item: ICFAOption): any {
     return item.id;
   }
 
-  byteSize(field) {
+  byteSize(field: any): any {
     return this.dataUtils.byteSize(field);
   }
 
-  openFile(contentType, field) {
+  openFile(contentType: any, field: any): void {
     return this.dataUtils.openFile(contentType, field);
   }
 
-  registerChangeInCFAOptions() {
+  registerChangeInCFAOptions(): void {
     this.eventSubscriber = this.eventManager.subscribe('cFAOptionListModification', () => this.loadAll());
   }
 
-  sort() {
+  sort(): any {
     const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
     if (this.predicate !== 'id') {
       result.push('id');
@@ -125,13 +127,13 @@ export class CFAOptionComponent implements OnInit, OnDestroy {
     return result;
   }
 
-  protected paginateCFAOptions(data: ICFAOption[], headers: HttpHeaders) {
-    this.links = this.parseLinks.parse(headers.get('link'));
-    this.totalItems = parseInt(headers.get('X-Total-Count'), 10);
+  protected paginateCFAOptions(data: ICFAOption[] | null, headers: HttpHeaders): void {
+    this.links = headers.get('link') != null ? this.parseLinks.parse(headers.get('link')!) : null;
+    this.totalItems = Number(headers.get('X-Total-Count'));
     this.cFAOptions = data;
   }
 
-  protected onError(errorMessage: string) {
-    this.jhiAlertService.error(errorMessage, null, null);
+  protected onError(errorMessage: string): void {
+    this.jhiAlertService.error(errorMessage, null, undefined);
   }
 }

@@ -16,24 +16,42 @@ export class AndroidOptionsService {
     return this.http.get<IAndroidVersion[]>(`${this.resourceUrl}/android-versions`, { observe: 'response' });
   }
 
-  getAndroidClasses(androidSourceFolderPath: string): Observable<HttpResponse<IAndroidClass[]>> {
+  getAndroidClasses(androidSourceFolderPath?: string | null): Observable<HttpResponse<IAndroidClass[]>> {
+    let param = new HttpParams();
+    if (androidSourceFolderPath != null) {
+      param = param.set('path', androidSourceFolderPath);
+    }
     return this.http.get<IAndroidClass[]>(`${this.resourceUrl}/system-services`, {
-      params: new HttpParams().set('path', androidSourceFolderPath),
+      params: param,
       observe: 'response'
     });
   }
 
-  getServiceSource(androidVersion: number, sourceFileName: string): Observable<any> {
+  getServiceSource(androidVersion?: number | null, sourceFileName?: string | null): Observable<any> {
+    let param = new HttpParams();
+    if (androidVersion != null) {
+      param = param.set('version', androidVersion.toString());
+    }
+    if (sourceFileName != null) {
+      param = param.set('name', sourceFileName);
+    }
     return this.http.get(`${this.resourceUrl}/source-file`, {
       responseType: 'text',
-      params: new HttpParams().set('version', androidVersion.toString()).set('name', sourceFileName),
+      params: param,
       observe: 'response'
     });
   }
 
-  getEntryMethods(serviceClassName: string, sourceFilePath: string): Observable<HttpResponse<string[]>> {
+  getEntryMethods(serviceClassName?: string, sourceFilePath?: string): Observable<HttpResponse<string[]>> {
+    let param = new HttpParams();
+    if (serviceClassName != null) {
+      param = param.set('name', serviceClassName);
+    }
+    if (sourceFilePath != null) {
+      param = param.set('path', sourceFilePath);
+    }
     return this.http.get<string[]>(`${this.resourceUrl}/entry-methods`, {
-      params: new HttpParams().set('name', serviceClassName).set('path', sourceFilePath),
+      params: param,
       observe: 'response'
     });
   }
