@@ -80,9 +80,7 @@ public class SlicerSettingResource {
     /**
      * {@code GET  /slicer-setting} : get all the slicerSettings.
      *
-
      * @param pageable the pagination information.
-
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of slicerSettings in body.
      */
     @GetMapping("/slicer-settings")

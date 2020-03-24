@@ -1,6 +1,5 @@
 import { TestBed, getTestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { take, map } from 'rxjs/operators';
 import { SliceService } from 'app/entities/slice/slice.service';
 import { ISlice, Slice } from 'app/shared/model/slice.model';
 import { CFAType } from 'app/shared/model/enumerations/cfa-type.model';
@@ -14,12 +13,13 @@ describe('Service Tests', () => {
     let service: SliceService;
     let httpMock: HttpTestingController;
     let elemDefault: ISlice;
-    let expectedResult;
+    let expectedResult: ISlice | ISlice[] | boolean | null;
+
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule]
       });
-      expectedResult = {};
+      expectedResult = null;
       injector = getTestBed();
       service = injector.get(SliceService);
       httpMock = injector.get(HttpTestingController);
@@ -45,14 +45,12 @@ describe('Service Tests', () => {
     describe('Service methods', () => {
       it('should find an element', () => {
         const returnedFromService = Object.assign({}, elemDefault);
-        service
-          .find('123')
-          .pipe(take(1))
-          .subscribe(resp => (expectedResult = resp));
+
+        service.find('123').subscribe(resp => (expectedResult = resp.body));
 
         const req = httpMock.expectOne({ method: 'GET' });
         req.flush(returnedFromService);
-        expect(expectedResult).toMatchObject({ body: elemDefault });
+        expect(expectedResult).toMatchObject(elemDefault);
       });
 
       it('should create a Slice', () => {
@@ -62,14 +60,14 @@ describe('Service Tests', () => {
           },
           elemDefault
         );
+
         const expected = Object.assign({}, returnedFromService);
-        service
-          .create(new Slice(null))
-          .pipe(take(1))
-          .subscribe(resp => (expectedResult = resp));
+
+        service.create(new Slice()).subscribe(resp => (expectedResult = resp.body));
+
         const req = httpMock.expectOne({ method: 'POST' });
         req.flush(returnedFromService);
-        expect(expectedResult).toMatchObject({ body: expected });
+        expect(expectedResult).toMatchObject(expected);
       });
 
       it('should return a list of Slice', () => {
@@ -91,14 +89,11 @@ describe('Service Tests', () => {
           },
           elemDefault
         );
+
         const expected = Object.assign({}, returnedFromService);
-        service
-          .query(expected)
-          .pipe(
-            take(1),
-            map(resp => resp.body)
-          )
-          .subscribe(body => (expectedResult = body));
+
+        service.query().subscribe(resp => (expectedResult = resp.body));
+
         const req = httpMock.expectOne({ method: 'GET' });
         req.flush([returnedFromService]);
         httpMock.verify();

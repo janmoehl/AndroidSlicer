@@ -3,7 +3,9 @@
         <div *ngIf="slice">
             <h2><span>Slice</span> {{slice.id}} ({{slice.sliceMode}})</h2>
             <hr>
+
             <jhi-alert-error></jhi-alert-error>
+
             <dl class="row-md jh-entity-details">
                 <ng-template [ngIf]="slice.sliceMode == 'ANDROID'">
                     <dt><span>Android Version</span></dt>
@@ -93,15 +95,15 @@
                 </dd>
                 <dt><span>Reflection Options</span></dt>
                 <dd>
-                    <span>{{slice.reflectionOptions}}</span>
+                    <span>{{ slice.reflectionOptions }}</span>
                 </dd>
                 <dt><span>Data Dependence Options</span></dt>
                 <dd>
-                    <span>{{slice.dataDependenceOptions}}</span>
+                    <span>{{ slice.dataDependenceOptions }}</span>
                 </dd>
                 <dt><span>Control Dependence Options</span></dt>
                 <dd>
-                    <span>{{slice.controlDependenceOptions}}</span>
+                    <span>{{ slice.controlDependenceOptions }}</span>
                 </dd>
                 <div *ngIf="slice.log">
                     <div class="row justify-content-md-left pb-2">
@@ -128,7 +130,7 @@
             <button type="submit"
                     (click)="previousState()"
                     class="btn btn-info">
-                <fa-icon [icon]="'arrow-left'"></fa-icon>&nbsp;<span> Back</span>
+                <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
             </button>
         </div>
     </div>

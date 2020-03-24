@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { HttpResponse } from '@angular/common/http';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
+
 import { ISlicerSetting, SlicerSetting } from 'app/shared/model/slicer-setting.model';
 import { SlicerSettingService } from './slicer-setting.service';
 
@@ -13,7 +13,7 @@ import { SlicerSettingService } from './slicer-setting.service';
   templateUrl: './slicer-setting-update.component.html'
 })
 export class SlicerSettingUpdateComponent implements OnInit {
-  isSaving: boolean;
+  isSaving = false;
 
   editForm = this.fb.group({
     id: [],
@@ -24,14 +24,13 @@ export class SlicerSettingUpdateComponent implements OnInit {
 
   constructor(protected slicerSettingService: SlicerSettingService, protected activatedRoute: ActivatedRoute, private fb: FormBuilder) {}
 
-  ngOnInit() {
-    this.isSaving = false;
+  ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ slicerSetting }) => {
       this.updateForm(slicerSetting);
     });
   }
 
-  updateForm(slicerSetting: ISlicerSetting) {
+  updateForm(slicerSetting: ISlicerSetting): void {
     this.editForm.patchValue({
       id: slicerSetting.id,
       key: slicerSetting.key,
@@ -40,11 +39,11 @@ export class SlicerSettingUpdateComponent implements OnInit {
     });
   }
 
-  previousState() {
+  previousState(): void {
     window.history.back();
   }
 
-  save() {
+  save(): void {
     this.isSaving = true;
     const slicerSetting = this.createFromForm();
     if (slicerSetting.id !== undefined) {
@@ -62,16 +61,19 @@ export class SlicerSettingUpdateComponent implements OnInit {
     };
   }
 
-  protected subscribeToSaveResponse(result: Observable<HttpResponse<ISlicerSetting>>) {
-    result.subscribe(() => this.onSaveSuccess(), () => this.onSaveError());
+  protected subscribeToSaveResponse(result: Observable<HttpResponse<ISlicerSetting>>): void {
+    result.subscribe(
+      () => this.onSaveSuccess(),
+      () => this.onSaveError()
+    );
   }
 
-  protected onSaveSuccess() {
+  protected onSaveSuccess(): void {
     this.isSaving = false;
     this.previousState();
   }
 
-  protected onSaveError() {
+  protected onSaveError(): void {
     this.isSaving = false;
   }
 }

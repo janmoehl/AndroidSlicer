@@ -8,7 +8,7 @@
     </a>
     <div class="navbar-collapse collapse" id="navbarResponsive" [ngbCollapse]="isNavbarCollapsed" [ngSwitch]="isAuthenticated()">
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+            <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
                 <a class="nav-link" routerLink="/" (click)="collapseNavbar()">
                     <span>
                         <fa-icon icon="home"></fa-icon>
@@ -84,15 +84,15 @@
             <!-- Profile + Login has been disabled -->
             <!-- <li ngbDropdown class="nav-item dropdown pointer" display="dynamic" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
                 <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="account-menu">
-                  <span *ngIf="!getImageUrl()">
-                    <fa-icon icon="user"></fa-icon>
-                    <span>
-                      Account
+                    <span *ngIf="!getImageUrl()">
+                        <fa-icon icon="user"></fa-icon>
+                        <span>
+                            Account
+                        </span>
                     </span>
-                  </span>
-                  <span *ngIf="getImageUrl()">
-                      <img [src]="getImageUrl()" class="profile-image rounded-circle" alt="Avatar">
-                  </span>
+                    <span *ngIf="getImageUrl()">
+                        <img [src]="getImageUrl()" class="profile-image rounded-circle" alt="Avatar">
+                    </span>
                 </a>
                 <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="account-menu">
                     <li *ngSwitchCase="true">

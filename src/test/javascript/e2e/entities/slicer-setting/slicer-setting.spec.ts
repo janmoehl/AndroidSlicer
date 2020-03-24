@@ -25,6 +25,10 @@ describe('SlicerSetting e2e test', () => {
     slicerSettingComponentsPage = new SlicerSettingComponentsPage();
     await browser.wait(ec.visibilityOf(slicerSettingComponentsPage.title), 5000);
     expect(await slicerSettingComponentsPage.getTitle()).to.eq('Slicer Settings');
+    await browser.wait(
+      ec.or(ec.visibilityOf(slicerSettingComponentsPage.entities), ec.visibilityOf(slicerSettingComponentsPage.noResult)),
+      1000
+    );
   });
 
   it('should load create SlicerSetting page', async () => {

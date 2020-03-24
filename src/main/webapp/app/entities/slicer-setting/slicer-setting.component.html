@@ -2,10 +2,12 @@
     <h2 id="page-heading">
         <span>Slicer Settings</span>
     </h2>
+
     <jhi-alert-error></jhi-alert-error>
+
     <jhi-alert></jhi-alert>
-    <br/>
-    <div class="alert alert-warning" *ngIf="slicerSettings?.length === 0">
+
+    <div class="alert alert-warning" id="no-result" *ngIf="slicerSettings?.length === 0">
         <span>No slicerSettings found</span>
     </div>
     <h5>
@@ -46,12 +48,14 @@
             </tbody>
         </table>
     </div>
-    <div [hidden]="slicerSettings?.length === 0">
+
+    <div *ngIf="slicerSettings?.length > 0">
         <div class="row justify-content-center">
             <jhi-item-count [page]="page" [total]="totalItems" [itemsPerPage]="itemsPerPage"></jhi-item-count>
         </div>
+
         <div class="row justify-content-center">
-            <ngb-pagination [collectionSize]="totalItems" [(page)]="page" [pageSize]="itemsPerPage" [maxSize]="5" [rotate]="true" [boundaryLinks]="true" (pageChange)="loadPage(page)"></ngb-pagination>
+            <ngb-pagination [collectionSize]="totalItems" [(page)]="ngbPaginationPage" [pageSize]="itemsPerPage" [maxSize]="5" [rotate]="true" [boundaryLinks]="true" (pageChange)="loadPage($event)"></ngb-pagination>
         </div>
     </div>
 </div>

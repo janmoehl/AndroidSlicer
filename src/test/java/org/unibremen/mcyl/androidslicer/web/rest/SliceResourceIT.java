@@ -4,17 +4,16 @@ import org.unibremen.mcyl.androidslicer.AndroidSlicerApp;
 import org.unibremen.mcyl.androidslicer.domain.Slice;
 import org.unibremen.mcyl.androidslicer.repository.SliceRepository;
 import org.unibremen.mcyl.androidslicer.service.SliceService;
-import org.unibremen.mcyl.androidslicer.web.rest.errors.ExceptionTranslator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.Validator;
@@ -28,7 +27,6 @@ import com.ibm.wala.ipa.callgraph.AnalysisOptions.ReflectionOptions;
 import com.ibm.wala.ipa.slicer.Slicer.ControlDependenceOptions;
 import com.ibm.wala.ipa.slicer.Slicer.DataDependenceOptions;
 
-import static org.unibremen.mcyl.androidslicer.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -68,17 +66,6 @@ public class SliceResourceIT {
     private SliceService sliceService;
 
     @Autowired
-    private MappingJackson2HttpMessageConverter jacksonMessageConverter;
-
-    @Autowired
-    private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
-
-    @Autowired
-    private ExceptionTranslator exceptionTranslator;
-
-    @Autowired
-    private Validator validator;
-
     private MockMvc restSliceMockMvc;
 
     private Slice slice;
@@ -275,7 +262,7 @@ public class SliceResourceIT {
         // Get all the sliceList
         restSliceMockMvc.perform(get("/api/slices?sort=id,desc"))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(slice.getId())))
             .andExpect(jsonPath("$.[*].androidVersion").value(hasItem(DEFAULT_ANDROID_VERSION)))
             .andExpect(jsonPath("$.[*].androidClassName").value(hasItem(DEFAULT_ANDROID_CLASS_NAME)))
@@ -294,7 +281,7 @@ public class SliceResourceIT {
         // Get the slice
         restSliceMockMvc.perform(get("/api/slices/{id}", slice.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(slice.getId()))
             .andExpect(jsonPath("$.androidVersion").value(DEFAULT_ANDROID_VERSION))
             .andExpect(jsonPath("$.cfaType").value(DEFAULT_CFA_TYPE.toString()))

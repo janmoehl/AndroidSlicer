@@ -1,6 +1,5 @@
 package org.unibremen.mcyl.androidslicer.web.rest;
 
-import org.unibremen.mcyl.androidslicer.AndroidSlicerApp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Integration tests for the {@link ClientForwardController} REST controller.
+ * Unit tests for the {@link ClientForwardController} REST controller.
  */
 @SpringBootTest(classes = AndroidSlicerApp.class)
 @Import(TestMongoConfig.class)
@@ -56,6 +55,7 @@ public class ClientForwardControllerIT {
             .andExpect(status().isOk())
             .andExpect(forwardedUrl("/"));
     }
+
 
     @RestController
     public static class TestController {

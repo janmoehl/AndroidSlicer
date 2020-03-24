@@ -16,11 +16,13 @@
             (sliceModeChange)="onSliceModeChange($event)"></jhi-slicemode-switch>
     </div>
     <jhi-alert-error></jhi-alert-error>
+
     <jhi-alert></jhi-alert>
     <div class="alert alert-warning" *ngIf="slice?.length === 0">
         <span>No slice found</span>
     </div>
-    <div class="table-responsive" *ngIf="slice?.length > 0">
+
+    <div class="table-responsive" id="entities" *ngIf="slice?.length > 0">
         <table class="table table-striped" aria-describedby="page-heading">
             <thead>
             <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
@@ -85,12 +87,14 @@
             </tbody>
         </table>
     </div>
-    <div [hidden]="slice?.length === 0">
+
+    <div *ngIf="slice?.length > 0">
         <div class="row justify-content-center">
             <jhi-item-count [page]="page" [total]="totalItems" [itemsPerPage]="itemsPerPage"></jhi-item-count>
         </div>
+
         <div class="row justify-content-center">
-            <ngb-pagination [collectionSize]="totalItems" [(page)]="page" [pageSize]="itemsPerPage" [maxSize]="5" [rotate]="true" [boundaryLinks]="true" (pageChange)="loadPage(page)"></ngb-pagination>
+            <ngb-pagination [collectionSize]="totalItems" [(page)]="ngbPaginationPage" [pageSize]="itemsPerPage" [maxSize]="5" [rotate]="true" [boundaryLinks]="true" (pageChange)="loadPage($event)"></ngb-pagination>
         </div>
     </div>
 </div>

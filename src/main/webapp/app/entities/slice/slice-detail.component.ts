@@ -18,7 +18,7 @@ import { SliceService } from './slice.service';
   templateUrl: './slice-detail.component.html'
 })
 export class SliceDetailComponent implements OnInit {
-  slice: ISlice;
+  slice: ISlice | null = null;
 
   slicedClassItems: MenuItem[] = [];
   activeItem: MenuItem;

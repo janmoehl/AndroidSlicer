@@ -3,25 +3,20 @@ package org.unibremen.mcyl.androidslicer.web.rest;
 import org.unibremen.mcyl.androidslicer.AndroidSlicerApp;
 import org.unibremen.mcyl.androidslicer.domain.SlicerSetting;
 import org.unibremen.mcyl.androidslicer.repository.SlicerSettingRepository;
-import org.unibremen.mcyl.androidslicer.web.rest.errors.ExceptionTranslator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.validation.Validator;
-
 
 import java.util.List;
 
-import static org.unibremen.mcyl.androidslicer.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -47,32 +42,9 @@ public class SlicerSettingResourceIT {
     private SlicerSettingRepository slicerSettingRepository;
 
     @Autowired
-    private MappingJackson2HttpMessageConverter jacksonMessageConverter;
-
-    @Autowired
-    private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
-
-    @Autowired
-    private ExceptionTranslator exceptionTranslator;
-
-    @Autowired
-    private Validator validator;
-
     private MockMvc restSlicerSettingMockMvc;
 
     private SlicerSetting slicerSetting;
-
-    @BeforeEach
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-        final SlicerSettingResource slicerSettingResource = new SlicerSettingResource(slicerSettingRepository);
-        this.restSlicerSettingMockMvc = MockMvcBuilders.standaloneSetup(slicerSettingResource)
-            .setCustomArgumentResolvers(pageableArgumentResolver)
-            .setControllerAdvice(exceptionTranslator)
-            .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter)
-            .setValidator(validator).build();
-    }
 
     /**
      * Create an entity for this test.
@@ -149,7 +121,7 @@ public class SlicerSettingResourceIT {
         // Get all the slicerSettingList
         restSlicerSettingMockMvc.perform(get("/api/slicer-settings?sort=id,desc"))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(slicerSetting.getId())))
             .andExpect(jsonPath("$.[*].key").value(hasItem(DEFAULT_KEY)))
             .andExpect(jsonPath("$.[*].value").value(hasItem(DEFAULT_VALUE)))
@@ -164,7 +136,7 @@ public class SlicerSettingResourceIT {
         // Get the slicerSetting
         restSlicerSettingMockMvc.perform(get("/api/slicer-settings/{id}", slicerSetting.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(slicerSetting.getId()))
             .andExpect(jsonPath("$.key").value(DEFAULT_KEY))
             .andExpect(jsonPath("$.value").value(DEFAULT_VALUE))
@@ -193,7 +165,7 @@ public class SlicerSettingResourceIT {
             .description(UPDATED_DESCRIPTION);
 
         restSlicerSettingMockMvc.perform(put("/api/slicer-settings")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(updatedSlicerSetting)))
             .andExpect(status().isOk());
 
@@ -214,7 +186,7 @@ public class SlicerSettingResourceIT {
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restSlicerSettingMockMvc.perform(put("/api/slicer-settings")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(slicerSetting)))
             .andExpect(status().isBadRequest());
 

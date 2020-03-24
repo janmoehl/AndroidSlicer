@@ -34,7 +34,6 @@ export class SliceComponent implements OnInit, OnDestroy {
 
   constructor(
     protected sliceService: SliceService,
-    protected parseLinks: JhiParseLinks,
     protected activatedRoute: ActivatedRoute,
     protected dataUtils: JhiDataUtils,
     protected router: Router,
@@ -57,19 +56,15 @@ export class SliceComponent implements OnInit, OnDestroy {
   loadAll() {
     this.sliceService
       .query({
-        page: this.page - 1,
+        page: pageToLoad - 1,
         size: this.itemsPerPage,
         sort: this.sort(),
         sliceMode: this.sliceMode
       })
-      .subscribe((res: HttpResponse<ISlice[]>) => this.paginateSlice(res.body, res.headers));
-  }
-
-  loadPage(page: number) {
-    if (page !== this.previousPage) {
-      this.previousPage = page;
-      this.transition();
-    }
+      .subscribe(
+        (res: HttpResponse<ISlice[]>) => this.onSuccess(res.body, res.headers, pageToLoad),
+        () => this.onError()
+      );
   }
 
   transition() {
@@ -101,24 +96,27 @@ export class SliceComponent implements OnInit, OnDestroy {
     // sliceMode variable
   }
 
-  ngOnDestroy() {
-    this.eventManager.destroy(this.eventSubscriber);
+  ngOnDestroy(): void {
+    if (this.eventSubscriber) {
+      this.eventManager.destroy(this.eventSubscriber);
+    }
   }
 
-  trackId(index: number, item: ISlice) {
-    return item.id;
+  trackId(index: number, item: ISlice): string {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    return item.id!;
   }
 
-  byteSize(field) {
-    return this.dataUtils.byteSize(field);
+  byteSize(base64String: string): string {
+    return this.dataUtils.byteSize(base64String);
   }
 
-  openFile(contentType, field) {
-    return this.dataUtils.openFile(contentType, field);
+  openFile(contentType: string, base64String: string): void {
+    return this.dataUtils.openFile(contentType, base64String);
   }
 
-  registerChangeInSlice() {
-    this.eventSubscriber = this.eventManager.subscribe('sliceListModification', () => this.loadAll());
+  registerChangeInSlice(): void {
+    this.eventSubscriber = this.eventManager.subscribe('sliceListModification', () => this.loadPage());
   }
 
   sort() {
@@ -129,9 +127,20 @@ export class SliceComponent implements OnInit, OnDestroy {
     return result;
   }
 
-  protected paginateSlice(data: ISlice[], headers: HttpHeaders) {
-    this.links = this.parseLinks.parse(headers.get('link'));
-    this.totalItems = parseInt(headers.get('X-Total-Count'), 10);
-    this.slice = data;
+  protected onSuccess(data: ISlice[] | null, headers: HttpHeaders, page: number): void {
+    this.totalItems = Number(headers.get('X-Total-Count'));
+    this.page = page;
+    this.router.navigate(['/slice'], {
+      queryParams: {
+        page: this.page,
+        size: this.itemsPerPage,
+        sort: this.predicate + ',' + (this.ascending ? 'asc' : 'desc')
+      }
+    });
+    this.slice = data || [];
+  }
+
+  protected onError(): void {
+    this.ngbPaginationPage = this.page;
   }
 }

@@ -26,6 +26,7 @@ describe('Slice e2e test', () => {
     sliceComponentsPage = new SliceComponentsPage();
     await browser.wait(ec.visibilityOf(sliceComponentsPage.title), 5000);
     expect(await sliceComponentsPage.getTitle()).to.eq('Slice');
+    await browser.wait(ec.or(ec.visibilityOf(sliceComponentsPage.entities), ec.visibilityOf(sliceComponentsPage.noResult)), 1000);
   });
 
   it('should load create Slice page', async () => {
@@ -39,6 +40,7 @@ describe('Slice e2e test', () => {
     const nbButtonsBeforeCreate = await sliceComponentsPage.countDeleteButtons();
 
     await sliceComponentsPage.clickOnCreateButton();
+
     await promise.all([
       sliceMakePage.setAndroidVersionInput('5'),
       sliceMakePage.setAndroidClassNameInput('androidClassName'),

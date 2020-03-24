@@ -9,24 +9,23 @@ import { ISlicerOption } from 'app/shared/model/slicer-option.model';
   templateUrl: './slicer-option-detail.component.html'
 })
 export class SlicerOptionDetailComponent implements OnInit {
-  slicerOption: ISlicerOption;
+  slicerOption: ISlicerOption | null = null;
 
   constructor(protected dataUtils: JhiDataUtils, protected activatedRoute: ActivatedRoute) {}
 
-  ngOnInit() {
-    this.activatedRoute.data.subscribe(({ slicerOption }) => {
-      this.slicerOption = slicerOption;
-    });
+  ngOnInit(): void {
+    this.activatedRoute.data.subscribe(({ slicerOption }) => (this.slicerOption = slicerOption));
   }
 
-  byteSize(field) {
-    return this.dataUtils.byteSize(field);
+  byteSize(base64String: string): string {
+    return this.dataUtils.byteSize(base64String);
   }
 
-  openFile(contentType, field) {
-    return this.dataUtils.openFile(contentType, field);
+  openFile(contentType: string, base64String: string): void {
+    this.dataUtils.openFile(contentType, base64String);
   }
-  previousState() {
+
+  previousState(): void {
     window.history.back();
   }
 }

@@ -1,12 +1,10 @@
 package org.unibremen.mcyl.androidslicer.web.rest;
 
 import org.unibremen.mcyl.androidslicer.AndroidSlicerApp;
-import org.unibremen.mcyl.androidslicer.security.jwt.TokenProvider;
-import org.unibremen.mcyl.androidslicer.web.rest.errors.ExceptionTranslator;
 import org.unibremen.mcyl.androidslicer.web.rest.vm.LoginVM;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -18,34 +16,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.isEmptyString;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 /**
  * Integration tests for the {@link UserJWTController} REST controller.
  */
+@AutoConfigureMockMvc
 @SpringBootTest(classes = AndroidSlicerApp.class)
 @Import(TestMongoConfig.class)
 public class UserJWTControllerIT {
 
     @Autowired
-    private TokenProvider tokenProvider;
-
-    @Autowired
-    private AuthenticationManagerBuilder authenticationManager;
-
-    @Autowired
-    private ExceptionTranslator exceptionTranslator;
-
     private MockMvc mockMvc;
-
-    @BeforeEach
-    public void setup() {
-        UserJWTController userJWTController = new UserJWTController(tokenProvider, authenticationManager);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(userJWTController)
-            .setControllerAdvice(exceptionTranslator)
-            .build();
-    }
 
     @Test
     public void testAuthorize() throws Exception {
@@ -53,13 +37,13 @@ public class UserJWTControllerIT {
         login.setUsername("test");
         login.setPassword("test");
         mockMvc.perform(post("/api/authenticate")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(login)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id_token").isString())
             .andExpect(jsonPath("$.id_token").isNotEmpty())
             .andExpect(header().string("Authorization", not(nullValue())))
-            .andExpect(header().string("Authorization", not(isEmptyString())));
+            .andExpect(header().string("Authorization", not(is(emptyString()))));
     }
 
     @Test
@@ -69,13 +53,13 @@ public class UserJWTControllerIT {
         login.setPassword("test");
         login.setRememberMe(true);
         mockMvc.perform(post("/api/authenticate")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(login)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id_token").isString())
             .andExpect(jsonPath("$.id_token").isNotEmpty())
             .andExpect(header().string("Authorization", not(nullValue())))
-            .andExpect(header().string("Authorization", not(isEmptyString())));
+            .andExpect(header().string("Authorization", not(is(emptyString()))));
     }
 
     @Test
@@ -84,7 +68,7 @@ public class UserJWTControllerIT {
         login.setUsername("wrong-user");
         login.setPassword("wrong password");
         mockMvc.perform(post("/api/authenticate")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(login)))
             .andExpect(status().isUnauthorized())
             .andExpect(jsonPath("$.id_token").doesNotExist())

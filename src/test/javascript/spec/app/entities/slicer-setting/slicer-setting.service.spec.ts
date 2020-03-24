@@ -1,6 +1,5 @@
 import { TestBed, getTestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { take, map } from 'rxjs/operators';
 import { SlicerSettingService } from 'app/entities/slicer-setting/slicer-setting.service';
 import { ISlicerSetting, SlicerSetting } from 'app/shared/model/slicer-setting.model';
 
@@ -10,12 +9,13 @@ describe('Service Tests', () => {
     let service: SlicerSettingService;
     let httpMock: HttpTestingController;
     let elemDefault: ISlicerSetting;
-    let expectedResult;
+    let expectedResult: ISlicerSetting | ISlicerSetting[] | boolean | null;
+
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule]
       });
-      expectedResult = {};
+      expectedResult = null;
       injector = getTestBed();
       service = injector.get(SlicerSettingService);
       httpMock = injector.get(HttpTestingController);
@@ -26,14 +26,12 @@ describe('Service Tests', () => {
     describe('Service methods', () => {
       it('should find an element', () => {
         const returnedFromService = Object.assign({}, elemDefault);
-        service
-          .find('123')
-          .pipe(take(1))
-          .subscribe(resp => (expectedResult = resp));
+
+        service.find('123').subscribe(resp => (expectedResult = resp.body));
 
         const req = httpMock.expectOne({ method: 'GET' });
         req.flush(returnedFromService);
-        expect(expectedResult).toMatchObject({ body: elemDefault });
+        expect(expectedResult).toMatchObject(elemDefault);
       });
 
       it('should update a SlicerSetting', () => {
@@ -47,13 +45,12 @@ describe('Service Tests', () => {
         );
 
         const expected = Object.assign({}, returnedFromService);
-        service
-          .update(expected)
-          .pipe(take(1))
-          .subscribe(resp => (expectedResult = resp));
+
+        service.update(expected).subscribe(resp => (expectedResult = resp.body));
+
         const req = httpMock.expectOne({ method: 'PUT' });
         req.flush(returnedFromService);
-        expect(expectedResult).toMatchObject({ body: expected });
+        expect(expectedResult).toMatchObject(expected);
       });
 
       it('should return a list of SlicerSetting', () => {
@@ -65,14 +62,11 @@ describe('Service Tests', () => {
           },
           elemDefault
         );
+
         const expected = Object.assign({}, returnedFromService);
-        service
-          .query(expected)
-          .pipe(
-            take(1),
-            map(resp => resp.body)
-          )
-          .subscribe(body => (expectedResult = body));
+
+        service.query().subscribe(resp => (expectedResult = resp.body));
+
         const req = httpMock.expectOne({ method: 'GET' });
         req.flush([returnedFromService]);
         httpMock.verify();

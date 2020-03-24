@@ -4,20 +4,22 @@ export class SlicerSettingComponentsPage {
   createButton = element(by.id('jh-create-entity'));
   deleteButtons = element.all(by.css('jhi-slicer-setting div table .btn-danger'));
   title = element.all(by.css('jhi-slicer-setting div h2#page-heading span')).first();
+  noResult = element(by.id('no-result'));
+  entities = element(by.id('entities'));
 
-  async clickOnCreateButton() {
+  async clickOnCreateButton(): Promise<void> {
     await this.createButton.click();
   }
 
-  async clickOnLastDeleteButton() {
+  async clickOnLastDeleteButton(): Promise<void> {
     await this.deleteButtons.last().click();
   }
 
-  async countDeleteButtons() {
+  async countDeleteButtons(): Promise<number> {
     return this.deleteButtons.count();
   }
 
-  async getTitle() {
+  async getTitle(): Promise<string> {
     return this.title.getText();
   }
 }
@@ -26,27 +28,28 @@ export class SlicerSettingUpdatePage {
   pageTitle = element(by.id('jhi-slicer-setting-heading'));
   saveButton = element(by.id('save-entity'));
   cancelButton = element(by.id('cancel-save'));
+
   keyInput = element(by.id('field_key'));
   valueInput = element(by.id('field_value'));
   descriptionInput = element(by.id('field_description'));
 
-  async getPageTitle() {
+  async getPageTitle(): Promise<string> {
     return this.pageTitle.getText();
   }
 
-  async setKeyInput(key) {
+  async setKeyInput(key: string): Promise<void> {
     await this.keyInput.sendKeys(key);
   }
 
-  async getKeyInput() {
+  async getKeyInput(): Promise<string> {
     return await this.keyInput.getAttribute('value');
   }
 
-  async setValueInput(value) {
+  async setValueInput(value: string): Promise<void> {
     await this.valueInput.sendKeys(value);
   }
 
-  async getValueInput() {
+  async getValueInput(): Promise<string> {
     return await this.valueInput.getAttribute('value');
   }
 
@@ -63,7 +66,7 @@ export class SlicerSettingUpdatePage {
     await this.saveButton.click();
   }
 
-  async cancel() {
+  async cancel(): Promise<void> {
     await this.cancelButton.click();
   }
 
@@ -76,11 +79,11 @@ export class SlicerSettingDeleteDialog {
   private dialogTitle = element(by.id('jhi-delete-slicerSetting-heading'));
   private confirmButton = element(by.id('jhi-confirm-delete-slicerSetting'));
 
-  async getDialogTitle() {
+  async getDialogTitle(): Promise<string> {
     return this.dialogTitle.getText();
   }
 
-  async clickOnConfirmButton() {
+  async clickOnConfirmButton(): Promise<void> {
     await this.confirmButton.click();
   }
 }

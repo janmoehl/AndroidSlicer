@@ -12,21 +12,18 @@ import { SliceService } from './slice.service';
   templateUrl: './slice-delete-dialog.component.html'
 })
 export class SliceDeleteDialogComponent {
-  slice: ISlice;
+  slice?: ISlice;
 
   constructor(protected sliceService: SliceService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager) {}
 
-  clear() {
-    this.activeModal.dismiss('cancel');
+  cancel(): void {
+    this.activeModal.dismiss();
   }
 
-  confirmDelete(id: string) {
+  confirmDelete(id: string): void {
     this.sliceService.delete(id).subscribe(() => {
-      this.eventManager.broadcast({
-        name: 'sliceListModification',
-        content: 'Deleted an slice'
-      });
-      this.activeModal.dismiss(true);
+      this.eventManager.broadcast('sliceListModification');
+      this.activeModal.close();
     });
   }
 }

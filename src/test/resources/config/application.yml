@@ -16,6 +16,9 @@
 spring:
   application:
     name: AndroidSlicer
+  jackson:
+    serialization:
+      write-durations-as-timestamps: false
   data:
     mongodb:
       host: localhost
