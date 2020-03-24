@@ -5,6 +5,7 @@ import { JhiResolvePagingParams } from 'ng-jhipster';
 import { Observable, of, EMPTY } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
+import { Authority } from 'app/shared/constants/authority.constants';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access-service';
 import { ISlice, Slice } from 'app/shared/model/slice.model';
 import { SliceService } from './slice.service';
@@ -42,7 +43,7 @@ export const sliceRoute: Routes = [
       pagingParams: JhiResolvePagingParams
     },
     data: {
-      authorities: ['ROLE_USER'],
+      authorities: [Authority.USER],
       defaultSort: 'id,asc',
       pageTitle: 'Slice'
     },
@@ -55,7 +56,7 @@ export const sliceRoute: Routes = [
       slice: SliceResolve
     },
     data: {
-      authorities: ['ROLE_USER'],
+      authorities: [Authority.USER],
       pageTitle: 'Slice'
     },
     canActivate: [UserRouteAccessService]
@@ -67,7 +68,7 @@ export const sliceRoute: Routes = [
       slice: SliceResolve
     },
     data: {
-      authorities: ['ROLE_USER'],
+      authorities: [Authority.USER],
       pageTitle: 'Slice'
     },
     canActivate: [UserRouteAccessService]
@@ -79,7 +80,7 @@ export const sliceRoute: Routes = [
       slice: SliceResolve
     },
     data: {
-      authorities: ['ROLE_USER'],
+      authorities: [Authority.USER],
       pageTitle: 'Slice'
     },
     canActivate: [UserRouteAccessService]

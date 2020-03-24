@@ -5,6 +5,7 @@ import { JhiResolvePagingParams } from 'ng-jhipster';
 import { Observable, of, EMPTY } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
+import { Authority } from 'app/shared/constants/authority.constants';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access-service';
 import { ISlicerSetting, SlicerSetting } from 'app/shared/model/slicer-setting.model';
 import { SlicerSettingService } from './slicer-setting.service';
@@ -42,7 +43,7 @@ export const slicerSettingRoute: Routes = [
       pagingParams: JhiResolvePagingParams
     },
     data: {
-      authorities: ['ROLE_USER'],
+      authorities: [Authority.USER],
       defaultSort: 'id,asc',
       pageTitle: 'SlicerSettings'
     },
@@ -55,7 +56,7 @@ export const slicerSettingRoute: Routes = [
       slicerSetting: SlicerSettingResolve
     },
     data: {
-      authorities: ['ROLE_USER'],
+      authorities: [Authority.USER],
       pageTitle: 'SlicerSettings'
     },
     canActivate: [UserRouteAccessService]
@@ -67,7 +68,7 @@ export const slicerSettingRoute: Routes = [
       slicerSetting: SlicerSettingResolve
     },
     data: {
-      authorities: ['ROLE_USER'],
+      authorities: [Authority.USER],
       pageTitle: 'SlicerSettings'
     },
     canActivate: [UserRouteAccessService]
@@ -79,7 +80,7 @@ export const slicerSettingRoute: Routes = [
       slicerSetting: SlicerSettingResolve
     },
     data: {
-      authorities: ['ROLE_USER'],
+      authorities: [Authority.USER],
       pageTitle: 'SlicerSettings'
     },
     canActivate: [UserRouteAccessService]
