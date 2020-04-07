@@ -113,11 +113,11 @@ export class SlicerSettingComponent implements OnInit, OnDestroy {
   }
 
   protected paginateSlicerSettings(data: ISlicerSetting[] | null, headers: HttpHeaders): void {
-    if (data == null) {
-      return;
+    const linkParam = headers.get('link');
+    if (linkParam) {
+      this.links = this.parseLinks.parse(linkParam);
     }
-    this.links = this.parseLinks.parse(headers.get('link'));
     this.totalItems = Number(headers.get('X-Total-Count'));
-    this.slicerSettings = data;
+    this.slicerSettings = data || this.slicerSettings;
   }
 }
