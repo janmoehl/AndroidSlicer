@@ -82,7 +82,12 @@
                                 </div>        
                             </div>
                             <div *ngIf="showDiff">
-                                <ngx-monaco-diff-editor [options]="diffEditorOptions" [originalModel]="sourceFileDiffModel" [modifiedModel]="sliceCodeDiffModel" class="code-editor" (onInit)="onInitDiffEditor($event)""></ngx-monaco-diff-editor>
+                                <ngx-monaco-diff-editor [options]="diffEditorOptions"
+                                    [originalModel]="sourceFileDiffModel"
+                                    [modifiedModel]="sliceCodeDiffModel"
+                                    class="code-editor"
+                                    (onInit)="onInitDiffEditor($event)">
+                                </ngx-monaco-diff-editor>
                             </div>
                         </dd>
                         <div *ngIf="isCodeLoadingOrPrecessing" id="overlay">
