@@ -72,7 +72,9 @@ public class SliceService {
         try {
             exclusionFile = File.createTempFile("ExclusionList", ".txt");
             BufferedWriter bw = new BufferedWriter(new FileWriter(exclusionFile));
-            bw.write(slicerSettingRepository.findOneByKey(Constants.EXCLUSION_LIST_KEY).get().getValue());
+            String exclusions = slicerSettingRepository.findOneByKey(Constants.EXCLUSION_LIST_KEY).get().getValue();
+            exclusions = exclusions.replaceAll("\\s+",System.getProperty("line.separator"));
+            bw.write(exclusions);
             bw.close();
         } catch (IOException e) {
             throw new CompletionException(e);

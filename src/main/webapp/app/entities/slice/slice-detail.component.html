@@ -16,6 +16,7 @@
                     <dd>
                         <span>{{slice.className}}</span>
                     </dd>
+                    <dt><span>Entry Methods</span></dt>
                 </ng-template>
                 <ng-template [ngIf]="slice.sliceMode == 'JAVA'">
                     <dt><span>Java Source Path</span></dt>
@@ -26,12 +27,12 @@
                     <dd>
                         <span>{{slice.javaJarPath}}</span>
                     </dd>
-                    <dt><span>Java Class Name</span></dt>
+                    <dt><span>Seed Statement Class</span></dt>
                     <dd>
                         <span>{{slice.className}}</span>
                     </dd>
+                    <dt><span>Seed Statement Methods</span></dt>
                 </ng-template>
-                <dt><span>Entry Methods</span></dt>
                 <dd>
                     <ul class="list-inline">
                         <li class="list-inline-item" *ngFor="let entryMethod of slice.entryMethods"><span class="badge badge-info">{{entryMethod}}</span></li>

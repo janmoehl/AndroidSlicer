@@ -14,6 +14,7 @@ import { SlicerOptionType } from 'app/shared/model/enumerations/slicer-option-ty
 import { ISlice, Slice } from 'app/shared/model/slice.model';
 import { ISlicerOption } from 'app/shared/model/slicer-option.model';
 import { AndroidOptionsService } from 'app/shared/services/android-options.service';
+import { JavaService } from 'app/shared/services/java.service';
 import { JhiAlertService, JhiDataUtils } from 'ng-jhipster';
 import { SelectItem } from 'primeng/api';
 import { Observable } from 'rxjs';
@@ -42,7 +43,9 @@ export class SliceMakeComponent implements OnInit {
   filteredAndroidSeedStatementOptions: string[] = [];
 
   // java
+  javaJarPaths: string[] = [];
   filteredJavaJarPaths: string[] = [];
+  javaSourcePaths: string[] = [];
   filteredJavaSourcePaths: string[] = [];
   filteredJavaEntryMethodOptions: string[] = [];
   filteredJavaSeedStatementOptions: string[] = [];
@@ -81,6 +84,7 @@ export class SliceMakeComponent implements OnInit {
     protected slicerOptionService: SlicerOptionService,
     protected activatedRoute: ActivatedRoute,
     protected androidOptionsService: AndroidOptionsService,
+    protected javaService: JavaService,
     protected cfaOptionService: CFAOptionService,
     private fb: FormBuilder
   ) {}
@@ -156,24 +160,34 @@ export class SliceMakeComponent implements OnInit {
     );
   }
 
-  // TODO
-  onJarPathChange(event: any): void {
-    this.filteredJavaJarPaths = [event.query.toString()];
-    this.filterMultiSelectOptions(
-      event,
-      ['/home/jan/Dokumente/uni/masterarbeit/prototyp/objectOfInterest/build/libs/objectOfInterest-1.0-SNAPSHOT-all.jar'],
-      this.filteredJavaJarPaths
-    );
+  onJarPathComplete(event: any): void {
+    this.javaService
+      .getDirectories(event.query.toString())
+      .subscribe((res: HttpResponse<string[]>) => {
+        if (res.body != null && res.body.length > 0) {
+          this.javaJarPaths = res.body;
+        }
+      })
+      .add(() => {
+        this.filteredJavaJarPaths = [];
+        this.filterMultiSelectOptions(event, this.javaJarPaths, this.filteredJavaJarPaths);
+        console.log(this.javaJarPaths); // eslint-disable-line
+      });
   }
 
-  // TODO
-  onSourcePathChange(event: any): void {
-    this.filteredJavaSourcePaths = [event.query.toString()];
-    this.filterMultiSelectOptions(
-      event,
-      ['/home/jan/Dokumente/uni/masterarbeit/prototyp/objectOfInterest/src/main/java'],
-      this.filteredJavaSourcePaths
-    );
+  onSourcePathComplete(event: any): void {
+    this.javaService
+      .getDirectories(event.query.toString())
+      .subscribe((res: HttpResponse<string[]>) => {
+        if (res.body != null && res.body.length > 0) {
+          this.javaSourcePaths = res.body;
+        }
+      })
+      .add(() => {
+        this.filteredJavaSourcePaths = [];
+        this.filterMultiSelectOptions(event, this.javaSourcePaths, this.filteredJavaSourcePaths);
+        console.log(this.javaSourcePaths); // eslint-disable-line
+      });
   }
 
   onSliceModeChange(event: SliceMode): void {
@@ -351,7 +365,7 @@ export class SliceMakeComponent implements OnInit {
     }
   }
 
-  private filterMultiSelectOptions(event: any, options: any, filterdOptions: any): void {
+  private filterMultiSelectOptions(event: any, options: any, filteredOptions: any): void {
     for (let i = 0; i < options.length; i++) {
       const option = options[i];
       if (
@@ -360,7 +374,7 @@ export class SliceMakeComponent implements OnInit {
           .toLowerCase()
           .indexOf(event.query.toString().toLowerCase()) > -1
       ) {
-        filterdOptions.push(option);
+        filteredOptions.push(option);
       }
     }
   }

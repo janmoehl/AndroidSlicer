@@ -136,9 +136,10 @@
                                 [dropdown]="true"
                                 [style]="{'width':'100%'}"
                                 [inputStyle]="{'width':'100%'}"
+				emptyMessage="No files found"
                                 required="true"
                                 placeholder=".../executable.jar"
-                                (completeMethod)="onJarPathChange($event)"
+                                (completeMethod)="onJarPathComplete($event)"
                                 [minLength]="1"></p-autoComplete>
                     </div>
                     <div class="form-group">
@@ -150,15 +151,15 @@
                                 required="true"
                                 [inputStyle]="{'width':'100%'}"
                                 [suggestions]="filteredJavaSourcePaths"
-                                (completeMethod)="onSourcePathChange($event)"
-                                placeholder=".../source-root/"
+                                (completeMethod)="onSourcePathComplete($event)"
+                                placeholder=".../src/"
                                 [minLength]="1"></p-autoComplete>
                     </div>
 
                     <!-- - - - - - - - - - - - - - - TODO: improve - - - - - - - -->
 
                     <div class="form-group">
-                        <label class="form-control-label" for="field_javaClassName">Dirty Java Class Name -- later Dropdown</label>
+                        <label class="form-control-label" for="field_javaClassName">Class for searching the seed statement</label>
                         <input type="text"
                                 name="javaClassName"
                                 id="field_javaClassName"
@@ -167,7 +168,7 @@
                                 [style]="{'display':'block','width':'100%'}"></input>
                     </div>
                     <div class="form-group">
-                        <label class="form-control-label" for="field_javaEntryMethods" ngbTooltip="JSON-List with entry method names">Entry Methods</label>
+                        <label class="form-control-label" for="field_javaEntryMethods" ngbTooltip="JSON-List with entry method names">Method for searching the seed statement</label>
                         <div class="row no-gutters mx-lg-n1">
                             <div class="col-10 px-lg-1">
                                 <p-autoComplete name="javaEntryMethods"
@@ -201,7 +202,7 @@
                         </div>-->
                     </div>
                     <div class="form-group">
-                        <label class="form-control-label" for="field_javaSeedStatements" ngbTooltip="JSON-List with seed statement names">Seed Statements</label>
+                        <label class="form-control-label" for="field_javaSeedStatements" ngbTooltip="JSON-List with seed statement names">Seed Statement (method call)</label>
                         <div class="row no-gutters mx-lg-n1">
                             <div class="col-10 px-lg-1">
                                 <p-autoComplete name="javaSeedStatements" id="field_javaSeedStatement" formControlName="javaSeedStatements" [suggestions]="filteredJavaSeedStatementOptions" required="true" [dropdown]="true" [multiple]="true" [minLength]="1" placeholder="Select Seed Statement..." (completeMethod)="filterJavaSeedStatementOptions($event)" (onKeyUp)="addJavaSeedStatementOption($event)"></p-autoComplete>

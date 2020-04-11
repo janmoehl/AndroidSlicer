@@ -28,15 +28,17 @@
             <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
                 <ng-template [ngIf]="sliceMode === SliceModeEnum.ANDROID">
                     <th scope="col" jhiSortBy="androidVersion"><span>Android Version</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-                    <th scope="col" jhiSortBy="androidClassName"><span>Android Class Name</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                    <th scope="col" jhiSortBy="className"><span>Android Class Name</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                    <th scope="col" jhiSortBy="entryMethods"><span>Entry Methods</span> <fa-icon [icon]="'sort'"></fa-icon></th>
                 </ng-template>
                 <ng-template [ngIf]="sliceMode === SliceModeEnum.JAVA">
                     <th scope="col" jhiSortBy="javaJarPath"><span>Java Jar Path</span> <fa-icon [icon]="'sort'"></fa-icon></th>
                     <th scope="col" jhiSortBy="javaSourcePath"><span>Java Source Path</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                    <th scope="col" jhiSortBy="className"><span>Seed Statement Class</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                    <th scope="col" jhiSortBy="entryMethods"><span>Seed Statement Method</span> <fa-icon [icon]="'sort'"></fa-icon></th>
                 </ng-template>
-                <th scope="col" jhiSortBy="entryMethods"><span>Entry Methods</span> <fa-icon [icon]="'sort'"></fa-icon></th>
                 <th scope="col" jhiSortBy="seedStatements"><span>Seed Statements</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-                <th scope="col" jhiSortBy="cfaOptions"><span>CFA Option</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th scope="col" jhiSortBy="cfaType"><span>CFA Option</span> <fa-icon [icon]="'sort'"></fa-icon></th>
                 <th scope="col" jhiSortBy="reflectionOptions"><span>Reflection Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>
                 <th scope="col" jhiSortBy="dataDependenceOptions"><span>Data Dependence Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>
                 <th scope="col" jhiSortBy="controlDependenceOptions"><span>Control Dependence Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>
@@ -48,11 +50,12 @@
             <tr *ngFor="let slice of slice ;trackBy: trackId">
                 <ng-template [ngIf]="sliceMode === SliceModeEnum.ANDROID">
                     <td><div>{{slice.androidVersion}}</div></td>
-                    <td><div>{{slice.androidClassName}}</div></td>
+                    <td><div>{{slice.className}}</div></td>
                 </ng-template>
                 <ng-template [ngIf]="sliceMode === SliceModeEnum.JAVA">
                     <td><div>{{slice.javaJarPath}}</div></td>
                     <td><div>{{slice.javaSourcePath}}</div></td>
+                    <td><div>{{slice.className}}</div></td>
                 </ng-template>
                 <td><div>{{slice.entryMethods}}</div></td>
                 <td><div>{{slice.seedStatements}}</div></td>

@@ -34,6 +34,7 @@ import com.ibm.wala.util.config.AnalysisScopeReader;
 import com.ibm.wala.util.debug.UnimplementedError;
 import com.ibm.wala.util.intset.IntSet;
 import com.ibm.wala.util.strings.Atom;
+import com.ibm.wala.classLoader.IClass;
 
 import org.apache.commons.io.FilenameUtils;
 import org.unibremen.mcyl.androidslicer.domain.Slice;
@@ -75,10 +76,18 @@ public class WalaSlicer {
 
         /* create an analysis scope representing the appJar as a J2SE application */
         AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(appJar.getAbsolutePath(), exclusionFile);
+        long end = System.currentTimeMillis();
+
+        logger.log("Build analysis scope (took " + (end - start) + "ms)");
+
         IClassHierarchy classHierarchy = ClassHierarchyFactory.make(scope);
+        end = System.currentTimeMillis();
+        logger.log("Build class hierarchy (took " + (end - start) + "ms)");
 
         /* make entry points */
         Iterable<Entrypoint> entrypoints = getEntrypoints(slice, scope, classHierarchy, className, logger);
+        end = System.currentTimeMillis();
+        logger.log("get Entrypoints (took " + (end - start) + "ms)\n");
 
         /* create the call graph */
         AnalysisOptions options = new AnalysisOptions(scope, entrypoints);
@@ -87,11 +96,11 @@ public class WalaSlicer {
         CallGraphBuilder callGraphBuilder = getCallGraphBuilder(slice, entrypoints, classHierarchy, options,  scope, logger);
         CallGraph callGraph = callGraphBuilder.makeCallGraph(options, null);
 
-        long end = System.currentTimeMillis();
+        end = System.currentTimeMillis();
         logger.log("Took " + (end - start) + "ms.");
         logger.log(CallGraphStats.getStats(callGraph));
 
-        logger.log("\n== FIND ENTRY_METHOD(s) ==");
+        logger.log("\n== FIND METHOD(s) FOR SEED_STATEMENT(s) ==");
         Set<CGNode> methodNodes = new HashSet<CGNode>();
         Set<String> entryMethods = slice.getEntryMethods();
         WalaSlicer.findMethodNodes(callGraph, entryMethods, methodNodes, className, logger);
@@ -307,7 +316,7 @@ public class WalaSlicer {
      * @throws WalaException
      */
     private static Set<CGNode> findMethodNodes(CallGraph callGraph, Set<String> methodNames,
-                                               Set<CGNode> methodNodes, String androidClassName,
+                                               Set<CGNode> methodNodes, String className,
                                                SliceLogger logger) throws WalaException {
 
         for (Iterator<? extends CGNode> nodeIt = callGraph.iterator(); nodeIt.hasNext();) {
@@ -318,10 +327,10 @@ public class WalaSlicer {
             // get the class name
             TypeName declaringClassName = node.getMethod().getDeclaringClass().getName();
 
-            // check if class name of current node equals android class name ...
-            if (declaringClassName.equals(TypeName.findOrCreate(androidClassName))
+            // check if class name of current node equals class name ...
+            if (declaringClassName.equals(TypeName.findOrCreate(className))
                 // ... or inner class name
-                | declaringClassName.toString().startsWith(androidClassName + "$")) {
+                | declaringClassName.toString().startsWith(className + "$")) {
 
                 // check all given method names (i.e. entry methods and inner methods)
                 for (String methodName : methodNames){
@@ -335,7 +344,7 @@ public class WalaSlicer {
                             // search inner method nodes
                             Set<String> innerMethodNames = getInnerMethodNames(node);
                             if(!innerMethodNames.isEmpty()){
-                                findMethodNodes(callGraph, innerMethodNames, methodNodes, androidClassName, logger);
+                                findMethodNodes(callGraph, innerMethodNames, methodNodes, className, logger);
                             }
                         }
                     }

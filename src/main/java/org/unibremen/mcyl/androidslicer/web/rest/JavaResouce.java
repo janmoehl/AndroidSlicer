@@ -48,7 +48,7 @@ public class JavaResouce {
      */
     @GetMapping("/java/source-file")
     public ResponseEntity<String> getJavaSourceFile(@RequestParam("filePath") String filePath) {
-        log.debug("REST request to get android source file");
+        log.debug("REST request to get java source file");
 
         File file = new File(filePath);
         if (file.exists()) {
@@ -67,5 +67,36 @@ public class JavaResouce {
             return new ResponseEntity<String>(result.toString(), httpHeaders, HttpStatus.OK);
         }
         throw new BadRequestAlertException("Source File not found in " + filePath + " !", ENTITY_NAME, "idnull");
+    }
+
+    /**
+     * GET /java/paths : get all direct subdirectories and jar files for a given path
+     *
+     * @param path the path in which the subdirectories and files are
+     * @return a list of all paths and jar files in that given path
+     */
+    @GetMapping("/java/directories")
+    public ResponseEntity<List<String>> getDirectories(@RequestParam("path") String path) {
+        log.debug("REST request to get directories of " + path);
+
+        // if we got "/home/user/documen", then return all directories/jar-files of "/home/user/"
+        if(path.lastIndexOf('/') < path.length() -1) {
+            path = path.substring(0,path.lastIndexOf('/')+1);
+        }
+        File file = new File(path);
+        if (file.exists() && file.isDirectory()) {
+            List<String> result = new ArrayList<>();
+            for(File f : file.listFiles()) {
+                if (f.isFile() && f.getName().endsWith(".jar")) {
+                    result.add(f.getAbsolutePath());
+                } else if (f.isDirectory()) {
+                    result.add(f.getAbsolutePath() + "/");
+                }
+            }
+            return ResponseEntity.ok().body(result);
+        }
+        log.debug("does not exist/is no directory: " + path);
+        return ResponseEntity.noContent().build();
+        //throw new BadRequestAlertException("No directory: " + path + " !", ENTITY_NAME, "idnull");
     }
 }
