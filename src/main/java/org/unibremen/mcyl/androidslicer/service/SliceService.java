@@ -49,6 +49,19 @@ public class SliceService {
     }
 
     /**
+     * Creates an temporary exclusion file
+     */
+    public File createTemporaryExclusionFile() throws IOException {
+        File exclusionFile = File.createTempFile("ExclusionList", ".txt");
+        BufferedWriter bw = new BufferedWriter(new FileWriter(exclusionFile));
+        String exclusions = slicerSettingRepository.findOneByKey(Constants.EXCLUSION_LIST_KEY).get().getValue();
+        exclusions = exclusions.replaceAll("\\s+",System.getProperty("line.separator"));
+        bw.write(exclusions);
+        bw.close();
+        return exclusionFile;
+    }
+
+    /**
      * Process a slice.
      *
      * @param slice the entity to save
@@ -70,12 +83,7 @@ public class SliceService {
 
         File exclusionFile;
         try {
-            exclusionFile = File.createTempFile("ExclusionList", ".txt");
-            BufferedWriter bw = new BufferedWriter(new FileWriter(exclusionFile));
-            String exclusions = slicerSettingRepository.findOneByKey(Constants.EXCLUSION_LIST_KEY).get().getValue();
-            exclusions = exclusions.replaceAll("\\s+",System.getProperty("line.separator"));
-            bw.write(exclusions);
-            bw.close();
+            exclusionFile = createTemporaryExclusionFile();
         } catch (IOException e) {
             throw new CompletionException(e);
         }
@@ -121,7 +129,9 @@ public class SliceService {
             String androidClassName = slice.getClassName()
                 .substring(slice.getClassName().lastIndexOf("/") + 1, slice.getClassName().length());
             // remove .java
-            androidClassName = androidClassName.substring(0, androidClassName.lastIndexOf("."));
+            if (androidClassName.contains(".")) {
+                androidClassName = androidClassName.substring(0, androidClassName.lastIndexOf("."));
+            }
 
             if(saveToFileSetting != null &&
                 Boolean.parseBoolean(saveToFileSetting.getValue()) &&

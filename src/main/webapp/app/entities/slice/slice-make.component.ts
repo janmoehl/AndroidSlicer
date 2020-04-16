@@ -47,6 +47,8 @@ export class SliceMakeComponent implements OnInit {
   filteredJavaJarPaths: string[] = [];
   javaSourcePaths: string[] = [];
   filteredJavaSourcePaths: string[] = [];
+  javaClasses: string[] = [];
+  filteredJavaClasses: string[] = [];
   filteredJavaEntryMethodOptions: string[] = [];
   filteredJavaSeedStatementOptions: string[] = [];
 
@@ -62,7 +64,7 @@ export class SliceMakeComponent implements OnInit {
   createForm = this.fb.group({
     javaSourcePath: [null, [Validators.required]],
     javaJarPath: [null, [Validators.required]],
-    javaClassName: [null, [Validators.required]],
+    javaClasses: [null, [Validators.required]],
     javaEntryMethods: [null, [Validators.required]],
     javaSeedStatements: [null, [Validators.required]],
     androidVersion: [null, [Validators.required]],
@@ -162,7 +164,7 @@ export class SliceMakeComponent implements OnInit {
 
   onJarPathComplete(event: any): void {
     this.javaService
-      .getDirectories(event.query.toString())
+      .getDirectories(event.query.toString(), '.jar')
       .subscribe((res: HttpResponse<string[]>) => {
         if (res.body != null && res.body.length > 0) {
           this.javaJarPaths = res.body;
@@ -171,8 +173,32 @@ export class SliceMakeComponent implements OnInit {
       .add(() => {
         this.filteredJavaJarPaths = [];
         this.filterMultiSelectOptions(event, this.javaJarPaths, this.filteredJavaJarPaths);
-        console.log(this.javaJarPaths); // eslint-disable-line
       });
+  }
+
+  onJarPathKey(event: KeyboardEvent): void {
+    if (event && event.key === 'Enter' && this.filteredJavaJarPaths.length > 0) {
+      this.createForm.get(['javaJarPath'])!.setValue(this.filteredJavaJarPaths[0]);
+      // hack a little bit, because i don't know how to create the complete-events
+      const changeEvent = {} as any;
+      changeEvent.query = this.createForm.get(['javaJarPath'])!.value;
+      this.onJarPathComplete(changeEvent);
+    }
+  }
+
+  onJarPathSelected(event: any): void {
+    // eslint-disable-line
+    if (event.sourceCapabilities == null) {
+      return; // only switched focused window
+    }
+    const jarPath = this.createForm.get(['javaJarPath'])!.value;
+    if (jarPath && jarPath.endsWith('.jar')) {
+      this.javaService.getClasses(jarPath).subscribe((res: HttpResponse<string[]>) => {
+        if (res.body != null && res.body.length > 0) {
+          this.javaClasses = res.body;
+        }
+      });
+    }
   }
 
   onSourcePathComplete(event: any): void {
@@ -186,8 +212,34 @@ export class SliceMakeComponent implements OnInit {
       .add(() => {
         this.filteredJavaSourcePaths = [];
         this.filterMultiSelectOptions(event, this.javaSourcePaths, this.filteredJavaSourcePaths);
-        console.log(this.javaSourcePaths); // eslint-disable-line
       });
+  }
+
+  onSourcePathKey(event: KeyboardEvent): void {
+    if (event && event.key === 'Enter' && this.filteredJavaSourcePaths.length > 0) {
+      this.createForm.get(['javaSourcePath'])!.setValue(this.filteredJavaSourcePaths[0]);
+      // hack a little bit, because i don't know how to create the complete-events
+      const changeEvent = {} as any;
+      changeEvent.query = this.createForm.get(['javaSourcePath'])!.value;
+      this.onSourcePathComplete(changeEvent);
+    }
+  }
+
+  onJavaClassesComplete(event: any): void {
+    this.filteredJavaClasses = [];
+    this.filterMultiSelectOptions(event, this.javaClasses, this.filteredJavaClasses);
+  }
+
+  // TODO
+  // eslint-disable-next-line
+  onJavaClassesKey(event: KeyboardEvent): void {
+    /* if (event && event.key === 'Enter' && this.filteredJavaClasses.length > 0) {
+      this.createForm.get(['javaSourcePath'])!.setValue(this.filteredJavaSourcePaths[0]);
+      // hack a little bit, because i don't know how to create the complete-events
+      const changeEvent = {} as any;
+      changeEvent.query = this.createForm.get(['javaSourcePath'])!.value;
+      this.onSourcePathComplete(changeEvent);
+    } */
   }
 
   onSliceModeChange(event: SliceMode): void {
@@ -199,7 +251,7 @@ export class SliceMakeComponent implements OnInit {
     if (this.sliceMode === 'JAVA') {
       this.createForm.get('javaSourcePath')!.enable();
       this.createForm.get('javaJarPath')!.enable();
-      this.createForm.get('javaClassName')!.enable();
+      this.createForm.get('javaClasses')!.enable();
       this.createForm.get('javaEntryMethods')!.enable();
       this.createForm.get('javaSeedStatements')!.enable();
 
@@ -211,7 +263,7 @@ export class SliceMakeComponent implements OnInit {
       // this.sliceMode == 'android'
       this.createForm.get('javaSourcePath')!.disable();
       this.createForm.get('javaJarPath')!.disable();
-      this.createForm.get('javaClassName')!.disable();
+      this.createForm.get('javaClasses')!.disable();
       this.createForm.get('javaEntryMethods')!.disable();
       this.createForm.get('javaSeedStatements')!.disable();
 
@@ -242,7 +294,7 @@ export class SliceMakeComponent implements OnInit {
     const androidVersionField = this.createForm.get('androidVersion')!.value as IAndroidVersion;
     const currentNameValue =
       this.sliceMode === 'JAVA'
-        ? this.createForm.get('javaClassName')!.value
+        ? this.createForm.get('javaClasses')!.value
         : (this.createForm.get('androidClassName')!.value as IAndroidClass).name;
     const entity = {
       ...new Slice(),

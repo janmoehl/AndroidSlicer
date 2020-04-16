@@ -129,7 +129,9 @@
                 <!-- java-specific part -->
                 <div *ngIf="sliceMode == SliceModeEnum.JAVA">
                     <div class="form-group">
-                        <label class="form-control-label" for="field_jarPath">Systempath to jar</label>
+                        <label class="form-control-label"
+				for="field_jarPath"
+				ngbTooltip="Absolute path to jar (press 'Enter' to take first entry)">Systempath to jar</label>
                         <p-autoComplete [suggestions]="filteredJavaJarPaths"
                                 id="field_jarPath"
                                 formControlName="javaJarPath"
@@ -140,10 +142,14 @@
                                 required="true"
                                 placeholder=".../executable.jar"
                                 (completeMethod)="onJarPathComplete($event)"
+				(onKeyUp)="onJarPathKey($event)"
+				(onBlur)="onJarPathSelected($event)"
                                 [minLength]="1"></p-autoComplete>
                     </div>
                     <div class="form-group">
-                        <label class="form-control-label" for="field_sourcePath">Systempath to source files</label>
+                        <label class="form-control-label"
+				ngbTooltip="Absolute path to the source directory (press 'Enter' to take first entry)"
+				for="field_sourcePath">Systempath to source files</label>
                         <p-autoComplete formControlName="javaSourcePath"
                                 id="field_sourcePath"
                                 [style]="{'width':'100%'}"
@@ -152,20 +158,27 @@
                                 [inputStyle]="{'width':'100%'}"
                                 [suggestions]="filteredJavaSourcePaths"
                                 (completeMethod)="onSourcePathComplete($event)"
+				(onKeyUp)="onSourcePathKey($event)"
                                 placeholder=".../src/"
                                 [minLength]="1"></p-autoComplete>
                     </div>
 
-                    <!-- - - - - - - - - - - - - - - TODO: improve - - - - - - - -->
-
                     <div class="form-group">
                         <label class="form-control-label" for="field_javaClassName">Class for searching the seed statement</label>
-                        <input type="text"
-                                name="javaClassName"
-                                id="field_javaClassName"
-                                formControlName="javaClassName"
-                                required="true"
-                                [style]="{'display':'block','width':'100%'}"></input>
+
+                        <p-autoComplete
+                            id="field_javaClassName"
+                            formControlName="javaClasses"
+                            required="true"
+                            [unique]="true"
+                            [minLength]="0"
+                            [suggestions]="filteredJavaClasses"
+                            [dropdown]="true"
+                            [inputStyle]="{'width':'100%'}"
+                            placeholder="Java class with slicing criterion, e.g. de/example/www/Class"
+                            (completeMethod)="onJavaClassesComplete($event)"
+                            (onKeyUp)="onJavaClassesKey($event)">
+                        </p-autoComplete>
                     </div>
                     <div class="form-group">
                         <label class="form-control-label" for="field_javaEntryMethods" ngbTooltip="JSON-List with entry method names">Method for searching the seed statement</label>

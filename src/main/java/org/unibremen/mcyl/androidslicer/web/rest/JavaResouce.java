@@ -1,5 +1,10 @@
 package org.unibremen.mcyl.androidslicer.web.rest;
 
+import com.ibm.wala.ipa.callgraph.AnalysisScope;
+import com.ibm.wala.ipa.cha.ClassHierarchyException;
+import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
+import com.ibm.wala.ipa.cha.IClassHierarchy;
+import com.ibm.wala.util.config.AnalysisScopeReader;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
@@ -16,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.unibremen.mcyl.androidslicer.config.Constants;
 import org.unibremen.mcyl.androidslicer.domain.SlicerSetting;
 import org.unibremen.mcyl.androidslicer.repository.SlicerSettingRepository;
+import org.unibremen.mcyl.androidslicer.service.SliceService;
 import org.unibremen.mcyl.androidslicer.web.rest.errors.BadRequestAlertException;
 import org.unibremen.mcyl.androidslicer.web.rest.vm.AndroidServiceClassesVM;
 import org.unibremen.mcyl.androidslicer.web.rest.vm.AndroidVersionVM;
@@ -37,6 +43,12 @@ public class JavaResouce {
     private final Logger log = LoggerFactory.getLogger(JavaResouce.class);
 
     private static final String ENTITY_NAME = "java";
+
+    private final SliceService sliceService;
+
+    public JavaResouce(final SliceService sliceService) {
+        this.sliceService = sliceService;
+    }
 
     /**
      * GET /java/source-file : get android system service code from
@@ -70,14 +82,58 @@ public class JavaResouce {
     }
 
     /**
+     * GET /java/getClasses: gets all classes of a .jar file
+     *
+     * Maybe need some seconds, depending on the size of the jar...
+     *
+     * @param pathToJar the path to the JAR file
+     * @return a list of all classes of the given JAR file
+     */
+    @GetMapping("/java/getClasses")
+    public ResponseEntity<List<String>> getAllClasses(@RequestParam("pathToJar") String pathToJar) {
+        log.debug("REST request to get all classes of jar file " + pathToJar);
+
+        File jarFile = new File(pathToJar);
+        if (!jarFile.exists() || !jarFile.getName().endsWith(".jar")) {
+            return ResponseEntity.noContent().build();
+        }
+
+        File exclusionFile;
+        AnalysisScope scope;
+        IClassHierarchy classHierarchy;
+        try {
+            exclusionFile = sliceService.createTemporaryExclusionFile();
+            scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(jarFile.getAbsolutePath(), exclusionFile);
+            classHierarchy = ClassHierarchyFactory.make(scope);
+        } catch (IOException e) {
+            throw new BadRequestAlertException("Error when creating analysis kontext: " + e , ENTITY_NAME, "idnull");
+        } catch (ClassHierarchyException e) {
+            throw new BadRequestAlertException("Error when creating class hierarchy: " + e , ENTITY_NAME, "idnull");
+        }
+
+        List<String> result = new ArrayList<>();
+        classHierarchy.forEach((singleClass) -> {
+            String rawName = singleClass.getName().toString();
+            if (!rawName.startsWith("Ljava/")) {
+                String className = rawName.substring(1); // remove leading 'L'
+                result.add(className);
+            }
+        });
+
+        return ResponseEntity.ok().body(result);
+    }
+
+    /**
      * GET /java/paths : get all direct subdirectories and jar files for a given path
      *
      * @param path the path in which the subdirectories and files are
+     * @param filter if 'filter' is given, the returned list also include files that ends with 'filter'
      * @return a list of all paths and jar files in that given path
      */
     @GetMapping("/java/directories")
-    public ResponseEntity<List<String>> getDirectories(@RequestParam("path") String path) {
-        log.debug("REST request to get directories of " + path);
+    public ResponseEntity<List<String>> getDirectories(@RequestParam(value = "path") String path,
+                                                       @RequestParam(value = "filter", required = false) String filter) {
+        log.debug("REST request to get directories of " + path + " with filter " + filter);
 
         // if we got "/home/user/documen", then return all directories/jar-files of "/home/user/"
         if(path.lastIndexOf('/') < path.length() -1) {
@@ -87,7 +143,10 @@ public class JavaResouce {
         if (file.exists() && file.isDirectory()) {
             List<String> result = new ArrayList<>();
             for(File f : file.listFiles()) {
-                if (f.isFile() && f.getName().endsWith(".jar")) {
+                if (filter != null
+                    && filter.length()>0
+                    && f.isFile()
+                    && f.getName().endsWith(filter)) {
                     result.add(f.getAbsolutePath());
                 } else if (f.isDirectory()) {
                     result.add(f.getAbsolutePath() + "/");
