@@ -14,6 +14,7 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -193,6 +194,16 @@ public class SliceService {
                             try{
                                 FileWriter fw = new FileWriter(javaFileForSlicedClass.getAbsoluteFile());
                                 BufferedWriter bw = new BufferedWriter(fw);
+                                StringBuilder fileHead = new StringBuilder();
+                                fileHead.append("// sliced with following settings:").append(System.lineSeparator())
+                                    .append("// CFA-Type: ").append(slice.getCfaType())
+                                    .append(" (level: ").append(slice.getCfaLevel()).append(System.lineSeparator())
+                                    .append("// reflections: ").append(slice.getReflectionOptions()).append(System.lineSeparator())
+                                    .append("// data dependence options: ").append(slice.getDataDependenceOptions()).append(System.lineSeparator())
+                                    .append("// control dependence options: ").append(slice.getControlDependenceOptions()).append(System.lineSeparator());
+                                fileHead.append("// slicing criterion: ")
+                                    .append(String.join(", ", slice.getSeedStatements())).append(System.lineSeparator());
+                                bw.write(fileHead.toString());
                                 bw.write(builder.toString());
                                 bw.close();
                             }
