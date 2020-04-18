@@ -2,12 +2,11 @@ package org.unibremen.mcyl.androidslicer.domain;
 
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.*;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 import org.unibremen.mcyl.androidslicer.domain.enumeration.ReflectionOptions;
 
@@ -85,6 +84,12 @@ public class Slice implements Serializable {
     @ApiModelProperty(value = "com.ibm.wala.ipa.slicer.Slicer.ControlDependenceOptions", required = true)
     @Field("control_dependence_options")
     private ControlDependenceOptions controlDependenceOptions;
+
+    @Field("object_tracking")
+    private Boolean objectTracking;
+
+    @Field("parameter_tracking")
+    private Boolean parameterTracking;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public String getId() {
@@ -237,6 +242,32 @@ public class Slice implements Serializable {
     public void setControlDependenceOptions(ControlDependenceOptions controlDependenceOptions) {
         this.controlDependenceOptions = controlDependenceOptions;
     }
+
+    public Boolean isObjectTracking() {
+        return objectTracking;
+    }
+
+    public Slice objectTracking(Boolean objectTracking) {
+        this.objectTracking = objectTracking;
+        return this;
+    }
+
+    public void setObjectTracking(Boolean objectTracking) {
+        this.objectTracking = objectTracking;
+    }
+
+    public Boolean isParameterTracking() {
+        return parameterTracking;
+    }
+
+    public Slice parameterTracking(Boolean parameterTracking) {
+        this.parameterTracking = parameterTracking;
+        return this;
+    }
+
+    public void setParameterTracking(Boolean parameterTracking) {
+        this.parameterTracking = parameterTracking;
+    }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -270,6 +301,8 @@ public class Slice implements Serializable {
             ", reflectionOptions='" + getReflectionOptions() + "'" +
             ", dataDependenceOptions='" + getDataDependenceOptions() + "'" +
             ", controlDependenceOptions='" + getControlDependenceOptions() + "'" +
+            ", objectTracking='" + isObjectTracking() + "'" +
+            ", parameterTracking='" + isParameterTracking() + "'" +
             "}";
     }
 }

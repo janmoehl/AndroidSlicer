@@ -77,6 +77,14 @@
             "fieldValidateRules": [
                 "required"
             ]
+        },
+        {
+            "fieldName": "objectTracking",
+            "fieldType": "Boolean"
+        },
+        {
+            "fieldName": "parameterTracking",
+            "fieldType": "Boolean"
         }
     ],
     "relationships": [],
@@ -90,5 +98,8 @@
     "clientRootFolder": "",
     "applications": [
         "AndroidSlicer"
-    ]
+    ],
+    "searchEngine": false,
+    "databaseType": "mongodb",
+    "readOnly": false
 }

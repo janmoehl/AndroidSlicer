@@ -34,6 +34,8 @@
                     <th scope="col"  jhiSortBy="reflectionOptions"><span>Reflection Options</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"  jhiSortBy="dataDependenceOptions"><span>Data Dependence Options</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"  jhiSortBy="controlDependenceOptions"><span>Control Dependence Options</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="objectTracking"><span>Object Tracking</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="parameterTracking"><span>Parameter Tracking</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -51,6 +53,8 @@
                     <td>{{ slice.reflectionOptions }}</td>
                     <td>{{ slice.dataDependenceOptions }}</td>
                     <td>{{ slice.controlDependenceOptions }}</td>
+                    <td>{{ slice.objectTracking }}</td>
+                    <td>{{ slice.parameterTracking }}</td>
                     <td class="text-right">
                         <div class="btn-group">
                             <button type="submit"

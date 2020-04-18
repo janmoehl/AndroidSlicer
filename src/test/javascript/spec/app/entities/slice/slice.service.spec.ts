@@ -35,7 +35,9 @@ describe('Service Tests', () => {
         false,
         ReflectionOptions.FULL,
         DataDependenceOptions.FULL,
-        ControlDependenceOptions.FULL
+        ControlDependenceOptions.FULL,
+        false,
+        false
       );
     });
 
@@ -80,7 +82,9 @@ describe('Service Tests', () => {
             running: true,
             reflectionOptions: 'BBBBBB',
             dataDependenceOptions: 'BBBBBB',
-            controlDependenceOptions: 'BBBBBB'
+            controlDependenceOptions: 'BBBBBB',
+            objectTracking: true,
+            parameterTracking: true
           },
           elemDefault
         );
@@ -107,7 +111,9 @@ describe('Service Tests', () => {
             running: true,
             reflectionOptions: 'BBBBBB',
             dataDependenceOptions: 'BBBBBB',
-            controlDependenceOptions: 'BBBBBB'
+            controlDependenceOptions: 'BBBBBB',
+            objectTracking: true,
+            parameterTracking: true
           },
           elemDefault
         );

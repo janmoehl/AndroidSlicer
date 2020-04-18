@@ -74,6 +74,22 @@ describe('Slice e2e test', () => {
       await sliceUpdatePage.getRunningInput().click();
       expect(await sliceUpdatePage.getRunningInput().isSelected(), 'Expected running to be selected').to.be.true;
     }
+    const selectedObjectTracking = sliceUpdatePage.getObjectTrackingInput();
+    if (await selectedObjectTracking.isSelected()) {
+      await sliceUpdatePage.getObjectTrackingInput().click();
+      expect(await sliceUpdatePage.getObjectTrackingInput().isSelected(), 'Expected objectTracking not to be selected').to.be.false;
+    } else {
+      await sliceUpdatePage.getObjectTrackingInput().click();
+      expect(await sliceUpdatePage.getObjectTrackingInput().isSelected(), 'Expected objectTracking to be selected').to.be.true;
+    }
+    const selectedParameterTracking = sliceUpdatePage.getParameterTrackingInput();
+    if (await selectedParameterTracking.isSelected()) {
+      await sliceUpdatePage.getParameterTrackingInput().click();
+      expect(await sliceUpdatePage.getParameterTrackingInput().isSelected(), 'Expected parameterTracking not to be selected').to.be.false;
+    } else {
+      await sliceUpdatePage.getParameterTrackingInput().click();
+      expect(await sliceUpdatePage.getParameterTrackingInput().isSelected(), 'Expected parameterTracking to be selected').to.be.true;
+    }
 
     await sliceUpdatePage.save();
     expect(await sliceUpdatePage.getSaveButton().isPresent(), 'Expected save button disappear').to.be.false;

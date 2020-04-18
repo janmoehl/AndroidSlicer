@@ -29,7 +29,9 @@ export class SliceUpdateComponent implements OnInit {
     running: [],
     reflectionOptions: [null, [Validators.required]],
     dataDependenceOptions: [null, [Validators.required]],
-    controlDependenceOptions: [null, [Validators.required]]
+    controlDependenceOptions: [null, [Validators.required]],
+    objectTracking: [],
+    parameterTracking: []
   });
 
   constructor(
@@ -59,7 +61,9 @@ export class SliceUpdateComponent implements OnInit {
       running: slice.running,
       reflectionOptions: slice.reflectionOptions,
       dataDependenceOptions: slice.dataDependenceOptions,
-      controlDependenceOptions: slice.controlDependenceOptions
+      controlDependenceOptions: slice.controlDependenceOptions,
+      objectTracking: slice.objectTracking,
+      parameterTracking: slice.parameterTracking
     });
   }
 
@@ -107,7 +111,9 @@ export class SliceUpdateComponent implements OnInit {
       running: this.editForm.get(['running'])!.value,
       reflectionOptions: this.editForm.get(['reflectionOptions'])!.value,
       dataDependenceOptions: this.editForm.get(['dataDependenceOptions'])!.value,
-      controlDependenceOptions: this.editForm.get(['controlDependenceOptions'])!.value
+      controlDependenceOptions: this.editForm.get(['controlDependenceOptions'])!.value,
+      objectTracking: this.editForm.get(['objectTracking'])!.value,
+      parameterTracking: this.editForm.get(['parameterTracking'])!.value
     };
   }
 

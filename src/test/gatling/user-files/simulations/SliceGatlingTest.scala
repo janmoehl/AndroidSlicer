@@ -83,6 +83,8 @@ class SliceGatlingTest extends Simulation {
                 , "reflectionOptions":"FULL"
                 , "dataDependenceOptions":"FULL"
                 , "controlDependenceOptions":"FULL"
+                , "objectTracking":null
+                , "parameterTracking":null
                 }""")).asJson
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_slice_url"))).exitHereIfFailed
