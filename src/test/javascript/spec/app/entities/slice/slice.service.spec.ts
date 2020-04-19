@@ -38,7 +38,9 @@ describe('Service Tests', () => {
         0,
         ReflectionOptions.FULL,
         DataDependenceOptions.FULL,
-        ControlDependenceOptions.FULL
+        ControlDependenceOptions.FULL,
+        false,
+        false
       );
     });
 
@@ -85,7 +87,9 @@ describe('Service Tests', () => {
             cfaLevel: 1,
             reflectionOptions: 'BBBBBB',
             dataDependenceOptions: 'BBBBBB',
-            controlDependenceOptions: 'BBBBBB'
+            controlDependenceOptions: 'BBBBBB',
+            objectTracking: true,
+            parameterTracking: true
           },
           elemDefault
         );

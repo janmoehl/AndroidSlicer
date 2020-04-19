@@ -108,6 +108,12 @@ public class Slice implements Serializable {
     @Field("java_jar_path")
     private String javaJarPath;
 
+    @Field("object_tracking")
+    private Boolean objectTracking;
+
+    @Field("parameter_tracking")
+    private Boolean parameterTracking;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public String getId() {
         return id;
@@ -293,6 +299,14 @@ public class Slice implements Serializable {
         return javaJarPath;
     }
 
+    public Boolean isObjectTracking() {
+        return objectTracking;
+    }
+
+    public Boolean isParameterTracking() {
+        return parameterTracking;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -331,6 +345,8 @@ public class Slice implements Serializable {
             ", sliceMode='" + getSliceMode() + "'" +
             ", javaSourcePath='" + getJavaSourcePath() + "'" +
             ", javaJarPath='" + getJavaJarPath() + "'" +
+            ", objectTracking='" + isObjectTracking() + "'" +
+            ", parameterTracking='" + isParameterTracking() + "'" +
             "}";
     }
 }

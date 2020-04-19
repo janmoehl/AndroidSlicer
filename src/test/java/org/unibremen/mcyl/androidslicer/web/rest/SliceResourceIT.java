@@ -4,16 +4,17 @@ import org.unibremen.mcyl.androidslicer.AndroidSlicerApp;
 import org.unibremen.mcyl.androidslicer.domain.Slice;
 import org.unibremen.mcyl.androidslicer.repository.SliceRepository;
 import org.unibremen.mcyl.androidslicer.service.SliceService;
+import org.unibremen.mcyl.androidslicer.web.rest.errors.ExceptionTranslator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.Validator;
@@ -27,6 +28,7 @@ import com.ibm.wala.ipa.callgraph.AnalysisOptions.ReflectionOptions;
 import com.ibm.wala.ipa.slicer.Slicer.ControlDependenceOptions;
 import com.ibm.wala.ipa.slicer.Slicer.DataDependenceOptions;
 
+import static org.unibremen.mcyl.androidslicer.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -59,6 +61,12 @@ public class SliceResourceIT {
 
     private static final ControlDependenceOptions DEFAULT_CONTROL_DEPENDENCE_OPTIONS = ControlDependenceOptions.FULL;
 
+    private static final Boolean DEFAULT_OBJECT_TRACKING = false;
+    private static final Boolean UPDATED_OBJECT_TRACKING = true;
+
+    private static final Boolean DEFAULT_PARAMETER_TRACKING = false;
+    private static final Boolean UPDATED_PARAMETER_TRACKING = true;
+
     @Autowired
     private SliceRepository sliceRepository;
 
@@ -66,6 +74,17 @@ public class SliceResourceIT {
     private SliceService sliceService;
 
     @Autowired
+    private MappingJackson2HttpMessageConverter jacksonMessageConverter;
+
+    @Autowired
+    private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
+
+    @Autowired
+    private ExceptionTranslator exceptionTranslator;
+
+    @Autowired
+    private Validator validator;
+
     private MockMvc restSliceMockMvc;
 
     private Slice slice;
@@ -98,7 +117,9 @@ public class SliceResourceIT {
             .cfaLevel(DEFAULT_CFA_LEVEL)
             .reflectionOptions(DEFAULT_REFLECTION_OPTIONS)
             .dataDependenceOptions(DEFAULT_DATA_DEPENDENCE_OPTIONS)
-            .controlDependenceOptions(DEFAULT_CONTROL_DEPENDENCE_OPTIONS);
+            .controlDependenceOptions(DEFAULT_CONTROL_DEPENDENCE_OPTIONS)
+            .objectTracking(DEFAULT_OBJECT_TRACKING)
+            .parameterTracking(DEFAULT_PARAMETER_TRACKING);
         return slice;
     }
 
@@ -131,6 +152,8 @@ public class SliceResourceIT {
         assertThat(testSlice.getReflectionOptions()).isEqualTo(DEFAULT_REFLECTION_OPTIONS);
         assertThat(testSlice.getDataDependenceOptions()).isEqualTo(DEFAULT_DATA_DEPENDENCE_OPTIONS);
         assertThat(testSlice.getControlDependenceOptions()).isEqualTo(DEFAULT_CONTROL_DEPENDENCE_OPTIONS);
+        assertThat(testSlice.isObjectTracking()).isEqualTo(DEFAULT_OBJECT_TRACKING);
+        assertThat(testSlice.isParameterTracking()).isEqualTo(DEFAULT_PARAMETER_TRACKING);
     }
 
     @Test
@@ -270,7 +293,9 @@ public class SliceResourceIT {
             .andExpect(jsonPath("$.[*].cfaLevel").value(hasItem(DEFAULT_CFA_LEVEL)))
             .andExpect(jsonPath("$.[*].reflectionOptions").value(hasItem(DEFAULT_REFLECTION_OPTIONS.toString())))
             .andExpect(jsonPath("$.[*].dataDependenceOptions").value(hasItem(DEFAULT_DATA_DEPENDENCE_OPTIONS.toString())))
-            .andExpect(jsonPath("$.[*].controlDependenceOptions").value(hasItem(DEFAULT_CONTROL_DEPENDENCE_OPTIONS.toString())));
+            .andExpect(jsonPath("$.[*].controlDependenceOptions").value(hasItem(DEFAULT_CONTROL_DEPENDENCE_OPTIONS.toString())))
+            .andExpect(jsonPath("$.[*].objectTracking").value(hasItem(DEFAULT_OBJECT_TRACKING.booleanValue())))
+            .andExpect(jsonPath("$.[*].parameterTracking").value(hasItem(DEFAULT_PARAMETER_TRACKING.booleanValue())));
     }
 
     @Test
@@ -288,7 +313,9 @@ public class SliceResourceIT {
             .andExpect(jsonPath("$.cfaLevel").value(DEFAULT_CFA_LEVEL))
             .andExpect(jsonPath("$.reflectionOptions").value(DEFAULT_REFLECTION_OPTIONS.toString()))
             .andExpect(jsonPath("$.dataDependenceOptions").value(DEFAULT_DATA_DEPENDENCE_OPTIONS.toString()))
-            .andExpect(jsonPath("$.controlDependenceOptions").value(DEFAULT_CONTROL_DEPENDENCE_OPTIONS.toString()));
+            .andExpect(jsonPath("$.controlDependenceOptions").value(DEFAULT_CONTROL_DEPENDENCE_OPTIONS.toString()))
+            .andExpect(jsonPath("$.objectTracking").value(DEFAULT_OBJECT_TRACKING.booleanValue()))
+            .andExpect(jsonPath("$.parameterTracking").value(DEFAULT_PARAMETER_TRACKING.booleanValue()));
     }
 
     @Test

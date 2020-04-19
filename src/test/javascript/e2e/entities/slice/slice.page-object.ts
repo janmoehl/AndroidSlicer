@@ -38,6 +38,8 @@ export class SliceMakePage {
   reflectionOptionsSelect = element(by.id('field_reflectionOptions'));
   dataDependenceOptionsSelect = element(by.id('field_dataDependenceOptions'));
   controlDependenceOptionsSelect = element(by.id('field_controlDependenceOptions'));
+  objectTrackingInput = element(by.id('field_objectTracking'));
+  parameterTrackingInput = element(by.id('field_parameterTracking'));
 
   async getPageTitle(): Promise<string> {
     return this.pageTitle.getText();
@@ -141,6 +143,14 @@ export class SliceMakePage {
       .all(by.tagName('option'))
       .last()
       .click();
+  }
+
+  getObjectTrackingInput(): ElementFinder {
+    return this.objectTrackingInput;
+  }
+
+  getParameterTrackingInput(): ElementFinder {
+    return this.parameterTrackingInput;
   }
 
   async save(): Promise<void> {

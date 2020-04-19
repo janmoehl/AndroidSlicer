@@ -76,7 +76,9 @@ export class SliceMakeComponent implements OnInit {
     cfaLevel: [null],
     reflectionOptions: [null, Validators.required],
     dataDependenceOptions: [null, Validators.required],
-    controlDependenceOptions: [null, Validators.required]
+    controlDependenceOptions: [null, Validators.required],
+    objectTracking: [null],
+    parameterTracking: [null]
   });
 
   constructor(
@@ -307,9 +309,11 @@ export class SliceMakeComponent implements OnInit {
       seedStatements: currentSeedStatements,
       cfaType: (this.createForm.get(['cfaOptions'])!.value as ICFAOption).type,
       cfaLevel: this.createForm.get(['cfaLevel'])!.value,
-      reflectionOptions: (this.createForm.get(['reflectionOptions'])!.value as ISlicerOption).key as ReflectionOptions,
+      reflectionOptions: (this.createForm.get(['reflectionOptions'])!.value as ISlicerOption).key! as ReflectionOptions,
       dataDependenceOptions: (this.createForm.get(['dataDependenceOptions'])!.value as ISlicerOption).key as DataDependenceOptions,
-      controlDependenceOptions: (this.createForm.get(['controlDependenceOptions'])!.value as ISlicerOption).key as ControlDependenceOptions
+      controlDependenceOptions: (this.createForm.get(['controlDependenceOptions'])!.value as ISlicerOption).key as ControlDependenceOptions,
+      objectTracking: this.createForm.get(['objectTracking'])!.value,
+      parameterTracking: this.createForm.get(['parameterTracking'])!.value
     };
     return entity;
   }

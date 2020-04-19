@@ -243,6 +243,16 @@
 
                 </div> <!-- end of java-specific part -->
 
+                <div class="form-group">
+                    <label class="form-control-label" for="field_objectTracking">Tracking</label>
+		    <div>
+                        <p-checkbox id="field_objectTracking" [formControl]="createForm.controls['objectTracking']" binary="true" label="Enable object tracking"></p-checkbox>
+                    </div>
+		    <div>
+                        <p-checkbox id="field_parameterTracking" [formControl]="createForm.controls['parameterTracking']" binary="true" label="Enable parameter tracking"></p-checkbox>
+                    </div>
+                </div>
+
 
                 <div class="form-group">
                     <label class="form-control-label" for="field_cfaOptions">CFA Options</label>

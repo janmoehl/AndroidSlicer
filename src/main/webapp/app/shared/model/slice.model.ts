@@ -32,6 +32,8 @@ export interface ISlice {
   sliceMode?: SliceMode;
   javaSourcePath?: string;
   javaJarPath?: string;
+  objectTracking?: boolean;
+  parameterTracking?: boolean;
 }
 
 export class Slice implements ISlice {
@@ -52,8 +54,12 @@ export class Slice implements ISlice {
     public controlDependenceOptions?: ControlDependenceOptions,
     public sliceMode?: SliceMode,
     public javaSourcePath?: string,
-    public javaJarPath?: string
+    public javaJarPath?: string,
+    public objectTracking?: boolean,
+    public parameterTracking?: boolean
   ) {
     this.running = this.running || false;
+    this.objectTracking = this.objectTracking || false;
+    this.parameterTracking = this.parameterTracking || false;
   }
 }

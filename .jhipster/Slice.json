@@ -100,6 +100,14 @@
         {
             "fieldName": "javaJarPath",
             "fieldType": "String"
+	},
+	{
+            "fieldName": "objectTracking",
+            "fieldType": "Boolean"
+        },
+        {
+            "fieldName": "parameterTracking",
+            "fieldType": "Boolean"
         }
     ],
     "relationships": [],
