@@ -1,6 +1,8 @@
 package org.unibremen.mcyl.androidslicer.web.rest;
 
+import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.ipa.callgraph.AnalysisScope;
+import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
 import com.ibm.wala.ipa.cha.IClassHierarchy;
@@ -22,6 +24,8 @@ import org.unibremen.mcyl.androidslicer.config.Constants;
 import org.unibremen.mcyl.androidslicer.domain.SlicerSetting;
 import org.unibremen.mcyl.androidslicer.repository.SlicerSettingRepository;
 import org.unibremen.mcyl.androidslicer.service.SliceService;
+import org.unibremen.mcyl.androidslicer.util.Pair;
+import org.unibremen.mcyl.androidslicer.wala.WalaSlicer;
 import org.unibremen.mcyl.androidslicer.web.rest.errors.BadRequestAlertException;
 import org.unibremen.mcyl.androidslicer.web.rest.vm.AndroidServiceClassesVM;
 import org.unibremen.mcyl.androidslicer.web.rest.vm.AndroidVersionVM;
@@ -103,8 +107,9 @@ public class JavaResouce {
         IClassHierarchy classHierarchy;
         try {
             exclusionFile = sliceService.createTemporaryExclusionFile();
-            scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(jarFile.getAbsolutePath(), exclusionFile);
-            classHierarchy = ClassHierarchyFactory.make(scope);
+            Pair<AnalysisScope, ClassHierarchy> touple = WalaSlicer.getClassHierarchy(jarFile, exclusionFile);
+            scope = touple.one;
+            classHierarchy = touple.two;
         } catch (IOException e) {
             throw new BadRequestAlertException("Error when creating analysis kontext: " + e , ENTITY_NAME, "idnull");
         } catch (ClassHierarchyException e) {
@@ -121,6 +126,51 @@ public class JavaResouce {
         });
 
         return ResponseEntity.ok().body(result);
+    }
+
+    /**
+     * GET /java/getClasses: gets all classes of a .jar file
+     *
+     * Maybe need some seconds, depending on the size of the jar...
+     *
+     * @param pathToJar the path to the JAR file
+     * @return a list of all classes of the given JAR file
+     */
+    @GetMapping("/java/getMethods")
+    public ResponseEntity<List<String>> getAllClasses(@RequestParam("pathToJar") String pathToJar,
+                                                      @RequestParam("className") String className) {
+        log.debug("REST request to get all methods of jar file " + pathToJar + " of class " + className);
+
+        File jarFile = new File(pathToJar);
+        if (!jarFile.exists() || !jarFile.getName().endsWith(".jar")) {
+            return ResponseEntity.noContent().build();
+        }
+
+        File exclusionFile;
+        AnalysisScope scope;
+        IClassHierarchy classHierarchy;
+        try {
+            exclusionFile = sliceService.createTemporaryExclusionFile();
+            Pair<AnalysisScope, ClassHierarchy> touple = WalaSlicer.getClassHierarchy(jarFile, exclusionFile);
+            scope = touple.one;
+            classHierarchy = touple.two;
+        } catch (IOException e) {
+            throw new BadRequestAlertException("Error when creating analysis kontext: " + e , ENTITY_NAME, "idnull");
+        } catch (ClassHierarchyException e) {
+            throw new BadRequestAlertException("Error when creating class hierarchy: " + e , ENTITY_NAME, "idnull");
+        }
+
+        Set<String> result = new HashSet(); // to filter double entries
+        for (Iterator<IClass> iter = classHierarchy.iterator(); iter.hasNext();) {
+            IClass currentClass = iter.next();
+            final String lClassName = 'L' + className;
+            if (lClassName.equals(currentClass.getName().toString())) {
+                currentClass.getAllMethods().forEach(m -> result.add(m.getName().toString()));
+                break;
+            }
+        };
+
+        return ResponseEntity.ok().body(new ArrayList<String>(result));
     }
 
     /**

@@ -177,6 +177,7 @@
                             [inputStyle]="{'width':'100%'}"
                             placeholder="Java class with slicing criterion, e.g. de/example/www/Class"
                             (completeMethod)="onJavaClassesComplete($event)"
+                            (onBlur)="onJavaClassSelected($event)"
                             (onKeyUp)="onJavaClassesKey($event)">
                         </p-autoComplete>
                     </div>

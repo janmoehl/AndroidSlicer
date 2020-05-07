@@ -49,6 +49,7 @@ export class SliceMakeComponent implements OnInit {
   filteredJavaSourcePaths: string[] = [];
   javaClasses: string[] = [];
   filteredJavaClasses: string[] = [];
+  javaEntryMethodOptions: string[] = ['meth1', 'meth2', 'meth22'];
   filteredJavaEntryMethodOptions: string[] = [];
   filteredJavaSeedStatementOptions: string[] = [];
 
@@ -165,17 +166,13 @@ export class SliceMakeComponent implements OnInit {
   }
 
   onJarPathComplete(event: any): void {
-    this.javaService
-      .getDirectories(event.query.toString(), '.jar')
-      .subscribe((res: HttpResponse<string[]>) => {
-        if (res.body != null && res.body.length > 0) {
-          this.javaJarPaths = res.body;
-        }
-      })
-      .add(() => {
-        this.filteredJavaJarPaths = [];
-        this.filterMultiSelectOptions(event, this.javaJarPaths, this.filteredJavaJarPaths);
-      });
+    this.javaService.getDirectories(event.query.toString(), '.jar').subscribe((res: HttpResponse<string[]>) => {
+      if (res.body != null && res.body.length > 0) {
+        this.javaJarPaths = res.body;
+      }
+      this.filteredJavaJarPaths = [];
+      this.filterMultiSelectOptions(event, this.javaJarPaths, this.filteredJavaJarPaths);
+    });
   }
 
   onJarPathKey(event: KeyboardEvent): void {
@@ -189,32 +186,51 @@ export class SliceMakeComponent implements OnInit {
   }
 
   onJarPathSelected(event: any): void {
-    // eslint-disable-line
     if (event.sourceCapabilities == null) {
       return; // only switched focused window
     }
     const jarPath = this.createForm.get(['javaJarPath'])!.value;
+    const javaClassesInput = this.createForm.get(['javaClasses'])!;
+    javaClassesInput.disable();
+
     if (jarPath && jarPath.endsWith('.jar')) {
       this.javaService.getClasses(jarPath).subscribe((res: HttpResponse<string[]>) => {
         if (res.body != null && res.body.length > 0) {
           this.javaClasses = res.body;
         }
+        javaClassesInput.enable();
       });
     }
   }
 
   onSourcePathComplete(event: any): void {
-    this.javaService
-      .getDirectories(event.query.toString())
-      .subscribe((res: HttpResponse<string[]>) => {
+    this.javaService.getDirectories(event.query.toString()).subscribe((res: HttpResponse<string[]>) => {
+      if (res.body != null && res.body.length > 0) {
+        this.javaSourcePaths = res.body;
+      }
+      this.filteredJavaSourcePaths = [];
+      this.filterMultiSelectOptions(event, this.javaSourcePaths, this.filteredJavaSourcePaths);
+    });
+  }
+
+  onJavaClassSelected(event: any): void {
+    console.log('Search for Methods!'); // eslint-disable-line
+    if (event.sourceCapabilities == null) {
+      return; // only switched focused window
+    }
+    const jarPath = this.createForm.get(['javaJarPath'])!.value;
+    const javaMethodInput = this.createForm.get(['javaEntryMethods'])!;
+    javaMethodInput.disable();
+    const className = this.createForm.get(['javaClasses'])!.value;
+
+    if (className != null) {
+      this.javaService.getMethods(jarPath, className).subscribe((res: HttpResponse<string[]>) => {
         if (res.body != null && res.body.length > 0) {
-          this.javaSourcePaths = res.body;
+          this.javaEntryMethodOptions = res.body;
         }
-      })
-      .add(() => {
-        this.filteredJavaSourcePaths = [];
-        this.filterMultiSelectOptions(event, this.javaSourcePaths, this.filteredJavaSourcePaths);
+        javaMethodInput.enable();
       });
+    }
   }
 
   onSourcePathKey(event: KeyboardEvent): void {
@@ -232,16 +248,14 @@ export class SliceMakeComponent implements OnInit {
     this.filterMultiSelectOptions(event, this.javaClasses, this.filteredJavaClasses);
   }
 
-  // TODO
-  // eslint-disable-next-line
   onJavaClassesKey(event: KeyboardEvent): void {
-    /* if (event && event.key === 'Enter' && this.filteredJavaClasses.length > 0) {
-      this.createForm.get(['javaSourcePath'])!.setValue(this.filteredJavaSourcePaths[0]);
+    if (event && event.key === 'Enter' && this.filteredJavaClasses.length > 0) {
+      this.createForm.get(['javaClasses'])!.setValue(this.filteredJavaClasses[0]);
       // hack a little bit, because i don't know how to create the complete-events
       const changeEvent = {} as any;
-      changeEvent.query = this.createForm.get(['javaSourcePath'])!.value;
-      this.onSourcePathComplete(changeEvent);
-    } */
+      changeEvent.query = this.createForm.get(['javaClasses'])!.value;
+      this.onJavaClassesComplete(changeEvent);
+    }
   }
 
   onSliceModeChange(event: SliceMode): void {
@@ -312,8 +326,8 @@ export class SliceMakeComponent implements OnInit {
       reflectionOptions: (this.createForm.get(['reflectionOptions'])!.value as ISlicerOption).key! as ReflectionOptions,
       dataDependenceOptions: (this.createForm.get(['dataDependenceOptions'])!.value as ISlicerOption).key as DataDependenceOptions,
       controlDependenceOptions: (this.createForm.get(['controlDependenceOptions'])!.value as ISlicerOption).key as ControlDependenceOptions,
-      objectTracking: this.createForm.get(['objectTracking'])!.value,
-      parameterTracking: this.createForm.get(['parameterTracking'])!.value
+      objectTracking: this.createForm.get(['objectTracking'])!.value ?? false,
+      parameterTracking: this.createForm.get(['parameterTracking'])!.value ?? false
     };
     return entity;
   }
@@ -398,11 +412,10 @@ export class SliceMakeComponent implements OnInit {
     }
   }
 
-  // TODO
   filterJavaEntryMethodOptions(event: any): void {
     if (event) {
-      this.filteredJavaEntryMethodOptions = [event.query.toString()];
-      this.filterMultiSelectOptions(event, ['main'], this.filteredJavaEntryMethodOptions);
+      this.filteredJavaEntryMethodOptions = [];
+      this.filterMultiSelectOptions(event, this.javaEntryMethodOptions, this.filteredJavaEntryMethodOptions);
     }
   }
 

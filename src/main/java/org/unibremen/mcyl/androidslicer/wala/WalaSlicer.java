@@ -1,21 +1,25 @@
 package org.unibremen.mcyl.androidslicer.wala;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.io.InputStream;
+import java.security.MessageDigest;
+import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import com.ibm.wala.analysis.pointers.HeapGraph;
 import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.classLoader.Language;
 import com.ibm.wala.classLoader.ShrikeBTMethod;
 import com.ibm.wala.ipa.callgraph.*;
 import com.ibm.wala.ipa.callgraph.impl.Util;
+import com.ibm.wala.ipa.callgraph.propagation.LocalPointerKey;
+import com.ibm.wala.ipa.callgraph.propagation.PointerAnalysis;
+import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
 import com.ibm.wala.ipa.cha.IClassHierarchy;
@@ -23,11 +27,10 @@ import com.ibm.wala.ipa.slicer.NormalStatement;
 import com.ibm.wala.ipa.slicer.Slicer;
 import com.ibm.wala.ipa.slicer.Statement;
 import com.ibm.wala.ipa.slicer.StatementWithInstructionIndex;
-import com.ibm.wala.ssa.IR;
-import com.ibm.wala.ssa.SSAAbstractInvokeInstruction;
-import com.ibm.wala.ssa.SSAInstruction;
-import com.ibm.wala.ssa.SSANewInstruction;
+import com.ibm.wala.ssa.*;
+import com.ibm.wala.types.FieldReference;
 import com.ibm.wala.types.TypeName;
+import com.ibm.wala.types.TypeReference;
 import com.ibm.wala.util.CancelException;
 import com.ibm.wala.util.WalaException;
 import com.ibm.wala.util.config.AnalysisScopeReader;
@@ -41,6 +44,7 @@ import org.unibremen.mcyl.androidslicer.domain.Slice;
 import org.unibremen.mcyl.androidslicer.domain.enumeration.CFAType;
 import org.unibremen.mcyl.androidslicer.service.SliceLogger;
 import org.unibremen.mcyl.androidslicer.domain.enumeration.SliceMode;
+import org.unibremen.mcyl.androidslicer.util.Pair;
 
 /**
  * This is an implementation of the WALA slicing algorithm described here: http://wala.sourceforge.net/wiki/index.php/UserGuide:Slicer
@@ -53,6 +57,90 @@ public class WalaSlicer {
 
     // maximum number of wala slice statements that will be logged to not blow up the db (maximum BSON document size for a MongoDB entity is 16MB)
     private static final int MAX_DETAILED_LOG = 1000;
+
+    // cache produced class hierarchies
+    // - MAX_CACHED_CLASSHIERARCHY gives the number, how many hierarchies should be cached
+    // cachedJarHashes contains the JAR-Hashes,
+    // cachedExclusionFiles contains the ExclusionFile-Hashes,
+    // cachedAnalysisScopes contains the scopes and
+    // cachedClassHierarchies contains the classHierarchies
+    private static final int MAX_CACHED_CLASSHIERARCHY = 5;
+    private static LinkedList<Byte[]> cachedJarHashes = new LinkedList<>();
+    private static LinkedList<Byte[]> cachedExFileHashes = new LinkedList<>();
+
+    private static LinkedList<AnalysisScope> cachedAnalysisScopes = new LinkedList<>();
+    private static LinkedList<ClassHierarchy> cachedClassHierarchies = new LinkedList<>();
+
+    /**
+     * Tries to create a classHierarchy
+     * @param jarFile
+     * @param exclusionFile
+     * @return
+     * @throws IOException
+     * @throws ClassHierarchyException
+     */
+    public static synchronized Pair<AnalysisScope, ClassHierarchy> getClassHierarchy(File jarFile, File exclusionFile) throws IOException, ClassHierarchyException {
+        // get hashes of jar and exclusionFile
+        Byte[] jarFileHash = getHashOfFile(jarFile);
+        Byte[] exFileHash = getHashOfFile(exclusionFile);
+
+        int cacheIndex = -1;
+        for (int i=0; i<cachedJarHashes.size(); i++) {
+            if (Arrays.equals(jarFileHash, cachedJarHashes.get(i))) {
+                if (Arrays.equals(exFileHash, cachedExFileHashes.get(i))) {
+                    cacheIndex = i;
+                }
+            }
+        }
+
+        Pair<AnalysisScope, ClassHierarchy> result = new Pair();
+
+        if (cacheIndex >= 0) {
+            // found valid classHierarchy
+            result.one = cachedAnalysisScopes.get(cacheIndex);
+            result.two = cachedClassHierarchies.get(cacheIndex);
+        } else {
+            // make some space, if needed
+            if (cachedJarHashes.size() == MAX_CACHED_CLASSHIERARCHY) {
+                cachedJarHashes.removeFirst();
+                cachedAnalysisScopes.removeFirst();
+                cachedExFileHashes.removeFirst();
+                cachedClassHierarchies.removeFirst();
+            }
+            cachedJarHashes.push(jarFileHash);
+            cachedExFileHashes.push(exFileHash);
+            result.one = AnalysisScopeReader.makeJavaBinaryAnalysisScope(jarFile.getAbsolutePath(), exclusionFile);
+            cachedAnalysisScopes.push(result.one);
+            result.two = ClassHierarchyFactory.make(result.one);
+            cachedClassHierarchies.push(result.two);
+        }
+        return result;
+    }
+
+    /**
+     * Returns the SHA-256 Hash of the given file
+     * @param f the given file
+     * @return the 64-byte long hash value
+     */
+    private static Byte[] getHashOfFile(File f) {
+        try (InputStream is = new FileInputStream(f)) {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            int length;
+            byte[] buffer = new byte[64];
+            while ((length = is.read(buffer)) > 0) {
+                digest.update(buffer, 0, length);
+            }
+            byte[] hash = digest.digest();
+            Byte[] result = new Byte[64];
+            for (int i=0; i<hash.length; i++) {
+                result[i] = hash[i];
+            }
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     /**
      * @param appJar the analysed Jar-file
@@ -67,6 +155,7 @@ public class WalaSlicer {
             ) throws WalaException, IOException, ClassHierarchyException, IllegalArgumentException,
             CallGraphBuilderCancelException, CancelException {
 
+        logger.log("\n== Start slicing, building context ==");
         long start = System.currentTimeMillis();
 
         // add "L" to class name and remove .java extension
@@ -74,38 +163,37 @@ public class WalaSlicer {
         // -> Lcom/android/server/AlarmManagerService
         String className = "L" + FilenameUtils.removeExtension(slice.getClassName());
 
-        /* create an analysis scope representing the appJar as a J2SE application */
-        AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(appJar.getAbsolutePath(), exclusionFile);
-        long end = System.currentTimeMillis();
-
-        logger.log("Build analysis scope (took " + (end - start) + "ms)");
-
-        IClassHierarchy classHierarchy = ClassHierarchyFactory.make(scope);
-        end = System.currentTimeMillis();
-        logger.log("Build class hierarchy (took " + (end - start) + "ms)");
+        Pair<AnalysisScope, ClassHierarchy> scopeAndClassHierarchy = getClassHierarchy(appJar, exclusionFile);
+        AnalysisScope scope = scopeAndClassHierarchy.one;
+        ClassHierarchy classHierarchy = scopeAndClassHierarchy.two;
+        logger.log("Build scope and class hierarchy (time: " + (System.currentTimeMillis() - start) + "ms)");
 
         /* make entry points */
         Iterable<Entrypoint> entrypoints = getEntrypoints(slice, scope, classHierarchy, className, logger);
-        end = System.currentTimeMillis();
-        logger.log("get Entrypoints (took " + (end - start) + "ms)\n");
+        logger.log("got Entrypoints (time: " + (System.currentTimeMillis() - start) + "ms)");
 
         /* create the call graph */
+        logger.log("\n== BUILDING THE CALL GRAPH ==");
         AnalysisOptions options = new AnalysisOptions(scope, entrypoints);
         /* you can dial down reflection handling if you like */
         options.setReflectionOptions(slice.getReflectionOptions());
         CallGraphBuilder callGraphBuilder = getCallGraphBuilder(slice, entrypoints, classHierarchy, options,  scope, logger);
         CallGraph callGraph = callGraphBuilder.makeCallGraph(options, null);
-
-        end = System.currentTimeMillis();
-        logger.log("Took " + (end - start) + "ms.");
+        logger.log("Took until now " + (System.currentTimeMillis() - start) + "ms.");
         logger.log(CallGraphStats.getStats(callGraph));
 
-        logger.log("\n== FIND METHOD(s) FOR SEED_STATEMENT(s) ==");
-        Set<CGNode> methodNodes = new HashSet<CGNode>();
-        Set<String> entryMethods = slice.getEntryMethods();
-        WalaSlicer.findMethodNodes(callGraph, entryMethods, methodNodes, className, logger);
-        if (methodNodes.size() == 0) {
-            throw new WalaException("Failed to find any methods from" + entryMethods + "!");
+        Set<CGNode> methodNodes = new HashSet<>();
+        if (slice.getSliceMode() != SliceMode.JAVA) {
+            logger.log("\n== FIND METHOD(s) FOR SEED_STATEMENT(s) ==");
+            Set<String> entryMethods = slice.getEntryMethods();
+            WalaSlicer.findMethodNodes(callGraph, entryMethods, methodNodes, className, logger);
+            if (methodNodes.size() == 0) {
+                throw new WalaException("Failed to find any methods from" + entryMethods + "!");
+            }
+        } else {
+            // TODO maybe take callGraph directly
+            Iterator i = callGraph.iterator();
+            i.forEachRemaining(x -> methodNodes.add((CGNode) x));
         }
 
         logger.log("\n== FIND SEED_STATEMENT(s) ==");
@@ -114,8 +202,16 @@ public class WalaSlicer {
             throw new WalaException("No Seed Statements found!");
         }
 
-        logger.log("\n== SLICING ==");
+        // set with the final sliced instructions
         Collection<Statement> sliceList = new HashSet<Statement>();
+
+        if (slice.isObjectTracking()) {
+            logger.log("\n== ADD OBJECT TRACING ==");
+            WalaSlicer.addObjectTracing(callGraphBuilder.getPointerAnalysis(), seedStatements, sliceList, logger);
+        }
+
+        logger.log("\n== SLICING ==");
+        logger.log("Starting at " + (System.currentTimeMillis() - start) + "ms.");
         for (Statement seedStatement : seedStatements) {
             logger.log("+ Computing backward slice for " + seedStatement.getNode().toString());
             try{
@@ -127,6 +223,7 @@ public class WalaSlicer {
                 throw new WalaException("One of the parameters is not implemented yet: " + ue.getStackTrace());
             }
         }
+        logger.log("Slicing finished at " + (System.currentTimeMillis() - start) + "ms.");
         logger.log("\nNumber of slice statements:  " + sliceList.size());
 
         /* Its too much to log this for big slices... */
@@ -138,11 +235,141 @@ public class WalaSlicer {
         return WalaSlicer.getLineNumbersGroupedBySourceFiles(sliceList, logger);
     }
 
+    /**
+     * Adds tracing of the sliced values, based on the pointer analysis. Some traced
+     * object locations and aliases are added as slicing criterion for the later analysis,
+     * some are added directly to the output slice
+     *
+     * @param pa the used pointer analysis
+     * @param seedStatements the statements from the slicing criterion
+     * @param sliceList the displayed (final) slice output
+     * @param logger used logger for debugging and info output
+     */
+    private static void addObjectTracing(final PointerAnalysis pa, Set<Statement> seedStatements,
+                                         final Collection<Statement> sliceList, final SliceLogger logger) {
+
+        HashMap<CGNode, Set<Integer>> aliasValueNumbers = new HashMap<>(); // this should save all value numbers of
+        // variables, that may point to an watched object
+
+        for (Statement s : seedStatements) {
+            if (!(s instanceof StatementWithInstructionIndex)) continue;
+            int instructionIndex = ((StatementWithInstructionIndex) s).getInstructionIndex();
+            CGNode cgNode = s.getNode();
+            SSAInstruction ssaInstruction = cgNode.getIR().getInstructions()[instructionIndex];
+
+            final int valueNumber;
+            // TODO add support for other SSAInstructions
+            if (ssaInstruction instanceof SSAAbstractInvokeInstruction) {
+                valueNumber = ((SSAAbstractInvokeInstruction) ssaInstruction).getReceiver();
+            } else {
+                continue;
+            }
+
+            HeapGraph heapGraph = pa.getHeapGraph();
+            heapGraph.forEach(heapNode -> {
+                if (!(heapNode instanceof LocalPointerKey)) return;
+                LocalPointerKey localPointerKey = (LocalPointerKey) heapNode;
+                if (localPointerKey.getNode() != cgNode) return;
+                if (localPointerKey.getValueNumber() != valueNumber) return;
+
+                // lpk points to our watched object, lets check for aliases
+                heapGraph.getSuccNodes(localPointerKey).forEachRemaining(instanceKey -> {
+                    // for each instance localPointerKey may points to
+                    heapGraph.getPredNodes(instanceKey).forEachRemaining(lpkAliasObj -> {
+                        // for each variable, that may points on the instance
+                        if (!(lpkAliasObj instanceof LocalPointerKey)) return;
+                        LocalPointerKey lpkAlias = (LocalPointerKey) lpkAliasObj;
+                        CGNode aliasNode = lpkAlias.getNode();
+                        int aliasValue = lpkAlias.getValueNumber();
+
+                        if (!(aliasValueNumbers.containsKey(aliasNode))) {
+                            aliasValueNumbers.put(aliasNode, new HashSet<>());
+                        }
+
+                        aliasValueNumbers.get(aliasNode).add(aliasValue);
+                    });
+                });
+            });
+        }
+
+        // do a bit logging
+        logger.log("Found following possible aliases:");
+        aliasValueNumbers.forEach((cgNode, integers) -> {
+            String valueNumbers = integers
+                .stream()
+                .map(x -> x.toString())
+                .collect(Collectors.joining(", "));
+            logger.log("On Method " + cgNode.getMethod().getName() +
+                " the variables with the value numbers " + valueNumbers);
+        });
+
+        // find the statements, that use these aliases
+        logger.log(System.lineSeparator() + "Got following seed statements:");
+        aliasValueNumbers.forEach((nodeWithAliasStatements, integers) -> {
+            SSAInstruction irInstructions[] = nodeWithAliasStatements.getIR().getInstructions();
+            for (int i=0; i<irInstructions.length; i++) {
+                SSAInstruction ssaInstruction = irInstructions[i];
+                if (ssaInstruction == null) continue;
+                if (isValueUsedByInstruction(ssaInstruction, integers)) {
+                    seedStatements.add(new NormalStatement(nodeWithAliasStatements, i));
+                    logger.log("Addes Statement from class "
+                        + nodeWithAliasStatements.getMethod().getDeclaringClass().getName()
+                        + " in method " + nodeWithAliasStatements.getMethod().getName()
+                        + ", instruction index " + i
+                        + ", toString: " + ssaInstruction.toString());
+                }
+            }
+        });
+    }
+
+    /**
+     * Checks, weather the ssaInstruction does one of the following things with a value v from integers
+     * - calls a method on v
+     * - changes a parameter of v
+     * - changes a static parameter of the class from v
+     * - defines v
+     * @param ssaInstruction
+     * @param integers
+     * @return
+     */
+    private static boolean isValueUsedByInstruction(SSAInstruction ssaInstruction, Set<Integer> integers) {
+        // check, if v is defined by ssaInstruction
+        for (int i=0; i<ssaInstruction.getNumberOfDefs(); i++) {
+            if (integers.contains(ssaInstruction.getDef(i))) {
+                return true;
+            }
+        }
+
+        // check, if ssaInstruction is a method call on v
+        if (ssaInstruction instanceof SSAAbstractInvokeInstruction) {
+            SSAAbstractInvokeInstruction invokeInstruction = (SSAAbstractInvokeInstruction) ssaInstruction;
+            if (!invokeInstruction.isStatic()) { // don't call getReceiver on a static Method
+                if (integers.contains(invokeInstruction.getReceiver())) {
+                    return true;
+                }
+            }
+        }
+
+        // check, if ssaInstruction sets an attribute on v
+        if (ssaInstruction instanceof SSAPutInstruction) {
+            SSAPutInstruction putInstruction = (SSAPutInstruction) ssaInstruction;
+            if (putInstruction.isStatic()) {
+                // TODO
+                // putInstruction.getDeclaredField().getDeclaringClass().getName(); // Lde/uni_bremen/.../A
+            } else {
+                if (integers.contains(putInstruction.getUse(0))) {
+                    // putInstruction.getUse(0) returns the reference (v for v.field) if not static
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     private static CallGraphBuilder getCallGraphBuilder(Slice slice, Iterable<Entrypoint> entrypoints,
                                                         IClassHierarchy classHierarchy, AnalysisOptions options,
                                           AnalysisScope scope, SliceLogger logger) throws WalaException {
-
-        logger.log("\n== BUILDING CALL GRAPH ==");
         /*  build the call graph  */
         AnalysisCache cache = new AnalysisCacheImpl();
         /* builders can be constructed with different Util methods (see: https://wala.github.io/javadoc/com/ibm/wala/ipa/callgraph/impl/Util.html)*/
@@ -310,15 +537,13 @@ public class WalaSlicer {
      * @param callGraph CallGraph
      * @param methodNames Method names to compare the method nodes to
      * @param methodNodes Collection of found method nodes to keep during recursion
-     * @param androidClassName  Android class name to compare type names to (e.g. Lcom/android/server/AlarmManagerService)
      * @param logger
      * @return methodNodes: Collection of found method nodes
      * @throws WalaException
      */
-    private static Set<CGNode> findMethodNodes(CallGraph callGraph, Set<String> methodNames,
-                                               Set<CGNode> methodNodes, String className,
+    private static Set<CGNode> findMethodNodes(final CallGraph callGraph, Set<String> methodNames,
+                                               final Set<CGNode> methodNodes, final String className,
                                                SliceLogger logger) throws WalaException {
-
         for (Iterator<? extends CGNode> nodeIt = callGraph.iterator(); nodeIt.hasNext();) {
             CGNode node = nodeIt.next();
 
@@ -426,6 +651,7 @@ public class WalaSlicer {
                 }
 
                 // mcyl: add seed statements with "new" instructions
+                /*
                 if (instruction instanceof SSANewInstruction) {
                     SSANewInstruction call = (SSANewInstruction) instruction;
 
@@ -440,7 +666,7 @@ public class WalaSlicer {
                             logger.log("~ Found seed statement: new " + seedStatementName + " in " + node + ".");
                         }
                     }
-                }
+                }*/
             }
         }
 

@@ -39,11 +39,11 @@
                 </ng-template>
                 <th scope="col" jhiSortBy="seedStatements"><span>Seed Statements</span> <fa-icon [icon]="'sort'"></fa-icon></th>
                 <th scope="col" jhiSortBy="cfaType"><span>CFA Option</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-                <th scope="col" jhiSortBy="reflectionOptions"><span>Reflection Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+		<!--<th scope="col" jhiSortBy="reflectionOptions"><span>Reflection Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>-->
                 <th scope="col" jhiSortBy="dataDependenceOptions"><span>Data Dependence Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>
                 <th scope="col" jhiSortBy="controlDependenceOptions"><span>Control Dependence Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-                <th scope="col"  jhiSortBy="objectTracking"><span>Object Tracking</span> <fa-icon icon="sort"></fa-icon></th>
-                <th scope="col"  jhiSortBy="parameterTracking"><span>Parameter Tracking</span> <fa-icon icon="sort"></fa-icon></th>
+		<!--<th scope="col"  jhiSortBy="objectTracking"><span>Object Tracking</span> <fa-icon icon="sort"></fa-icon></th>-->
+		<!--<th scope="col"  jhiSortBy="parameterTracking"><span>Parameter Tracking</span> <fa-icon icon="sort"></fa-icon></th>-->
                 <th scope="col" jhiSortBy="running"><span>Running</span> <fa-icon [icon]="'sort'"></fa-icon></th>
                 <th scope="col"></th>
             </tr>
@@ -62,11 +62,11 @@
                     <td><div>{{slice.entryMethods}}</div></td>
                     <td><div>{{slice.seedStatements}}</div></td>
                     <td><div>{{slice.cfaType}} <span *ngIf="slice.cfaLevel">, n={{slice.cfaLevel}}</span></div></td> 
-                    <td><div>{{slice.reflectionOptions}}</div></td>
+		    <!--<td><div>{{slice.reflectionOptions}}</div></td>-->
                     <td><div>{{slice.dataDependenceOptions}}</div></td>
                     <td><div>{{slice.controlDependenceOptions}}</div></td>
-                    <td>{{ slice.objectTracking }}</td>
-                    <td>{{ slice.parameterTracking }}</td>
+		    <!--<td>{{ slice.objectTracking }}</td>-->
+		    <!--<td>{{ slice.parameterTracking }}</td>-->
                     <td>
                         <div [class.running]="slice.running">
                             <fa-icon [icon]="'sync'" ></fa-icon>

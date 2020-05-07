@@ -4,11 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
@@ -111,7 +107,10 @@ public class SliceService {
                     slice,
                     logger);
         } catch (Exception ex) {
-            logger.log(ex.getMessage());
+            logger.log("Exception while slicing");
+            logger.log(ex.toString());
+            logger.log("At stacktrace");
+            Arrays.stream(ex.getStackTrace()).forEach(x -> logger.log(x.toString()));
         }
 
         if (sliceLineNumbers != null) {

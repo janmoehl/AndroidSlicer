@@ -19,6 +19,14 @@ export class JavaService {
     });
   }
 
+  getMethods(pathToJar: string, className: string): Observable<HttpResponse<string[]>> {
+    const param = new HttpParams().set('pathToJar', pathToJar).set('className', className);
+    return this.http.get<string[]>(`${this.resourceUrl}/getMethods`, {
+      params: param,
+      observe: 'response'
+    });
+  }
+
   // gets a list of (sub)directories of 'path'
   // if 'filter' is given, also files ending with 'filter' are returned
   getDirectories(path: string, filter?: string): Observable<HttpResponse<string[]>> {
