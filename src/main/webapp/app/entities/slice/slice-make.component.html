@@ -245,12 +245,22 @@
                 </div> <!-- end of java-specific part -->
 
                 <div class="form-group">
-                    <label class="form-control-label" for="field_objectTracking">Tracking</label>
+                    <label class="form-control-label" for="field_objectTracking"
+                        ngbTooltip="Tracks the object from the slicing criterion and all its aliases">Object Tracking</label>
 		    <div>
                         <p-checkbox id="field_objectTracking" [formControl]="createForm.controls['objectTracking']" binary="true" label="Enable object tracking"></p-checkbox>
                     </div>
+                    <hr>
+                    <label class="form-control-label" for="field_parameterTracking"
+                        ngbTooltip="Tracks the parameters of the methodcall in the slicing criterion">Parameter Tracking</label>
 		    <div>
                         <p-checkbox id="field_parameterTracking" [formControl]="createForm.controls['parameterTracking']" binary="true" label="Enable parameter tracking"></p-checkbox>
+                    </div>
+                    <hr>
+                    <label class="form-control-label" for="field_trackingToSlicingCriterion"
+                        ngbTooltip="If enabled, the found tracking-instructions are added to the slicing criterion. If disabled, they are added to the slice directly.">Tracking to slicing criterion</label>
+		    <div>
+                        <p-checkbox id="field_trackingToSlicingCriterion" [formControl]="createForm.controls['trackingToSlicingCriterion']" binary="true" label="Add tracked instructions to slicing Criterion"></p-checkbox>
                     </div>
                 </div>
 

@@ -79,7 +79,8 @@ export class SliceMakeComponent implements OnInit {
     dataDependenceOptions: [null, Validators.required],
     controlDependenceOptions: [null, Validators.required],
     objectTracking: [null],
-    parameterTracking: [null]
+    parameterTracking: [null],
+    trackingToSlicingCriterion: [null]
   });
 
   constructor(
@@ -327,7 +328,8 @@ export class SliceMakeComponent implements OnInit {
       dataDependenceOptions: (this.createForm.get(['dataDependenceOptions'])!.value as ISlicerOption).key as DataDependenceOptions,
       controlDependenceOptions: (this.createForm.get(['controlDependenceOptions'])!.value as ISlicerOption).key as ControlDependenceOptions,
       objectTracking: this.createForm.get(['objectTracking'])!.value ?? false,
-      parameterTracking: this.createForm.get(['parameterTracking'])!.value ?? false
+      parameterTracking: this.createForm.get(['parameterTracking'])!.value ?? false,
+      trackingToSlicingCriterion: this.createForm.get(['trackingToSlicingCriterion'])!.value ?? false
     };
     return entity;
   }

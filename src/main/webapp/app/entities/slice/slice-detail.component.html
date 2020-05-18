@@ -119,6 +119,10 @@
                 <dd>
                     <span>{{ slice.parameterTracking }}</span>
 		</dd>
+                <dt><span>Tracking To Slicing Criterion</span></dt>
+                <dd>
+                    <span>{{ slice.trackingToSlicingCriterion }}</span>
+                </dd>
                 <div *ngIf="slice.log">
                     <div class="row justify-content-md-left pb-2">
                         <div class="col-md-auto align-middle">
@@ -137,10 +141,6 @@
                     <div [class.running]="slice.running">
                         <fa-icon [icon]="'sync'"></fa-icon>
                     </div>
-                </dd>
-                <dt><span>Tracking To Slicing Criterion</span></dt>
-                <dd>
-                    <span>{{ slice.trackingToSlicingCriterion }}</span>
                 </dd>
             </dl>
 
