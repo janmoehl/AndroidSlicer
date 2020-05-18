@@ -85,6 +85,10 @@
         {
             "fieldName": "parameterTracking",
             "fieldType": "Boolean"
+        },
+        {
+            "fieldName": "trackingToSlicingCriterion",
+            "fieldType": "Boolean"
         }
     ],
     "relationships": [],

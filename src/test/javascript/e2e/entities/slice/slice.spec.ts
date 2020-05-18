@@ -90,6 +90,18 @@ describe('Slice e2e test', () => {
       await sliceUpdatePage.getParameterTrackingInput().click();
       expect(await sliceUpdatePage.getParameterTrackingInput().isSelected(), 'Expected parameterTracking to be selected').to.be.true;
     }
+    const selectedTrackingToSlicingCriterion = sliceUpdatePage.getTrackingToSlicingCriterionInput();
+    if (await selectedTrackingToSlicingCriterion.isSelected()) {
+      await sliceUpdatePage.getTrackingToSlicingCriterionInput().click();
+      expect(
+        await sliceUpdatePage.getTrackingToSlicingCriterionInput().isSelected(),
+        'Expected trackingToSlicingCriterion not to be selected'
+      ).to.be.false;
+    } else {
+      await sliceUpdatePage.getTrackingToSlicingCriterionInput().click();
+      expect(await sliceUpdatePage.getTrackingToSlicingCriterionInput().isSelected(), 'Expected trackingToSlicingCriterion to be selected')
+        .to.be.true;
+    }
 
     await sliceUpdatePage.save();
     expect(await sliceUpdatePage.getSaveButton().isPresent(), 'Expected save button disappear').to.be.false;

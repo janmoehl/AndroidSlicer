@@ -37,6 +37,7 @@ describe('Service Tests', () => {
         DataDependenceOptions.FULL,
         ControlDependenceOptions.FULL,
         false,
+        false,
         false
       );
     });
@@ -84,7 +85,8 @@ describe('Service Tests', () => {
             dataDependenceOptions: 'BBBBBB',
             controlDependenceOptions: 'BBBBBB',
             objectTracking: true,
-            parameterTracking: true
+            parameterTracking: true,
+            trackingToSlicingCriterion: true
           },
           elemDefault
         );
@@ -113,7 +115,8 @@ describe('Service Tests', () => {
             dataDependenceOptions: 'BBBBBB',
             controlDependenceOptions: 'BBBBBB',
             objectTracking: true,
-            parameterTracking: true
+            parameterTracking: true,
+            trackingToSlicingCriterion: true
           },
           elemDefault
         );

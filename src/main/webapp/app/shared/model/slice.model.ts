@@ -17,6 +17,7 @@ export interface ISlice {
   controlDependenceOptions?: ControlDependenceOptions;
   objectTracking?: boolean;
   parameterTracking?: boolean;
+  trackingToSlicingCriterion?: boolean;
 }
 
 export class Slice implements ISlice {
@@ -34,10 +35,12 @@ export class Slice implements ISlice {
     public dataDependenceOptions?: DataDependenceOptions,
     public controlDependenceOptions?: ControlDependenceOptions,
     public objectTracking?: boolean,
-    public parameterTracking?: boolean
+    public parameterTracking?: boolean,
+    public trackingToSlicingCriterion?: boolean
   ) {
     this.running = this.running || false;
     this.objectTracking = this.objectTracking || false;
     this.parameterTracking = this.parameterTracking || false;
+    this.trackingToSlicingCriterion = this.trackingToSlicingCriterion || false;
   }
 }
