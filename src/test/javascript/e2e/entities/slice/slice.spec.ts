@@ -65,7 +65,6 @@ describe('Slice e2e test', () => {
     expect(await sliceMakePage.getCfaLevelInput()).to.eq('5', 'Expected cfaLevel value to be equals to 5');
     await sliceMakePage.save();
     expect(await sliceMakePage.getSaveButton().isPresent(), 'Expected save button disappear').to.be.false;
-
     expect(await sliceComponentsPage.countDeleteButtons()).to.eq(nbButtonsBeforeCreate + 1, 'Expected one more entry in the table');
   });
 

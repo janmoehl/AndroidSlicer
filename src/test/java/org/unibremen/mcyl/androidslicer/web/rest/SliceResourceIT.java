@@ -67,6 +67,9 @@ public class SliceResourceIT {
     private static final Boolean DEFAULT_PARAMETER_TRACKING = false;
     private static final Boolean UPDATED_PARAMETER_TRACKING = true;
 
+    private static final Boolean DEFAULT_TRACKING_TO_SLICING_CRITERION = false;
+    private static final Boolean UPDATED_TRACKING_TO_SLICING_CRITERION = true;
+
     @Autowired
     private SliceRepository sliceRepository;
 
@@ -119,7 +122,8 @@ public class SliceResourceIT {
             .dataDependenceOptions(DEFAULT_DATA_DEPENDENCE_OPTIONS)
             .controlDependenceOptions(DEFAULT_CONTROL_DEPENDENCE_OPTIONS)
             .objectTracking(DEFAULT_OBJECT_TRACKING)
-            .parameterTracking(DEFAULT_PARAMETER_TRACKING);
+            .parameterTracking(DEFAULT_PARAMETER_TRACKING)
+            .trackingToSlicingCriterion(DEFAULT_TRACKING_TO_SLICING_CRITERION);
         return slice;
     }
 
@@ -154,6 +158,7 @@ public class SliceResourceIT {
         assertThat(testSlice.getControlDependenceOptions()).isEqualTo(DEFAULT_CONTROL_DEPENDENCE_OPTIONS);
         assertThat(testSlice.isObjectTracking()).isEqualTo(DEFAULT_OBJECT_TRACKING);
         assertThat(testSlice.isParameterTracking()).isEqualTo(DEFAULT_PARAMETER_TRACKING);
+        assertThat(testSlice.isTrackingToSlicingCriterion()).isEqualTo(DEFAULT_TRACKING_TO_SLICING_CRITERION);
     }
 
     @Test
@@ -295,7 +300,8 @@ public class SliceResourceIT {
             .andExpect(jsonPath("$.[*].dataDependenceOptions").value(hasItem(DEFAULT_DATA_DEPENDENCE_OPTIONS.toString())))
             .andExpect(jsonPath("$.[*].controlDependenceOptions").value(hasItem(DEFAULT_CONTROL_DEPENDENCE_OPTIONS.toString())))
             .andExpect(jsonPath("$.[*].objectTracking").value(hasItem(DEFAULT_OBJECT_TRACKING.booleanValue())))
-            .andExpect(jsonPath("$.[*].parameterTracking").value(hasItem(DEFAULT_PARAMETER_TRACKING.booleanValue())));
+            .andExpect(jsonPath("$.[*].parameterTracking").value(hasItem(DEFAULT_PARAMETER_TRACKING.booleanValue())))
+            .andExpect(jsonPath("$.[*].trackingToSlicingCriterion").value(hasItem(DEFAULT_TRACKING_TO_SLICING_CRITERION.booleanValue())));
     }
 
     @Test
@@ -315,7 +321,8 @@ public class SliceResourceIT {
             .andExpect(jsonPath("$.dataDependenceOptions").value(DEFAULT_DATA_DEPENDENCE_OPTIONS.toString()))
             .andExpect(jsonPath("$.controlDependenceOptions").value(DEFAULT_CONTROL_DEPENDENCE_OPTIONS.toString()))
             .andExpect(jsonPath("$.objectTracking").value(DEFAULT_OBJECT_TRACKING.booleanValue()))
-            .andExpect(jsonPath("$.parameterTracking").value(DEFAULT_PARAMETER_TRACKING.booleanValue()));
+            .andExpect(jsonPath("$.parameterTracking").value(DEFAULT_PARAMETER_TRACKING.booleanValue()))
+            .andExpect(jsonPath("$.trackingToSlicingCriterion").value(DEFAULT_TRACKING_TO_SLICING_CRITERION.booleanValue()));
     }
 
     @Test

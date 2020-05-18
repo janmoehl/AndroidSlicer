@@ -40,6 +40,7 @@ export class SliceMakePage {
   controlDependenceOptionsSelect = element(by.id('field_controlDependenceOptions'));
   objectTrackingInput = element(by.id('field_objectTracking'));
   parameterTrackingInput = element(by.id('field_parameterTracking'));
+  trackingToSlicingCriterionInput = element(by.id('field_trackingToSlicingCriterion'));
 
   async getPageTitle(): Promise<string> {
     return this.pageTitle.getText();
@@ -151,6 +152,10 @@ export class SliceMakePage {
 
   getParameterTrackingInput(): ElementFinder {
     return this.parameterTrackingInput;
+  }
+
+  getTrackingToSlicingCriterionInput(): ElementFinder {
+    return this.trackingToSlicingCriterionInput;
   }
 
   async save(): Promise<void> {

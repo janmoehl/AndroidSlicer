@@ -114,6 +114,9 @@ public class Slice implements Serializable {
     @Field("parameter_tracking")
     private Boolean parameterTracking;
 
+    @Field("tracking_to_slicing_criterion")
+    private Boolean trackingToSlicingCriterion;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public String getId() {
         return id;
@@ -307,6 +310,9 @@ public class Slice implements Serializable {
         return parameterTracking;
     }
 
+    public Boolean isTrackingToSlicingCriterion() {
+        return trackingToSlicingCriterion;
+    }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -347,6 +353,7 @@ public class Slice implements Serializable {
             ", javaJarPath='" + getJavaJarPath() + "'" +
             ", objectTracking='" + isObjectTracking() + "'" +
             ", parameterTracking='" + isParameterTracking() + "'" +
+            ", trackingToSlicingCriterion='" + isTrackingToSlicingCriterion() + "'" +
             "}";
     }
 }

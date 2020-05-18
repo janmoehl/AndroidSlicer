@@ -25,28 +25,29 @@
     <div class="table-responsive" id="entities" *ngIf="slice?.length > 0">
         <table class="table table-striped" aria-describedby="page-heading">
             <thead>
-            <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
-                <ng-template [ngIf]="sliceMode === SliceModeEnum.ANDROID">
-                    <th scope="col" jhiSortBy="androidVersion"><span>Android Version</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-                    <th scope="col" jhiSortBy="className"><span>Android Class Name</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-                    <th scope="col" jhiSortBy="entryMethods"><span>Entry Methods</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-                </ng-template>
-                <ng-template [ngIf]="sliceMode === SliceModeEnum.JAVA">
-                    <th scope="col" jhiSortBy="javaJarPath"><span>Java Jar Path</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-                    <th scope="col" jhiSortBy="javaSourcePath"><span>Java Source Path</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-                    <th scope="col" jhiSortBy="className"><span>Seed Statement Class</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-                    <th scope="col" jhiSortBy="entryMethods"><span>Seed Statement Method</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-                </ng-template>
-                <th scope="col" jhiSortBy="seedStatements"><span>Seed Statements</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-                <th scope="col" jhiSortBy="cfaType"><span>CFA Option</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-		<!--<th scope="col" jhiSortBy="reflectionOptions"><span>Reflection Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>-->
-                <th scope="col" jhiSortBy="dataDependenceOptions"><span>Data Dependence Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-                <th scope="col" jhiSortBy="controlDependenceOptions"><span>Control Dependence Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-		<!--<th scope="col"  jhiSortBy="objectTracking"><span>Object Tracking</span> <fa-icon icon="sort"></fa-icon></th>-->
-		<!--<th scope="col"  jhiSortBy="parameterTracking"><span>Parameter Tracking</span> <fa-icon icon="sort"></fa-icon></th>-->
-                <th scope="col" jhiSortBy="running"><span>Running</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-                <th scope="col"></th>
-            </tr>
+                <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
+                    <ng-template [ngIf]="sliceMode === SliceModeEnum.ANDROID">
+                        <th scope="col" jhiSortBy="androidVersion"><span>Android Version</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                        <th scope="col" jhiSortBy="className"><span>Android Class Name</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                        <th scope="col" jhiSortBy="entryMethods"><span>Entry Methods</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                    </ng-template>
+                    <ng-template [ngIf]="sliceMode === SliceModeEnum.JAVA">
+                        <th scope="col" jhiSortBy="javaJarPath"><span>Java Jar Path</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                        <th scope="col" jhiSortBy="javaSourcePath"><span>Java Source Path</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                        <th scope="col" jhiSortBy="className"><span>Seed Statement Class</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                        <th scope="col" jhiSortBy="entryMethods"><span>Seed Statement Method</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                    </ng-template>
+                    <th scope="col" jhiSortBy="seedStatements"><span>Seed Statements</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                    <th scope="col" jhiSortBy="cfaType"><span>CFA Option</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                    <!--<th scope="col" jhiSortBy="reflectionOptions"><span>Reflection Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>-->
+                    <th scope="col" jhiSortBy="dataDependenceOptions"><span>Data Dependence Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                    <th scope="col" jhiSortBy="controlDependenceOptions"><span>Control Dependence Options</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                    <!--<th scope="col"  jhiSortBy="objectTracking"><span>Object Tracking</span> <fa-icon icon="sort"></fa-icon></th>-->
+                    <!--<th scope="col"  jhiSortBy="parameterTracking"><span>Parameter Tracking</span> <fa-icon icon="sort"></fa-icon></th>-->
+                    <!--<th scope="col"  jhiSortBy="trackingToSlicingCriterion"><span>Tracking To Slicing Criterion</span> <fa-icon icon="sort"></fa-icon></th>-->
+                    <th scope="col" jhiSortBy="running"><span>Running</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                    <th scope="col"></th>
+                </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let slice of slice ;trackBy: trackId">
@@ -67,6 +68,7 @@
                     <td><div>{{slice.controlDependenceOptions}}</div></td>
 		    <!--<td>{{ slice.objectTracking }}</td>-->
 		    <!--<td>{{ slice.parameterTracking }}</td>-->
+                    <!--<td>{{ slice.trackingToSlicingCriterion }}</td>-->
                     <td>
                         <div [class.running]="slice.running">
                             <fa-icon [icon]="'sync'" ></fa-icon>
