@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -17,27 +16,22 @@ import com.ibm.wala.classLoader.Language;
 import com.ibm.wala.classLoader.ShrikeBTMethod;
 import com.ibm.wala.ipa.callgraph.*;
 import com.ibm.wala.ipa.callgraph.impl.Util;
+import com.ibm.wala.ipa.callgraph.propagation.InstanceKey;
 import com.ibm.wala.ipa.callgraph.propagation.LocalPointerKey;
 import com.ibm.wala.ipa.callgraph.propagation.PointerAnalysis;
+import com.ibm.wala.ipa.callgraph.propagation.PointerKey;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
 import com.ibm.wala.ipa.cha.IClassHierarchy;
-import com.ibm.wala.ipa.slicer.NormalStatement;
-import com.ibm.wala.ipa.slicer.Slicer;
-import com.ibm.wala.ipa.slicer.Statement;
-import com.ibm.wala.ipa.slicer.StatementWithInstructionIndex;
+import com.ibm.wala.ipa.slicer.*;
 import com.ibm.wala.ssa.*;
-import com.ibm.wala.types.FieldReference;
 import com.ibm.wala.types.TypeName;
-import com.ibm.wala.types.TypeReference;
 import com.ibm.wala.util.CancelException;
 import com.ibm.wala.util.WalaException;
 import com.ibm.wala.util.config.AnalysisScopeReader;
-import com.ibm.wala.util.debug.UnimplementedError;
 import com.ibm.wala.util.intset.IntSet;
 import com.ibm.wala.util.strings.Atom;
-import com.ibm.wala.classLoader.IClass;
 
 import org.apache.commons.io.FilenameUtils;
 import org.unibremen.mcyl.androidslicer.domain.Slice;
@@ -155,7 +149,7 @@ public class WalaSlicer {
             ) throws WalaException, IOException, ClassHierarchyException, IllegalArgumentException,
             CallGraphBuilderCancelException, CancelException {
 
-        logger.log("\n== Start slicing, building context ==");
+        logger.log("\n== Start slicing process, building context ==");
         long start = System.currentTimeMillis();
 
         // add "L" to class name and remove .java extension
@@ -179,7 +173,7 @@ public class WalaSlicer {
         options.setReflectionOptions(slice.getReflectionOptions());
         CallGraphBuilder callGraphBuilder = getCallGraphBuilder(slice, entrypoints, classHierarchy, options,  scope, logger);
         CallGraph callGraph = callGraphBuilder.makeCallGraph(options, null);
-        logger.log("Took until now " + (System.currentTimeMillis() - start) + "ms.");
+        logger.log("Build call graph (time: " + (System.currentTimeMillis() - start) + "ms)");
         logger.log(CallGraphStats.getStats(callGraph));
 
         Set<CGNode> methodNodes = new HashSet<>();
@@ -206,23 +200,29 @@ public class WalaSlicer {
         Collection<Statement> sliceList = new HashSet<Statement>();
 
         if (slice.isObjectTracking()) {
-            logger.log("\n== ADD OBJECT TRACING ==");
-            WalaSlicer.addObjectTracing(callGraphBuilder.getPointerAnalysis(), seedStatements, sliceList, logger);
+            logger.log("\n== ADD OBJECT TRACKING ==");
+            WalaSlicer.addObjectTracking(callGraphBuilder.getPointerAnalysis(), seedStatements, sliceList, logger,
+                slice.isTrackingToSlicingCriterion());
+            logger.log("Object Tracking finished (until now " + (System.currentTimeMillis() - start) + "ms)");
+        }
+
+        SDG sdg = new SDG(callGraph, callGraphBuilder.getPointerAnalysis(),
+            slice.getDataDependenceOptions(), slice.getControlDependenceOptions());
+
+        if (slice.isParameterTracking()) {
+            logger.log("\n== ADD PARAMETER TRACING ==");
+            WalaSlicer.addParameterTracking(sdg, seedStatements, sliceList, logger,
+                slice.isTrackingToSlicingCriterion());
+            logger.log("Parameter tracking finished (until now " + (System.currentTimeMillis() - start) + "ms)");
         }
 
         logger.log("\n== SLICING ==");
         logger.log("Starting at " + (System.currentTimeMillis() - start) + "ms.");
-        for (Statement seedStatement : seedStatements) {
-            logger.log("+ Computing backward slice for " + seedStatement.getNode().toString());
-            try{
-            sliceList.addAll(Slicer.computeBackwardSlice(seedStatement, callGraph,
-                callGraphBuilder.getPointerAnalysis(), slice.getDataDependenceOptions(),
-                slice.getControlDependenceOptions()));
-            }
-            catch(UnimplementedError ue){
-                throw new WalaException("One of the parameters is not implemented yet: " + ue.getStackTrace());
-            }
-        }
+        logger.log("slicing criterions/seed statements:");
+        seedStatements.forEach(s -> {
+            logger.log("  > " + s);
+        });
+        sliceList.addAll(Slicer.computeBackwardSlice(sdg, seedStatements));
         logger.log("Slicing finished at " + (System.currentTimeMillis() - start) + "ms.");
         logger.log("\nNumber of slice statements:  " + sliceList.size());
 
@@ -236,6 +236,55 @@ public class WalaSlicer {
     }
 
     /**
+     * Adds tracking for the parameters, used by the invoke instructions in the seed statement
+     * @param sdg needed to find the parameter-edges in the pdg
+     * @param seedStatements contains the invoke-instructins
+     * @param sliceList the backwardslice
+     * @param logger just a logger for logging
+     * @param trackingToSlicingCriterion add instructions to slicingCriterion? (or else to slice directly)
+     */
+    private static void addParameterTracking(SDG sdg, Set<Statement> seedStatements, Collection<Statement> sliceList, SliceLogger logger, Boolean trackingToSlicingCriterion) {
+        HashMap<CGNode, Set<Integer>> parameterValues = new HashMap<>();
+        for (Statement seedStatement: seedStatements) {
+            // only invokeInstructions are interesting, skip all other, and get the correct pdg
+            if (!(seedStatement instanceof StatementWithInstructionIndex)) continue;
+            int instructionIndex = ((StatementWithInstructionIndex) seedStatement).getInstructionIndex();
+            CGNode cgNode = seedStatement.getNode();
+            SSAInstruction ssaInstruction = cgNode.getIR().getInstructions()[instructionIndex];
+            if (!(ssaInstruction instanceof SSAAbstractInvokeInstruction)) continue;
+            SSAAbstractInvokeInstruction methodCall = (SSAAbstractInvokeInstruction) ssaInstruction;
+            PDG pdg = sdg.getPDG(cgNode);
+
+            // now check for the parameter-statements
+            Set<Statement> callerParams = pdg.getCallerParamStatements(methodCall);
+            for (Statement callerParam : callerParams) {
+                int valueNumber;
+                if (callerParam instanceof ParamCaller) {
+                    ParamCaller paramCaller = (ParamCaller) callerParam;
+                    valueNumber = paramCaller.getValueNumber();
+                } else if (callerParam instanceof HeapStatement.HeapParamCaller) {
+                    HeapStatement.HeapParamCaller heapParamCaller = (HeapStatement.HeapParamCaller) callerParam;
+                    PointerKey pointer = heapParamCaller.getLocation();
+                    if (!(pointer instanceof LocalPointerKey)) {
+                        throw new RuntimeException("pointer was not an LocalPointerKey: " + pointer);
+                    }
+                    LocalPointerKey lpk = (LocalPointerKey) pointer;
+                    valueNumber = lpk.getValueNumber();
+                } else {
+                    throw new RuntimeException("Unexpected WALA behaviour: PDG#getCallerStatements should only return ParamCaller and HeapParamCaller");
+                }
+                if (!parameterValues.containsKey(cgNode)) {
+                    parameterValues.put(cgNode, new HashSet<>());
+                }
+                parameterValues.get(cgNode).add(valueNumber);
+            }
+        }
+
+        // add the found parameter
+        addAliasesToSlice(parameterValues, trackingToSlicingCriterion, sliceList, seedStatements,logger);
+    }
+
+    /**
      * Adds tracing of the sliced values, based on the pointer analysis. Some traced
      * object locations and aliases are added as slicing criterion for the later analysis,
      * some are added directly to the output slice
@@ -244,9 +293,11 @@ public class WalaSlicer {
      * @param seedStatements the statements from the slicing criterion
      * @param sliceList the displayed (final) slice output
      * @param logger used logger for debugging and info output
+     * @param trackingToSlicingCriterion weather to add tracked instructions to slicing criterion, or to the slice directly
      */
-    private static void addObjectTracing(final PointerAnalysis pa, Set<Statement> seedStatements,
-                                         final Collection<Statement> sliceList, final SliceLogger logger) {
+    private static void addObjectTracking(final PointerAnalysis<InstanceKey> pa, final Set<Statement> seedStatements,
+                                          final Collection<Statement> sliceList, final SliceLogger logger,
+                                          final boolean trackingToSlicingCriterion) {
 
         HashMap<CGNode, Set<Integer>> aliasValueNumbers = new HashMap<>(); // this should save all value numbers of
         // variables, that may point to an watched object
@@ -257,7 +308,7 @@ public class WalaSlicer {
             CGNode cgNode = s.getNode();
             SSAInstruction ssaInstruction = cgNode.getIR().getInstructions()[instructionIndex];
 
-            final int valueNumber;
+            final int valueNumber; // valueNumber of value, for which we look up the aliases
             // TODO add support for other SSAInstructions
             if (ssaInstruction instanceof SSAAbstractInvokeInstruction) {
                 valueNumber = ((SSAAbstractInvokeInstruction) ssaInstruction).getReceiver();
@@ -265,7 +316,7 @@ public class WalaSlicer {
                 continue;
             }
 
-            HeapGraph heapGraph = pa.getHeapGraph();
+            HeapGraph<InstanceKey> heapGraph = pa.getHeapGraph();
             heapGraph.forEach(heapNode -> {
                 if (!(heapNode instanceof LocalPointerKey)) return;
                 LocalPointerKey localPointerKey = (LocalPointerKey) heapNode;
@@ -297,21 +348,37 @@ public class WalaSlicer {
         aliasValueNumbers.forEach((cgNode, integers) -> {
             String valueNumbers = integers
                 .stream()
-                .map(x -> x.toString())
+                .map(Object::toString)
                 .collect(Collectors.joining(", "));
             logger.log("On Method " + cgNode.getMethod().getName() +
                 " the variables with the value numbers " + valueNumbers);
         });
+        WalaSlicer.addAliasesToSlice(aliasValueNumbers, trackingToSlicingCriterion, sliceList, seedStatements, logger);
+    }
 
+    /**
+     * Adds instruction with values from aliasValueNumbers to the slice
+     * @param aliasValueNumbers contains the values
+     * @param trackingToSlicingCriterion add instructions to the slicing criterion? (or else add them to the slicelist directly)
+     * @param sliceList the resulting slice
+     * @param seedStatements the slicing criterion for the slice
+     * @param logger in case of logging
+     */
+    private static void addAliasesToSlice(HashMap<CGNode, Set<Integer>> aliasValueNumbers, boolean trackingToSlicingCriterion, Collection<Statement> sliceList, Set<Statement> seedStatements, SliceLogger logger) {
         // find the statements, that use these aliases
-        logger.log(System.lineSeparator() + "Got following seed statements:");
         aliasValueNumbers.forEach((nodeWithAliasStatements, integers) -> {
-            SSAInstruction irInstructions[] = nodeWithAliasStatements.getIR().getInstructions();
+            SSAInstruction[] irInstructions = nodeWithAliasStatements.getIR().getInstructions();
             for (int i=0; i<irInstructions.length; i++) {
                 SSAInstruction ssaInstruction = irInstructions[i];
                 if (ssaInstruction == null) continue;
                 if (isValueUsedByInstruction(ssaInstruction, integers)) {
-                    seedStatements.add(new NormalStatement(nodeWithAliasStatements, i));
+                    if (trackingToSlicingCriterion) {
+                        // add to slicing criterion
+                        seedStatements.add(new NormalStatement(nodeWithAliasStatements, i));
+                    } else {
+                        sliceList.add(new NormalStatement(nodeWithAliasStatements, i));
+                    }
+
                     logger.log("Addes Statement from class "
                         + nodeWithAliasStatements.getMethod().getDeclaringClass().getName()
                         + " in method " + nodeWithAliasStatements.getMethod().getName()
@@ -328,9 +395,9 @@ public class WalaSlicer {
      * - changes a parameter of v
      * - changes a static parameter of the class from v
      * - defines v
-     * @param ssaInstruction
-     * @param integers
-     * @return
+     * @param ssaInstruction the inspected instruction
+     * @param integers set of value numbers, which represents the values for witch this method should look for
+     * @return true, if any of 'integers' is used
      */
     private static boolean isValueUsedByInstruction(SSAInstruction ssaInstruction, Set<Integer> integers) {
         // check, if v is defined by ssaInstruction
