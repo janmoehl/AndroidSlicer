@@ -190,7 +190,7 @@ dependencies {
     //compile group: 'com.ibm.wala', name: 'com.ibm.wala.scandroid', version: '1.5.3'
 
     // add https://github.com/javaparser/javaparser
-    compile 'com.github.javaparser:javaparser-symbol-solver-core:3.14.14'
+    compile 'com.github.javaparser:javaparser-symbol-solver-core:3.16.1'
 
     // import JHipster dependencies BOM
     if (!project.hasProperty("gae")) {
