@@ -75,7 +75,7 @@ cd WALA
 
 ### Start the Program
 
-Run the following commands in two separate terminals to create a blissful development experience where your browser auto-refreshes when files change on your hard drive.
+First check that MongoDB is running. Then run the following commands in two separate terminals to create a blissful development experience where your browser auto-refreshes when files change on your hard drive.
 
     ./gradlew -x webpack
     npm start

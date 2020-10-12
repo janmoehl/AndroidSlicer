@@ -33,6 +33,7 @@ import com.ibm.wala.util.config.AnalysisScopeReader;
 import com.ibm.wala.util.intset.IntSet;
 import com.ibm.wala.util.strings.Atom;
 
+import com.sun.org.apache.xalan.internal.xsltc.dom.MultiValuedNodeHeapIterator;
 import org.apache.commons.io.FilenameUtils;
 import org.unibremen.mcyl.androidslicer.domain.Slice;
 import org.unibremen.mcyl.androidslicer.domain.enumeration.CFAType;
@@ -137,9 +138,11 @@ public class WalaSlicer {
     }
 
     /**
+     * Main function for slicing
      * @param appJar the analysed Jar-file
+     * @param slice contains all parameters for the slice
      * @param exclusionFile file with excluded packages
-     * @param logger
+     * @param logger a logger
      */
     public static Map<String, Set<Integer>> doSlicing(
                 File appJar,
@@ -177,17 +180,22 @@ public class WalaSlicer {
         logger.log(CallGraphStats.getStats(callGraph));
 
         Set<CGNode> methodNodes = new HashSet<>();
+        Set<String> entryMethods = slice.getEntryMethods();
         if (slice.getSliceMode() != SliceMode.JAVA) {
             logger.log("\n== FIND METHOD(s) FOR SEED_STATEMENT(s) ==");
-            Set<String> entryMethods = slice.getEntryMethods();
             WalaSlicer.findMethodNodes(callGraph, entryMethods, methodNodes, className, logger);
             if (methodNodes.size() == 0) {
                 throw new WalaException("Failed to find any methods from" + entryMethods + "!");
             }
         } else {
-            // TODO maybe take callGraph directly
-            Iterator i = callGraph.iterator();
-            i.forEachRemaining(x -> methodNodes.add((CGNode) x));
+            // SliceMode == Java => entryMethodes are the methods to search the seedstatement
+            callGraph.forEach(node -> {
+                Atom methodNodeName = node.getMethod().getName();
+                for (String seedMethod : entryMethods) {
+                    if (methodNodeName.equals(Atom.findOrCreateUnicodeAtom(seedMethod)))
+                        methodNodes.add(node);
+                }
+            });
         }
 
         logger.log("\n== FIND SEED_STATEMENT(s) ==");
@@ -309,26 +317,35 @@ public class WalaSlicer {
             SSAInstruction ssaInstruction = cgNode.getIR().getInstructions()[instructionIndex];
 
             final int valueNumber; // valueNumber of value, for which we look up the aliases
-            // TODO add support for other SSAInstructions
-            if (ssaInstruction instanceof SSAAbstractInvokeInstruction) {
-                valueNumber = ((SSAAbstractInvokeInstruction) ssaInstruction).getReceiver();
-            } else {
-                continue;
-            }
+
+            if (!(ssaInstruction instanceof SSAAbstractInvokeInstruction))
+                continue; // Possible improvement: Add support for other SSAInstructions
+
+            valueNumber = ((SSAAbstractInvokeInstruction) ssaInstruction).getReceiver();
+
 
             HeapGraph<InstanceKey> heapGraph = pa.getHeapGraph();
-            heapGraph.forEach(heapNode -> {
-                if (!(heapNode instanceof LocalPointerKey)) return;
+            for (Object heapNode : heapGraph) {
+                if (!(heapNode instanceof LocalPointerKey)) continue;
                 LocalPointerKey localPointerKey = (LocalPointerKey) heapNode;
-                if (localPointerKey.getNode() != cgNode) return;
-                if (localPointerKey.getValueNumber() != valueNumber) return;
+                if (localPointerKey.getNode() != cgNode
+                        || localPointerKey.getValueNumber() != valueNumber)
+                    continue;
 
                 // lpk points to our watched object, lets check for aliases
-                heapGraph.getSuccNodes(localPointerKey).forEachRemaining(instanceKey -> {
+                Iterator instanceIter = heapGraph.getSuccNodes(localPointerKey);
+                while (instanceIter.hasNext()) {
+                    Object instanceKey = instanceIter.next();
+                    if (!(instanceKey instanceof InstanceKey))
+                        continue; // should not happen
+
                     // for each instance localPointerKey may points to
-                    heapGraph.getPredNodes(instanceKey).forEachRemaining(lpkAliasObj -> {
+                    Iterator pointerIter = heapGraph.getPredNodes(instanceKey);
+                    while (pointerIter.hasNext()) {
+                        Object lpkAliasObj = pointerIter.next();
                         // for each variable, that may points on the instance
-                        if (!(lpkAliasObj instanceof LocalPointerKey)) return;
+                        if (!(lpkAliasObj instanceof LocalPointerKey))
+                            continue; // should not happen
                         LocalPointerKey lpkAlias = (LocalPointerKey) lpkAliasObj;
                         CGNode aliasNode = lpkAlias.getNode();
                         int aliasValue = lpkAlias.getValueNumber();
@@ -338,9 +355,9 @@ public class WalaSlicer {
                         }
 
                         aliasValueNumbers.get(aliasNode).add(aliasValue);
-                    });
-                });
-            });
+                    }
+                }
+            }
         }
 
         // do a bit logging
@@ -718,7 +735,6 @@ public class WalaSlicer {
                 }
 
                 // mcyl: add seed statements with "new" instructions
-                /*
                 if (instruction instanceof SSANewInstruction) {
                     SSANewInstruction call = (SSANewInstruction) instruction;
 
@@ -733,7 +749,7 @@ public class WalaSlicer {
                             logger.log("~ Found seed statement: new " + seedStatementName + " in " + node + ".");
                         }
                     }
-                }*/
+                }
             }
         }
 

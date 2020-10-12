@@ -113,7 +113,7 @@ public class InitialSetupMigration {
         }
 
         exclusionList.setValue(result.toString());
-        exclusionList.setDescription("These classes will be excluded during the slicing analysis to prevent the slicer to go too deep into the java framework. Entries should be separated with new lines.");
+        exclusionList.setDescription("These classes will be excluded during the slicing analysis to prevent the slicer to go too deep into the java framework. Entries should be separated with new lines or spaces.");
         mongoTemplate.save(exclusionList);
 
     }

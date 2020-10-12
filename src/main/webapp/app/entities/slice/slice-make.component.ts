@@ -187,9 +187,6 @@ export class SliceMakeComponent implements OnInit {
   }
 
   onJarPathSelected(event: any): void {
-    if (event.sourceCapabilities == null) {
-      return; // only switched focused window
-    }
     const jarPath = this.createForm.get(['javaJarPath'])!.value;
     const javaClassesInput = this.createForm.get(['javaClasses'])!;
     javaClassesInput.disable();
@@ -216,9 +213,6 @@ export class SliceMakeComponent implements OnInit {
 
   onJavaClassSelected(event: any): void {
     console.log('Search for Methods!'); // eslint-disable-line
-    if (event.sourceCapabilities == null) {
-      return; // only switched focused window
-    }
     const jarPath = this.createForm.get(['javaJarPath'])!.value;
     const javaMethodInput = this.createForm.get(['javaEntryMethods'])!;
     javaMethodInput.disable();
