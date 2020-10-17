@@ -28,8 +28,7 @@ Before you can build this project, you must install and configure the following 
 
 | Operating System | Installation Instructions |
 | ---------------- | ------------------------- |
-| Windows          |                           |
-| Linux (Debian)   |                           |
+| Windows          | manual                    |
 | Linux (Arch)     | from AUR: `yay -S nodejs` |
 
 After installing Node, you should be able to run the following command to install development tools.
@@ -46,7 +45,6 @@ If `jhipster` isn't an executable in your path, try to fix it with `sudo npm ins
 | Operating System | Installation Instructions                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Windows          | [Download MongoDB](https://www.mongodb.com/download-center/community) server (community edition) from and follow the [installation instructions](https://docs.mongodb.com/manual/administration/install-community/). There is no need to install MongoDB-Compass (GUI for MongoDB). After the binaries are installed, create a folder under C:\data\db run with `mongod` or install the service with `mongod --install`. If you want the databases in a different folder use the `--dbpath` parameter, e.g. `mongod --dbpath=C:\folder\to\databases\data\db` |
-| Linux (Debian)   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | Linux (Arch)     | `yay -S mongodb-bin`<br />`sudo mkdir -p /data/db`<br />`sudo chown /data/db`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 
 Or run embedded mongo db with (use `gradle clean` before)
@@ -64,7 +62,7 @@ git clone https://github.com/wala/WALA
 git checkout v1.5.4
 ```
 
-Edit the file `WALA/com.ibm.wala.core/dat/wala.properties.sample` to match your environment. Unter linux the `java_runtime_dir` might look like `/usr/lib/jvm/default/jre/lib/`. Save it as `WALA/com.ibm.wala.core/dat/wala.properties`.
+Edit the file `WALA/com.ibm.wala.core/dat/wala.properties.sample` to match your environment. Under linux the `java_runtime_dir` might look like `/usr/lib/jvm/default/jre/lib/`. Save it as `WALA/com.ibm.wala.core/dat/wala.properties`.
 
 After that, you can compile it with
 
@@ -224,11 +222,6 @@ Then run:
     docker-compose -f src/main/docker/app.yml up -d
 
 For more information refer to [Using Docker and Docker-Compose][], this page also contains information on the docker-compose sub-generator (`jhipster docker-compose`), which is able to generate docker configurations for one or several JHipster applications.
-
-## TODO
-
-- Transform the slice-make.component-form into a nested one, with layers for Java and Android specific fields -> better maintainability, better performance when disable/enable these fields .
-- Close the security issues with the `GET /api/java/source-code` API (by restricting valid paths to a specific subdirectory?)
 
 ## Continuous Integration (optional)
 
