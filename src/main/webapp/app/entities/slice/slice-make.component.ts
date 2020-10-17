@@ -49,7 +49,7 @@ export class SliceMakeComponent implements OnInit {
   filteredJavaSourcePaths: string[] = [];
   javaClasses: string[] = [];
   filteredJavaClasses: string[] = [];
-  javaEntryMethodOptions: string[] = ['meth1', 'meth2', 'meth22'];
+  javaEntryMethodOptions: string[] = [];
   filteredJavaEntryMethodOptions: string[] = [];
   filteredJavaSeedStatementOptions: string[] = [];
 
@@ -298,7 +298,7 @@ export class SliceMakeComponent implements OnInit {
   private createFromForm(): ISlice {
     const currentSeedStatements =
       this.sliceMode === 'JAVA'
-        ? this.createForm.get(['javaSeedStatements'])!.value
+        ? [this.createForm.get(['javaSeedStatements'])!.value]
         : this.createForm.get(['androidSeedStatements'])!.value;
     const currentEntryMethods =
       this.sliceMode === 'JAVA' ? this.createForm.get(['javaEntryMethods'])!.value : this.createForm.get(['androidEntryMethods'])!.value;
@@ -426,7 +426,7 @@ export class SliceMakeComponent implements OnInit {
   filterJavaSeedStatementOptions(event: any): void {
     if (event) {
       this.filteredJavaSeedStatementOptions = [event.query.toString()];
-      this.filterMultiSelectOptions(event, ['doFinal'], this.filteredJavaSeedStatementOptions);
+      this.filterMultiSelectOptions(event, [], this.filteredJavaSeedStatementOptions);
     }
   }
 

@@ -137,7 +137,7 @@
                                 formControlName="javaJarPath"
                                 [dropdown]="true"
                                 [style]="{'width':'100%'}"
-                                [inputStyle]="{'width':'100%'}"
+                                [inputStyle]="{'width':'97%'}"
 				emptyMessage="No files found"
                                 required="true"
                                 placeholder=".../executable.jar"
@@ -155,7 +155,7 @@
                                 [style]="{'width':'100%'}"
                                 [dropdown]="true"
                                 required="true"
-                                [inputStyle]="{'width':'100%'}"
+                                [inputStyle]="{'width':'97%'}"
                                 [suggestions]="filteredJavaSourcePaths"
                                 (completeMethod)="onSourcePathComplete($event)"
 				(onKeyUp)="onSourcePathKey($event)"
@@ -174,7 +174,7 @@
                             [minLength]="0"
                             [suggestions]="filteredJavaClasses"
                             [dropdown]="true"
-                            [inputStyle]="{'width':'100%'}"
+                            [inputStyle]="{'width':'97%'}"
                             placeholder="Java class with slicing criterion, e.g. de/example/www/Class"
                             (completeMethod)="onJavaClassesComplete($event)"
                             (onBlur)="onJavaClassSelected($event)"
@@ -183,65 +183,29 @@
                     </div>
                     <div class="form-group">
                         <label class="form-control-label" for="field_javaEntryMethods" ngbTooltip="JSON-List with entry method names">Method for searching the seed statement</label>
-                        <div class="row no-gutters mx-lg-n1">
-                            <div class="col-10 px-lg-1">
-                                <p-autoComplete name="javaEntryMethods"
-                                      [suggestions]="filteredJavaEntryMethodOptions"
-                                      id="field_javaEntryMethods"
-                                      formControlName="javaEntryMethods" 
-                                      [multiple]="true"
-                                      [minLength]="1"
-                                      required="true"
-                                      placeholder="Select Entry Methods..."
-                                      (completeMethod)="filterJavaEntryMethodOptions($event)"
-                                      [dropdown]="true"
-                                      (onKeyUp)="addJavaEntryMethodOption($event)">
-                                </p-autoComplete>
-                            </div>
-                            <!-- <div class="btn-group col-2 px-lg-1" role="group">
-                                <button type="button"
-                                class="btn btn-outline-success btn-sm"
-                                (click)="addAllEntryMethods()">Add All</button>
-                                <button type="button"
-                                class="btn btn-outline-danger btn-sm"
-                                (click)="clearEntryMethods()">Clear</button>
-                            </div> -->
-                        </div>
-                        <!--
-                        <div *ngIf="createForm.get('androidEntryMethods')!.invalid && (createForm.get('androidEntryMethods')!.dirty || createForm.get('androidEntryMethods')!.touched)">
-                            <small class="form-text text-danger"
-                                *ngIf="createForm.get('androidEntryMethods')!.errors!.required">
-                                This field is required.
-                            </small>
-                        </div>-->
+                        <p-autoComplete name="javaEntryMethods"
+                              [suggestions]="filteredJavaEntryMethodOptions"
+                              id="field_javaEntryMethods"
+                              formControlName="javaEntryMethods" 
+                              [multiple]="true"
+                              [minLength]="1"
+                              required="true"
+                              placeholder="Select method with slicing criterion..."
+                              (completeMethod)="filterJavaEntryMethodOptions($event)"
+                              [dropdown]="true"
+                              (onKeyUp)="addJavaEntryMethodOption($event)">
+                        </p-autoComplete>
                     </div>
                     <div class="form-group">
-                        <label class="form-control-label" for="field_javaSeedStatements" ngbTooltip="JSON-List with seed statement names">Seed Statement (method call)</label>
-                        <div class="row no-gutters mx-lg-n1">
-                            <div class="col-10 px-lg-1">
-                                <p-autoComplete name="javaSeedStatements" id="field_javaSeedStatement" formControlName="javaSeedStatements" [suggestions]="filteredJavaSeedStatementOptions" required="true" [dropdown]="true" [multiple]="true" [minLength]="1" placeholder="Select Seed Statement..." (completeMethod)="filterJavaSeedStatementOptions($event)" (onKeyUp)="addJavaSeedStatementOption($event)"></p-autoComplete>
-                            </div>
-                            <!--
-                            <div class="btn-group col-2 px-lg-1" role="group">
-                                <button type="button"
-                                class="btn btn-outline-success btn-sm"
-                                (click)="addAllSeedStatements()">Add All</button>
-                                <button type="button"
-                                class="btn btn-outline-danger btn-sm"
-                                (click)="clearSeedStatements()">Clear</button>
-                            </div>
-                            -->
-                        </div>
-                        <!--
-                        <div *ngIf="createForm.get('javaSeedStatements')!.invalid && (createForm.get('javaSeedStatements')!.dirty || createForm.get('javaSeedStatements')!.touched)">
-                            <small class="form-text text-danger"
-                                *ngIf="createForm.get('javaSeedStatements')!.errors!.required">
-                                This field is required.
-                            </small>
-                        </div> -->
+                        <label class="form-control-label" for="field_javaSeedStatements" ngbTooltip="JSON-List with seed statement names">Seed Statement (method call)</label><br />
+                        <input pInputText
+                            class="p-inputtext-lg"
+                            style="width: 100%"
+                            name="javaSeedStatements"
+                            id="field_javaSeedStatement"
+                            formControlName="javaSeedStatements"
+			    placeholder="Select Seed Statement..." />
                     </div>
-
-
                 </div> <!-- end of java-specific part -->
 
                 <div class="form-group">
