@@ -2,8 +2,8 @@ package org.unibremen.mcyl.androidslicer.domain;
 
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import javax.validation.constraints.*;
 
 import java.io.Serializable;
@@ -94,7 +94,7 @@ public class Slice implements Serializable {
     @Field("tracking_to_slicing_criterion")
     private Boolean trackingToSlicingCriterion;
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
+    // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {
         return id;
     }
@@ -275,7 +275,16 @@ public class Slice implements Serializable {
     public Boolean isTrackingToSlicingCriterion() {
         return trackingToSlicingCriterion;
     }
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
+
+    public Slice trackingToSlicingCriterion(Boolean trackingToSlicingCriterion) {
+        this.trackingToSlicingCriterion = trackingToSlicingCriterion;
+        return this;
+    }
+
+    public void setTrackingToSlicingCriterion(Boolean trackingToSlicingCriterion) {
+        this.trackingToSlicingCriterion = trackingToSlicingCriterion;
+    }
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
     public boolean equals(Object o) {
@@ -293,6 +302,7 @@ public class Slice implements Serializable {
         return 31;
     }
 
+    // prettier-ignore
     @Override
     public String toString() {
         return "Slice{" +

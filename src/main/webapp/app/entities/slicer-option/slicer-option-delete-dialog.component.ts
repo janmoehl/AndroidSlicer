@@ -6,7 +6,7 @@ import { ISlicerOption } from 'app/shared/model/slicer-option.model';
 import { SlicerOptionService } from './slicer-option.service';
 
 @Component({
-  templateUrl: './slicer-option-delete-dialog.component.html'
+  templateUrl: './slicer-option-delete-dialog.component.html',
 })
 export class SlicerOptionDeleteDialogComponent {
   slicerOption?: ISlicerOption;

@@ -11,6 +11,6 @@ import { sliceRoute } from './slice.route';
 @NgModule({
   imports: [AndroidSlicerSharedModule, RouterModule.forChild(sliceRoute)],
   declarations: [SliceComponent, SliceDetailComponent, SliceUpdateComponent, SliceDeleteDialogComponent],
-  entryComponents: [SliceDeleteDialogComponent]
+  entryComponents: [SliceDeleteDialogComponent],
 })
 export class AndroidSlicerSliceModule {}

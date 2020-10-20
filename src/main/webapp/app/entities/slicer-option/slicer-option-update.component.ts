@@ -12,7 +12,7 @@ import { AlertError } from 'app/shared/alert/alert-error.model';
 
 @Component({
   selector: 'jhi-slicer-option-update',
-  templateUrl: './slicer-option-update.component.html'
+  templateUrl: './slicer-option-update.component.html',
 })
 export class SlicerOptionUpdateComponent implements OnInit {
   isSaving = false;
@@ -22,7 +22,7 @@ export class SlicerOptionUpdateComponent implements OnInit {
     type: [null, [Validators.required]],
     key: [null, [Validators.required]],
     description: [],
-    isDefault: []
+    isDefault: [],
   });
 
   constructor(
@@ -45,7 +45,7 @@ export class SlicerOptionUpdateComponent implements OnInit {
       type: slicerOption.type,
       key: slicerOption.key,
       description: slicerOption.description,
-      isDefault: slicerOption.isDefault
+      isDefault: slicerOption.isDefault,
     });
   }
 
@@ -86,7 +86,7 @@ export class SlicerOptionUpdateComponent implements OnInit {
       type: this.editForm.get(['type'])!.value,
       key: this.editForm.get(['key'])!.value,
       description: this.editForm.get(['description'])!.value,
-      isDefault: this.editForm.get(['isDefault'])!.value
+      isDefault: this.editForm.get(['isDefault'])!.value,
     };
   }
 

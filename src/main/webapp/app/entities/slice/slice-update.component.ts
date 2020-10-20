@@ -12,7 +12,7 @@ import { AlertError } from 'app/shared/alert/alert-error.model';
 
 @Component({
   selector: 'jhi-slice-update',
-  templateUrl: './slice-update.component.html'
+  templateUrl: './slice-update.component.html',
 })
 export class SliceUpdateComponent implements OnInit {
   isSaving = false;
@@ -32,7 +32,7 @@ export class SliceUpdateComponent implements OnInit {
     controlDependenceOptions: [null, [Validators.required]],
     objectTracking: [],
     parameterTracking: [],
-    trackingToSlicingCriterion: []
+    trackingToSlicingCriterion: [],
   });
 
   constructor(
@@ -65,7 +65,7 @@ export class SliceUpdateComponent implements OnInit {
       controlDependenceOptions: slice.controlDependenceOptions,
       objectTracking: slice.objectTracking,
       parameterTracking: slice.parameterTracking,
-      trackingToSlicingCriterion: slice.trackingToSlicingCriterion
+      trackingToSlicingCriterion: slice.trackingToSlicingCriterion,
     });
   }
 
@@ -116,7 +116,7 @@ export class SliceUpdateComponent implements OnInit {
       controlDependenceOptions: this.editForm.get(['controlDependenceOptions'])!.value,
       objectTracking: this.editForm.get(['objectTracking'])!.value,
       parameterTracking: this.editForm.get(['parameterTracking'])!.value,
-      trackingToSlicingCriterion: this.editForm.get(['trackingToSlicingCriterion'])!.value
+      trackingToSlicingCriterion: this.editForm.get(['trackingToSlicingCriterion'])!.value,
     };
   }
 

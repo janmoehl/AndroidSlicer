@@ -14,7 +14,7 @@ describe('Service Tests', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule]
+        imports: [HttpClientTestingModule],
       });
       expectedResult = null;
       injector = getTestBed();
@@ -38,7 +38,7 @@ describe('Service Tests', () => {
       it('should create a SlicerOption', () => {
         const returnedFromService = Object.assign(
           {
-            id: 'ID'
+            id: 'ID',
           },
           elemDefault
         );
@@ -58,7 +58,7 @@ describe('Service Tests', () => {
             type: 'BBBBBB',
             key: 'BBBBBB',
             description: 'BBBBBB',
-            isDefault: true
+            isDefault: true,
           },
           elemDefault
         );
@@ -78,7 +78,7 @@ describe('Service Tests', () => {
             type: 'BBBBBB',
             key: 'BBBBBB',
             description: 'BBBBBB',
-            isDefault: true
+            isDefault: true,
           },
           elemDefault
         );

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { ActivatedRoute, ParamMap, Router, Data } from '@angular/router';
+import { Subscription, combineLatest } from 'rxjs';
 import { JhiEventManager } from 'ng-jhipster';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -13,7 +13,7 @@ import { SlicerSettingDeleteDialogComponent } from './slicer-setting-delete-dial
 
 @Component({
   selector: 'jhi-slicer-setting',
-  templateUrl: './slicer-setting.component.html'
+  templateUrl: './slicer-setting.component.html',
 })
 export class SlicerSettingComponent implements OnInit, OnDestroy {
   slicerSettings?: ISlicerSetting[];
@@ -33,30 +33,39 @@ export class SlicerSettingComponent implements OnInit, OnDestroy {
     protected modalService: NgbModal
   ) {}
 
-  loadPage(page?: number): void {
-    const pageToLoad: number = page || this.page;
+  loadPage(page?: number, dontNavigate?: boolean): void {
+    const pageToLoad: number = page || this.page || 1;
 
     this.slicerSettingService
       .query({
         page: pageToLoad - 1,
         size: this.itemsPerPage,
-        sort: this.sort()
+        sort: this.sort(),
       })
       .subscribe(
-        (res: HttpResponse<ISlicerSetting[]>) => this.onSuccess(res.body, res.headers, pageToLoad),
+        (res: HttpResponse<ISlicerSetting[]>) => this.onSuccess(res.body, res.headers, pageToLoad, !dontNavigate),
         () => this.onError()
       );
   }
 
   ngOnInit(): void {
-    this.activatedRoute.data.subscribe(data => {
-      this.page = data.pagingParams.page;
-      this.ascending = data.pagingParams.ascending;
-      this.predicate = data.pagingParams.predicate;
-      this.ngbPaginationPage = data.pagingParams.page;
-      this.loadPage();
-    });
+    this.handleNavigation();
     this.registerChangeInSlicerSettings();
+  }
+
+  protected handleNavigation(): void {
+    combineLatest(this.activatedRoute.data, this.activatedRoute.queryParamMap, (data: Data, params: ParamMap) => {
+      const page = params.get('page');
+      const pageNumber = page !== null ? +page : 1;
+      const sort = (params.get('sort') ?? data['defaultSort']).split(',');
+      const predicate = sort[0];
+      const ascending = sort[1] === 'asc';
+      if (pageNumber !== this.page || predicate !== this.predicate || ascending !== this.ascending) {
+        this.predicate = predicate;
+        this.ascending = ascending;
+        this.loadPage(pageNumber, true);
+      }
+    }).subscribe();
   }
 
   ngOnDestroy(): void {
@@ -87,20 +96,23 @@ export class SlicerSettingComponent implements OnInit, OnDestroy {
     return result;
   }
 
-  protected onSuccess(data: ISlicerSetting[] | null, headers: HttpHeaders, page: number): void {
+  protected onSuccess(data: ISlicerSetting[] | null, headers: HttpHeaders, page: number, navigate: boolean): void {
     this.totalItems = Number(headers.get('X-Total-Count'));
     this.page = page;
-    this.router.navigate(['/slicer-setting'], {
-      queryParams: {
-        page: this.page,
-        size: this.itemsPerPage,
-        sort: this.predicate + ',' + (this.ascending ? 'asc' : 'desc')
-      }
-    });
+    if (navigate) {
+      this.router.navigate(['/slicer-setting'], {
+        queryParams: {
+          page: this.page,
+          size: this.itemsPerPage,
+          sort: this.predicate + ',' + (this.ascending ? 'asc' : 'desc'),
+        },
+      });
+    }
     this.slicerSettings = data || [];
+    this.ngbPaginationPage = this.page;
   }
 
   protected onError(): void {
-    this.ngbPaginationPage = this.page;
+    this.ngbPaginationPage = this.page ?? 1;
   }
 }

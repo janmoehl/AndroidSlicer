@@ -11,6 +11,6 @@ import { slicerSettingRoute } from './slicer-setting.route';
 @NgModule({
   imports: [AndroidSlicerSharedModule, RouterModule.forChild(slicerSettingRoute)],
   declarations: [SlicerSettingComponent, SlicerSettingDetailComponent, SlicerSettingUpdateComponent, SlicerSettingDeleteDialogComponent],
-  entryComponents: [SlicerSettingDeleteDialogComponent]
+  entryComponents: [SlicerSettingDeleteDialogComponent],
 })
 export class AndroidSlicerSlicerSettingModule {}

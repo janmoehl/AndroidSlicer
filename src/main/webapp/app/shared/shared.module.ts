@@ -9,6 +9,6 @@ import { HasAnyAuthorityDirective } from './auth/has-any-authority.directive';
   imports: [AndroidSlicerSharedLibsModule],
   declarations: [AlertComponent, AlertErrorComponent, LoginModalComponent, HasAnyAuthorityDirective],
   entryComponents: [LoginModalComponent],
-  exports: [AndroidSlicerSharedLibsModule, AlertComponent, AlertErrorComponent, LoginModalComponent, HasAnyAuthorityDirective]
+  exports: [AndroidSlicerSharedLibsModule, AlertComponent, AlertErrorComponent, LoginModalComponent, HasAnyAuthorityDirective],
 })
 export class AndroidSlicerSharedModule {}

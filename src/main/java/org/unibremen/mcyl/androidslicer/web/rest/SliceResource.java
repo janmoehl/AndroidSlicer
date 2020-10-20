@@ -45,26 +45,26 @@ public class SliceResource {
     }
 
     /**
-     * {@code POST  /slice} : Create a new slice.
+     * {@code POST  /slices} : Create a new slice.
      *
      * @param slice the slice to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new slice, or with status {@code 400 (Bad Request)} if the slice has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/slice")
+    @PostMapping("/slices")
     public ResponseEntity<Slice> createSlice(@Valid @RequestBody Slice slice) throws URISyntaxException {
         log.debug("REST request to save Slice : {}", slice);
         if (slice.getId() != null) {
             throw new BadRequestAlertException("A new slice cannot already have an ID", ENTITY_NAME, "idexists");
         }
         Slice result = sliceService.save(slice);
-        return ResponseEntity.created(new URI("/api/slice/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+        return ResponseEntity.created(new URI("/api/slices/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId()))
             .body(result);
     }
 
     /**
-     * {@code PUT  /slice} : Updates an existing slice.
+     * {@code PUT  /slices} : Updates an existing slice.
      *
      * @param slice the slice to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated slice,
@@ -72,7 +72,7 @@ public class SliceResource {
      * or with status {@code 500 (Internal Server Error)} if the slice couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/slice")
+    @PutMapping("/slices")
     public ResponseEntity<Slice> updateSlice(@Valid @RequestBody Slice slice) throws URISyntaxException {
         log.debug("REST request to update Slice : {}", slice);
         if (slice.getId() == null) {
@@ -80,31 +80,31 @@ public class SliceResource {
         }
         Slice result = sliceService.save(slice);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, slice.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, slice.getId()))
             .body(result);
     }
 
     /**
-     * {@code GET  /slice} : get all the slice.
+     * {@code GET  /slices} : get all the slices.
      *
      * @param pageable the pagination information.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of slice in body.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of slices in body.
      */
-    @GetMapping("/slice")
-    public ResponseEntity<List<Slice>> getAllSlice(Pageable pageable) {
-        log.debug("REST request to get a page of Slice");
+    @GetMapping("/slices")
+    public ResponseEntity<List<Slice>> getAllSlices(Pageable pageable) {
+        log.debug("REST request to get a page of Slices");
         Page<Slice> page = sliceService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
     /**
-     * {@code GET  /slice/:id} : get the "id" slice.
+     * {@code GET  /slices/:id} : get the "id" slice.
      *
      * @param id the id of the slice to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the slice, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/slice/{id}")
+    @GetMapping("/slices/{id}")
     public ResponseEntity<Slice> getSlice(@PathVariable String id) {
         log.debug("REST request to get Slice : {}", id);
         Optional<Slice> slice = sliceService.findOne(id);
@@ -112,12 +112,12 @@ public class SliceResource {
     }
 
     /**
-     * {@code DELETE  /slice/:id} : delete the "id" slice.
+     * {@code DELETE  /slices/:id} : delete the "id" slice.
      *
      * @param id the id of the slice to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/slice/{id}")
+    @DeleteMapping("/slices/{id}")
     public ResponseEntity<Void> deleteSlice(@PathVariable String id) {
         log.debug("REST request to delete Slice : {}", id);
         sliceService.delete(id);

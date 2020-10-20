@@ -37,15 +37,16 @@ public class SliceService {
     }
 
     /**
-     * Get all the slice.
+     * Get all the slices.
      *
      * @param pageable the pagination information.
      * @return the list of entities.
      */
     public Page<Slice> findAll(Pageable pageable) {
-        log.debug("Request to get all Slice");
+        log.debug("Request to get all Slices");
         return sliceRepository.findAll(pageable);
     }
+
 
     /**
      * Get one slice by id.

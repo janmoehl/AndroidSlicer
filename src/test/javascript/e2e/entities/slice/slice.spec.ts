@@ -20,11 +20,11 @@ describe('Slice e2e test', () => {
     await browser.wait(ec.visibilityOf(navBarPage.entityMenu), 5000);
   });
 
-  it('should load Slice', async () => {
+  it('should load Slices', async () => {
     await navBarPage.goToEntity('slice');
     sliceComponentsPage = new SliceComponentsPage();
     await browser.wait(ec.visibilityOf(sliceComponentsPage.title), 5000);
-    expect(await sliceComponentsPage.getTitle()).to.eq('Slice');
+    expect(await sliceComponentsPage.getTitle()).to.eq('Slices');
     await browser.wait(ec.or(ec.visibilityOf(sliceComponentsPage.entities), ec.visibilityOf(sliceComponentsPage.noResult)), 1000);
   });
 
@@ -35,7 +35,7 @@ describe('Slice e2e test', () => {
     await sliceUpdatePage.cancel();
   });
 
-  it('should create and save Slice', async () => {
+  it('should create and save Slices', async () => {
     const nbButtonsBeforeCreate = await sliceComponentsPage.countDeleteButtons();
 
     await sliceComponentsPage.clickOnCreateButton();
@@ -50,7 +50,7 @@ describe('Slice e2e test', () => {
       sliceUpdatePage.setThreadIdInput('threadId'),
       sliceUpdatePage.reflectionOptionsSelectLastOption(),
       sliceUpdatePage.dataDependenceOptionsSelectLastOption(),
-      sliceUpdatePage.controlDependenceOptionsSelectLastOption()
+      sliceUpdatePage.controlDependenceOptionsSelectLastOption(),
     ]);
 
     expect(await sliceUpdatePage.getAndroidVersionInput()).to.eq('5', 'Expected androidVersion value to be equals to 5');

@@ -6,7 +6,7 @@ import { ISlice } from 'app/shared/model/slice.model';
 import { SliceService } from './slice.service';
 
 @Component({
-  templateUrl: './slice-delete-dialog.component.html'
+  templateUrl: './slice-delete-dialog.component.html',
 })
 export class SliceDeleteDialogComponent {
   slice?: ISlice;

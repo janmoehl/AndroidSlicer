@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { ActivatedRoute, Data } from '@angular/router';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
 
 import { AndroidSlicerTestModule } from '../../../test.module';
 import { SliceComponent } from 'app/entities/slice/slice.component';
@@ -22,19 +22,19 @@ describe('Component Tests', () => {
           {
             provide: ActivatedRoute,
             useValue: {
-              data: {
-                subscribe: (fn: (value: Data) => void) =>
-                  fn({
-                    pagingParams: {
-                      predicate: 'id',
-                      reverse: false,
-                      page: 0
-                    }
-                  })
-              }
-            }
-          }
-        ]
+              data: of({
+                defaultSort: 'id,asc',
+              }),
+              queryParamMap: of(
+                convertToParamMap({
+                  page: '1',
+                  size: '1',
+                  sort: 'id,desc',
+                })
+              ),
+            },
+          },
+        ],
       })
         .overrideTemplate(SliceComponent, '')
         .compileComponents();
@@ -51,7 +51,7 @@ describe('Component Tests', () => {
         of(
           new HttpResponse({
             body: [new Slice('123')],
-            headers
+            headers,
           })
         )
       );
@@ -61,7 +61,7 @@ describe('Component Tests', () => {
 
       // THEN
       expect(service.query).toHaveBeenCalled();
-      expect(comp.slice && comp.slice[0]).toEqual(jasmine.objectContaining({ id: '123' }));
+      expect(comp.slices && comp.slices[0]).toEqual(jasmine.objectContaining({ id: '123' }));
     });
 
     it('should load a page', () => {
@@ -71,7 +71,7 @@ describe('Component Tests', () => {
         of(
           new HttpResponse({
             body: [new Slice('123')],
-            headers
+            headers,
           })
         )
       );
@@ -81,7 +81,7 @@ describe('Component Tests', () => {
 
       // THEN
       expect(service.query).toHaveBeenCalled();
-      expect(comp.slice && comp.slice[0]).toEqual(jasmine.objectContaining({ id: '123' }));
+      expect(comp.slices && comp.slices[0]).toEqual(jasmine.objectContaining({ id: '123' }));
     });
 
     it('should calculate the sort attribute for an id', () => {

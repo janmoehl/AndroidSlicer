@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import javax.validation.constraints.*;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 import org.unibremen.mcyl.androidslicer.domain.enumeration.SlicerOptionType;
 
@@ -40,7 +39,7 @@ public class SlicerOption implements Serializable {
     @Field("is_default")
     private Boolean isDefault;
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
+    // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {
         return id;
     }
@@ -100,7 +99,7 @@ public class SlicerOption implements Serializable {
     public void setIsDefault(Boolean isDefault) {
         this.isDefault = isDefault;
     }
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
     public boolean equals(Object o) {
@@ -118,6 +117,7 @@ public class SlicerOption implements Serializable {
         return 31;
     }
 
+    // prettier-ignore
     @Override
     public String toString() {
         return "SlicerOption{" +

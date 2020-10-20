@@ -1,5 +1,7 @@
 export const enum ControlDependenceOptions {
-  FULL,
-  NO_EXCEPTIONAL_EDGES,
-  NONE
+  FULL = 'FULL',
+
+  NO_EXCEPTIONAL_EDGES = 'NO_EXCEPTIONAL_EDGES',
+
+  NONE = 'NONE',
 }

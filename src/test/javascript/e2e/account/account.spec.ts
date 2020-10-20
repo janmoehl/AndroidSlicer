@@ -7,6 +7,8 @@ const expect = chai.expect;
 describe('account', () => {
   let navBarPage: NavBarPage;
   let signInPage: SignInPage;
+  const username = process.env.E2E_USERNAME || 'admin';
+  const password = process.env.E2E_PASSWORD || 'admin';
 
   before(async () => {
     await browser.get('/');
@@ -18,7 +20,7 @@ describe('account', () => {
     const value1 = await element(by.css('h1')).getText();
     expect(value1).to.eq(expect1);
     signInPage = await navBarPage.getSignInPage();
-    await signInPage.autoSignInUsing('admin', 'foo');
+    await signInPage.autoSignInUsing(username, 'foo');
 
     const expect2 = 'Failed to sign in! Please check your credentials and try again.';
     const value2 = await element(by.css('.alert-danger')).getText();
@@ -32,7 +34,7 @@ describe('account', () => {
     const expect1 = 'Login';
     const value1 = await element(by.className('username-label')).getText();
     expect(value1).to.eq(expect1);
-    await signInPage.autoSignInUsing('admin', 'admin');
+    await signInPage.autoSignInUsing(username, password);
 
     const expect2 = 'You are logged in as user "admin".';
     await browser.wait(ec.visibilityOf(element(by.id('home-logged-message'))));

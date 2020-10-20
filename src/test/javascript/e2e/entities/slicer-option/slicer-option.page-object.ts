@@ -47,10 +47,7 @@ export class SlicerOptionUpdatePage {
   }
 
   async typeSelectLastOption(): Promise<void> {
-    await this.typeSelect
-      .all(by.tagName('option'))
-      .last()
-      .click();
+    await this.typeSelect.all(by.tagName('option')).last().click();
   }
 
   async setKeyInput(key: string): Promise<void> {

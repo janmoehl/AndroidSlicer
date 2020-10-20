@@ -6,7 +6,7 @@ import { ISlice } from 'app/shared/model/slice.model';
 
 @Component({
   selector: 'jhi-slice-detail',
-  templateUrl: './slice-detail.component.html'
+  templateUrl: './slice-detail.component.html',
 })
 export class SliceDetailComponent implements OnInit {
   slice: ISlice | null = null;
@@ -21,7 +21,7 @@ export class SliceDetailComponent implements OnInit {
     return this.dataUtils.byteSize(base64String);
   }
 
-  openFile(contentType: string, base64String: string): void {
+  openFile(contentType = '', base64String: string): void {
     this.dataUtils.openFile(contentType, base64String);
   }
 

@@ -24,7 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Integration tests for the {@link SlicerSettingResource} REST controller.
  */
 @SpringBootTest(classes = AndroidSlicerApp.class)
-
 @AutoConfigureMockMvc
 @WithMockUser
 public class SlicerSettingResourceIT {
@@ -77,7 +76,6 @@ public class SlicerSettingResourceIT {
     @Test
     public void createSlicerSetting() throws Exception {
         int databaseSizeBeforeCreate = slicerSettingRepository.findAll().size();
-
         // Create the SlicerSetting
         restSlicerSettingMockMvc.perform(post("/api/slicer-settings")
             .contentType(MediaType.APPLICATION_JSON)
@@ -119,6 +117,7 @@ public class SlicerSettingResourceIT {
 
         // Create the SlicerSetting, which fails.
 
+
         restSlicerSettingMockMvc.perform(post("/api/slicer-settings")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(slicerSetting)))
@@ -135,6 +134,7 @@ public class SlicerSettingResourceIT {
         slicerSetting.setValue(null);
 
         // Create the SlicerSetting, which fails.
+
 
         restSlicerSettingMockMvc.perform(post("/api/slicer-settings")
             .contentType(MediaType.APPLICATION_JSON)
@@ -172,7 +172,6 @@ public class SlicerSettingResourceIT {
             .andExpect(jsonPath("$.key").value(DEFAULT_KEY))
             .andExpect(jsonPath("$.value").value(DEFAULT_VALUE));
     }
-
     @Test
     public void getNonExistingSlicerSetting() throws Exception {
         // Get the slicerSetting
@@ -209,8 +208,6 @@ public class SlicerSettingResourceIT {
     @Test
     public void updateNonExistingSlicerSetting() throws Exception {
         int databaseSizeBeforeUpdate = slicerSettingRepository.findAll().size();
-
-        // Create the SlicerSetting
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restSlicerSettingMockMvc.perform(put("/api/slicer-settings")

@@ -62,13 +62,13 @@ class SliceGatlingTest extends Simulation {
         .check(status.is(200)))
         .pause(10)
         .repeat(2) {
-            exec(http("Get all slice")
-            .get("/api/slice")
+            exec(http("Get all slices")
+            .get("/api/slices")
             .headers(headers_http_authenticated)
             .check(status.is(200)))
             .pause(10 seconds, 20 seconds)
             .exec(http("Create new slice")
-            .post("/api/slice")
+            .post("/api/slices")
             .headers(headers_http_authenticated)
             .body(StringBody("""{
                 "id":null

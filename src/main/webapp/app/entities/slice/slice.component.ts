@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { ActivatedRoute, ParamMap, Router, Data } from '@angular/router';
+import { Subscription, combineLatest } from 'rxjs';
 import { JhiEventManager, JhiDataUtils } from 'ng-jhipster';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -13,10 +13,10 @@ import { SliceDeleteDialogComponent } from './slice-delete-dialog.component';
 
 @Component({
   selector: 'jhi-slice',
-  templateUrl: './slice.component.html'
+  templateUrl: './slice.component.html',
 })
 export class SliceComponent implements OnInit, OnDestroy {
-  slice?: ISlice[];
+  slices?: ISlice[];
   eventSubscriber?: Subscription;
   totalItems = 0;
   itemsPerPage = ITEMS_PER_PAGE;
@@ -34,30 +34,39 @@ export class SliceComponent implements OnInit, OnDestroy {
     protected modalService: NgbModal
   ) {}
 
-  loadPage(page?: number): void {
-    const pageToLoad: number = page || this.page;
+  loadPage(page?: number, dontNavigate?: boolean): void {
+    const pageToLoad: number = page || this.page || 1;
 
     this.sliceService
       .query({
         page: pageToLoad - 1,
         size: this.itemsPerPage,
-        sort: this.sort()
+        sort: this.sort(),
       })
       .subscribe(
-        (res: HttpResponse<ISlice[]>) => this.onSuccess(res.body, res.headers, pageToLoad),
+        (res: HttpResponse<ISlice[]>) => this.onSuccess(res.body, res.headers, pageToLoad, !dontNavigate),
         () => this.onError()
       );
   }
 
   ngOnInit(): void {
-    this.activatedRoute.data.subscribe(data => {
-      this.page = data.pagingParams.page;
-      this.ascending = data.pagingParams.ascending;
-      this.predicate = data.pagingParams.predicate;
-      this.ngbPaginationPage = data.pagingParams.page;
-      this.loadPage();
-    });
-    this.registerChangeInSlice();
+    this.handleNavigation();
+    this.registerChangeInSlices();
+  }
+
+  protected handleNavigation(): void {
+    combineLatest(this.activatedRoute.data, this.activatedRoute.queryParamMap, (data: Data, params: ParamMap) => {
+      const page = params.get('page');
+      const pageNumber = page !== null ? +page : 1;
+      const sort = (params.get('sort') ?? data['defaultSort']).split(',');
+      const predicate = sort[0];
+      const ascending = sort[1] === 'asc';
+      if (pageNumber !== this.page || predicate !== this.predicate || ascending !== this.ascending) {
+        this.predicate = predicate;
+        this.ascending = ascending;
+        this.loadPage(pageNumber, true);
+      }
+    }).subscribe();
   }
 
   ngOnDestroy(): void {
@@ -75,11 +84,11 @@ export class SliceComponent implements OnInit, OnDestroy {
     return this.dataUtils.byteSize(base64String);
   }
 
-  openFile(contentType: string, base64String: string): void {
+  openFile(contentType = '', base64String: string): void {
     return this.dataUtils.openFile(contentType, base64String);
   }
 
-  registerChangeInSlice(): void {
+  registerChangeInSlices(): void {
     this.eventSubscriber = this.eventManager.subscribe('sliceListModification', () => this.loadPage());
   }
 
@@ -96,20 +105,23 @@ export class SliceComponent implements OnInit, OnDestroy {
     return result;
   }
 
-  protected onSuccess(data: ISlice[] | null, headers: HttpHeaders, page: number): void {
+  protected onSuccess(data: ISlice[] | null, headers: HttpHeaders, page: number, navigate: boolean): void {
     this.totalItems = Number(headers.get('X-Total-Count'));
     this.page = page;
-    this.router.navigate(['/slice'], {
-      queryParams: {
-        page: this.page,
-        size: this.itemsPerPage,
-        sort: this.predicate + ',' + (this.ascending ? 'asc' : 'desc')
-      }
-    });
-    this.slice = data || [];
+    if (navigate) {
+      this.router.navigate(['/slice'], {
+        queryParams: {
+          page: this.page,
+          size: this.itemsPerPage,
+          sort: this.predicate + ',' + (this.ascending ? 'asc' : 'desc'),
+        },
+      });
+    }
+    this.slices = data || [];
+    this.ngbPaginationPage = this.page;
   }
 
   protected onError(): void {
-    this.ngbPaginationPage = this.page;
+    this.ngbPaginationPage = this.page ?? 1;
   }
 }

@@ -1,6 +1,6 @@
 <div>
     <h2 id="page-heading">
-        <span>Slice</span>
+        <span>Slices</span>
 
         <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-slice" [routerLink]="['/slice/new']">
             <fa-icon icon="plus"></fa-icon>
@@ -14,11 +14,11 @@
 
     <jhi-alert></jhi-alert>
 
-    <div class="alert alert-warning" id="no-result" *ngIf="slice?.length === 0">
-        <span>No slice found</span>
+    <div class="alert alert-warning" id="no-result" *ngIf="slices?.length === 0">
+        <span>No slices found</span>
     </div>
 
-    <div class="table-responsive" id="entities" *ngIf="slice?.length > 0">
+    <div class="table-responsive" id="entities" *ngIf="slices && slices.length > 0">
         <table class="table table-striped" aria-describedby="page-heading">
             <thead>
                 <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="loadPage.bind(this)">
@@ -41,7 +41,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let slice of slice ;trackBy: trackId">
+                <tr *ngFor="let slice of slices ;trackBy: trackId">
                     <td><a [routerLink]="['/slice', slice.id, 'view']">{{ slice.id }}</a></td>
                     <td>{{ slice.androidVersion }}</td>
                     <td>{{ slice.androidClassName }}</td>
@@ -85,7 +85,7 @@
         </table>
     </div>
 
-    <div *ngIf="slice?.length > 0">
+    <div *ngIf="slices && slices.length > 0">
         <div class="row justify-content-center">
             <jhi-item-count [page]="page" [total]="totalItems" [itemsPerPage]="itemsPerPage"></jhi-item-count>
         </div>

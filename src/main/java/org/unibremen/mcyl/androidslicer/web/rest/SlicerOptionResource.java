@@ -60,7 +60,7 @@ public class SlicerOptionResource {
         }
         SlicerOption result = slicerOptionRepository.save(slicerOption);
         return ResponseEntity.created(new URI("/api/slicer-options/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId()))
             .body(result);
     }
 
@@ -81,7 +81,7 @@ public class SlicerOptionResource {
         }
         SlicerOption result = slicerOptionRepository.save(slicerOption);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, slicerOption.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, slicerOption.getId()))
             .body(result);
     }
 

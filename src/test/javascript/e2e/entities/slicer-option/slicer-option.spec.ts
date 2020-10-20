@@ -46,7 +46,7 @@ describe('SlicerOption e2e test', () => {
     await promise.all([
       slicerOptionUpdatePage.typeSelectLastOption(),
       slicerOptionUpdatePage.setKeyInput('key'),
-      slicerOptionUpdatePage.setDescriptionInput('description')
+      slicerOptionUpdatePage.setDescriptionInput('description'),
     ]);
 
     expect(await slicerOptionUpdatePage.getKeyInput()).to.eq('key', 'Expected Key value to be equals to key');

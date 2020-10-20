@@ -117,10 +117,7 @@ export class SliceUpdatePage {
   }
 
   async reflectionOptionsSelectLastOption(): Promise<void> {
-    await this.reflectionOptionsSelect
-      .all(by.tagName('option'))
-      .last()
-      .click();
+    await this.reflectionOptionsSelect.all(by.tagName('option')).last().click();
   }
 
   async setDataDependenceOptionsSelect(dataDependenceOptions: string): Promise<void> {
@@ -132,10 +129,7 @@ export class SliceUpdatePage {
   }
 
   async dataDependenceOptionsSelectLastOption(): Promise<void> {
-    await this.dataDependenceOptionsSelect
-      .all(by.tagName('option'))
-      .last()
-      .click();
+    await this.dataDependenceOptionsSelect.all(by.tagName('option')).last().click();
   }
 
   async setControlDependenceOptionsSelect(controlDependenceOptions: string): Promise<void> {
@@ -147,10 +141,7 @@ export class SliceUpdatePage {
   }
 
   async controlDependenceOptionsSelectLastOption(): Promise<void> {
-    await this.controlDependenceOptionsSelect
-      .all(by.tagName('option'))
-      .last()
-      .click();
+    await this.controlDependenceOptionsSelect.all(by.tagName('option')).last().click();
   }
 
   getObjectTrackingInput(): ElementFinder {

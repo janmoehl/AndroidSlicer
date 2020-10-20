@@ -26,7 +26,6 @@ import org.unibremen.mcyl.androidslicer.domain.enumeration.SlicerOptionType;
  * Integration tests for the {@link SlicerOptionResource} REST controller.
  */
 @SpringBootTest(classes = AndroidSlicerApp.class)
-
 @AutoConfigureMockMvc
 @WithMockUser
 public class SlicerOptionResourceIT {
@@ -89,7 +88,6 @@ public class SlicerOptionResourceIT {
     @Test
     public void createSlicerOption() throws Exception {
         int databaseSizeBeforeCreate = slicerOptionRepository.findAll().size();
-
         // Create the SlicerOption
         restSlicerOptionMockMvc.perform(post("/api/slicer-options")
             .contentType(MediaType.APPLICATION_JSON)
@@ -133,6 +131,7 @@ public class SlicerOptionResourceIT {
 
         // Create the SlicerOption, which fails.
 
+
         restSlicerOptionMockMvc.perform(post("/api/slicer-options")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(slicerOption)))
@@ -149,6 +148,7 @@ public class SlicerOptionResourceIT {
         slicerOption.setKey(null);
 
         // Create the SlicerOption, which fails.
+
 
         restSlicerOptionMockMvc.perform(post("/api/slicer-options")
             .contentType(MediaType.APPLICATION_JSON)
@@ -190,7 +190,6 @@ public class SlicerOptionResourceIT {
             .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION.toString()))
             .andExpect(jsonPath("$.isDefault").value(DEFAULT_IS_DEFAULT.booleanValue()));
     }
-
     @Test
     public void getNonExistingSlicerOption() throws Exception {
         // Get the slicerOption
@@ -231,8 +230,6 @@ public class SlicerOptionResourceIT {
     @Test
     public void updateNonExistingSlicerOption() throws Exception {
         int databaseSizeBeforeUpdate = slicerOptionRepository.findAll().size();
-
-        // Create the SlicerOption
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restSlicerOptionMockMvc.perform(put("/api/slicer-options")

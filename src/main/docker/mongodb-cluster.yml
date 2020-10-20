@@ -1,16 +1,16 @@
 version: '2'
 services:
   androidslicer-mongodb:
-    image: mongo:4.2.3
+    image: mongo:4.2.7
     ports:
       - '27017:27017'
-    command: mongos --configdb androidslicer-mongodb-config
+    command: mongos --configdb csvr/androidslicer-mongodb-config --bind_ip 0.0.0.0
   androidslicer-mongodb-node:
     build:
       context: .
       dockerfile: mongodb/MongoDB.Dockerfile
-    command: mongod --replSet rs1 --noprealloc --smallfiles
+    command: mongod --shardsvr --replSet rs1
   androidslicer-mongodb-config:
-    image: mongo:4.2.3
+    image: mongo:4.2.7
     container_name: androidslicer-mongodb-config
-    command: mongod --noprealloc --smallfiles --configsvr --dbpath /data/db
+    command: mongod --configsvr --dbpath /data/db --replSet csvr

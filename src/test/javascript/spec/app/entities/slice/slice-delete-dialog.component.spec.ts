@@ -20,7 +20,7 @@ describe('Component Tests', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [AndroidSlicerTestModule],
-        declarations: [SliceDeleteDialogComponent]
+        declarations: [SliceDeleteDialogComponent],
       })
         .overrideTemplate(SliceDeleteDialogComponent, '')
         .compileComponents();

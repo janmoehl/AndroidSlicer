@@ -18,7 +18,7 @@ describe('Component Tests', () => {
       TestBed.configureTestingModule({
         imports: [AndroidSlicerTestModule],
         declarations: [SliceUpdateComponent],
-        providers: [FormBuilder]
+        providers: [FormBuilder],
       })
         .overrideTemplate(SliceUpdateComponent, '')
         .compileComponents();

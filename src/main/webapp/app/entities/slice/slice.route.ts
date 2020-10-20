@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Resolve, ActivatedRouteSnapshot, Routes, Router } from '@angular/router';
-import { JhiResolvePagingParams } from 'ng-jhipster';
 import { Observable, of, EMPTY } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 
+import { Authority } from 'app/shared/constants/authority.constants';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access-service';
 import { ISlice, Slice } from 'app/shared/model/slice.model';
 import { SliceService } from './slice.service';
@@ -38,50 +38,47 @@ export const sliceRoute: Routes = [
   {
     path: '',
     component: SliceComponent,
-    resolve: {
-      pagingParams: JhiResolvePagingParams
-    },
     data: {
-      authorities: ['ROLE_USER'],
+      authorities: [Authority.USER],
       defaultSort: 'id,asc',
-      pageTitle: 'Slice'
+      pageTitle: 'Slices',
     },
-    canActivate: [UserRouteAccessService]
+    canActivate: [UserRouteAccessService],
   },
   {
     path: ':id/view',
     component: SliceDetailComponent,
     resolve: {
-      slice: SliceResolve
+      slice: SliceResolve,
     },
     data: {
-      authorities: ['ROLE_USER'],
-      pageTitle: 'Slice'
+      authorities: [Authority.USER],
+      pageTitle: 'Slices',
     },
-    canActivate: [UserRouteAccessService]
+    canActivate: [UserRouteAccessService],
   },
   {
     path: 'new',
     component: SliceUpdateComponent,
     resolve: {
-      slice: SliceResolve
+      slice: SliceResolve,
     },
     data: {
-      authorities: ['ROLE_USER'],
-      pageTitle: 'Slice'
+      authorities: [Authority.USER],
+      pageTitle: 'Slices',
     },
-    canActivate: [UserRouteAccessService]
+    canActivate: [UserRouteAccessService],
   },
   {
     path: ':id/edit',
     component: SliceUpdateComponent,
     resolve: {
-      slice: SliceResolve
+      slice: SliceResolve,
     },
     data: {
-      authorities: ['ROLE_USER'],
-      pageTitle: 'Slice'
+      authorities: [Authority.USER],
+      pageTitle: 'Slices',
     },
-    canActivate: [UserRouteAccessService]
-  }
+    canActivate: [UserRouteAccessService],
+  },
 ];

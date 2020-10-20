@@ -16,7 +16,7 @@ describe('Service Tests', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule]
+        imports: [HttpClientTestingModule],
       });
       expectedResult = null;
       injector = getTestBed();
@@ -56,7 +56,7 @@ describe('Service Tests', () => {
       it('should create a Slice', () => {
         const returnedFromService = Object.assign(
           {
-            id: 'ID'
+            id: 'ID',
           },
           elemDefault
         );
@@ -86,7 +86,7 @@ describe('Service Tests', () => {
             controlDependenceOptions: 'BBBBBB',
             objectTracking: true,
             parameterTracking: true,
-            trackingToSlicingCriterion: true
+            trackingToSlicingCriterion: true,
           },
           elemDefault
         );
@@ -116,7 +116,7 @@ describe('Service Tests', () => {
             controlDependenceOptions: 'BBBBBB',
             objectTracking: true,
             parameterTracking: true,
-            trackingToSlicingCriterion: true
+            trackingToSlicingCriterion: true,
           },
           elemDefault
         );

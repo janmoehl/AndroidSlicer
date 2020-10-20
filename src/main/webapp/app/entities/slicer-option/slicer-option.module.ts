@@ -11,6 +11,6 @@ import { slicerOptionRoute } from './slicer-option.route';
 @NgModule({
   imports: [AndroidSlicerSharedModule, RouterModule.forChild(slicerOptionRoute)],
   declarations: [SlicerOptionComponent, SlicerOptionDetailComponent, SlicerOptionUpdateComponent, SlicerOptionDeleteDialogComponent],
-  entryComponents: [SlicerOptionDeleteDialogComponent]
+  entryComponents: [SlicerOptionDeleteDialogComponent],
 })
 export class AndroidSlicerSlicerOptionModule {}

@@ -6,7 +6,7 @@ import { ISlicerSetting } from 'app/shared/model/slicer-setting.model';
 import { SlicerSettingService } from './slicer-setting.service';
 
 @Component({
-  templateUrl: './slicer-setting-delete-dialog.component.html'
+  templateUrl: './slicer-setting-delete-dialog.component.html',
 })
 export class SlicerSettingDeleteDialogComponent {
   slicerSetting?: ISlicerSetting;

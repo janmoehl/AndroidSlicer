@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { ActivatedRoute, Data } from '@angular/router';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
 
 import { AndroidSlicerTestModule } from '../../../test.module';
 import { SlicerOptionComponent } from 'app/entities/slicer-option/slicer-option.component';
@@ -22,19 +22,19 @@ describe('Component Tests', () => {
           {
             provide: ActivatedRoute,
             useValue: {
-              data: {
-                subscribe: (fn: (value: Data) => void) =>
-                  fn({
-                    pagingParams: {
-                      predicate: 'id',
-                      reverse: false,
-                      page: 0
-                    }
-                  })
-              }
-            }
-          }
-        ]
+              data: of({
+                defaultSort: 'id,asc',
+              }),
+              queryParamMap: of(
+                convertToParamMap({
+                  page: '1',
+                  size: '1',
+                  sort: 'id,desc',
+                })
+              ),
+            },
+          },
+        ],
       })
         .overrideTemplate(SlicerOptionComponent, '')
         .compileComponents();
@@ -51,7 +51,7 @@ describe('Component Tests', () => {
         of(
           new HttpResponse({
             body: [new SlicerOption('123')],
-            headers
+            headers,
           })
         )
       );
@@ -71,7 +71,7 @@ describe('Component Tests', () => {
         of(
           new HttpResponse({
             body: [new SlicerOption('123')],
-            headers
+            headers,
           })
         )
       );
